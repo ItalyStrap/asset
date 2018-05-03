@@ -10,10 +10,10 @@
  *
  * @since 2.0.0
  *
- * @package LocalStrategy\Core
+ * @package ItalyStrap\Asset
  */
 
-namespace LocalStrategy\Asset;
+namespace ItalyStrap\Asset;
 
 if ( ! defined( 'ABSPATH' ) or ! ABSPATH ) {
 	die();

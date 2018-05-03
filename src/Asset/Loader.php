@@ -10,10 +10,10 @@
  * @link www.italystrap.com
  * @since 4.0.0
  *
- * @package Italystrap
+ * @package ItalyStrap\Asset
  */
 
-namespace LocalStrategy\Asset;
+namespace ItalyStrap\Asset;
 
 /**
  * Asset_Loader
