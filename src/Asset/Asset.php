@@ -8,7 +8,7 @@
  * @link        http://hellofromtonya.github.io/Fulcrum/
  * @license     GPL-2.0+
  *
- * @since 2.0.0
+ * @version 0.0.1-alpha
  *
  * @package ItalyStrap\Asset
  */
@@ -72,8 +72,6 @@ abstract class Asset implements Asset_Interface {
 	/**
 	 * Checks if an asset has been enqueued
 	 *
-	 * @since 1.0.0
-	 *
 	 * @return bool
 	 */
 	public function is_enqueued() {
@@ -82,8 +80,6 @@ abstract class Asset implements Asset_Interface {
 
 	/**
 	 * Register each of the asset (enqueues it)
-	 *
-	 * @since 2.0.0
 	 *
 	 * @return null
 	 */
@@ -119,8 +115,6 @@ abstract class Asset implements Asset_Interface {
 	/**
 	 * Register each of the asset (enqueues it)
 	 *
-	 * @since 2.0.0
-	 *
 	 * @return null
 	 */
 	public function register() {}
@@ -128,16 +122,12 @@ abstract class Asset implements Asset_Interface {
 	/**
 	 * De-register each of the asset
 	 *
-	 * @since 1.0.0
-	 *
 	 * @return null
 	 */
 	// abstract public function deregister( $handle );
 
 	/**
 	 * Loading asset conditionally.
-	 *
-	 * @since 2.0.0
 	 *
 	 * @return bool
 	 */

@@ -8,7 +8,7 @@
  * @license     GPL-2.0+
  *
  * @link www.italystrap.com
- * @since 4.0.0
+ * @version 0.0.1-alpha
  *
  * @package ItalyStrap\Asset
  */
