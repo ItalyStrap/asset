@@ -30,11 +30,4 @@ interface Asset_Interface {
 	 * @return null
 	 */
 	public function register();
-
-	/**
-	 * De-register each of the asset
-	 *
-	 * @return null
-	 */
-	// public function deregister( $handle );
 }

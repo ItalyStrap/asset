@@ -20,7 +20,8 @@ if ( ! defined( 'ABSPATH' ) or ! ABSPATH ) {
 }
 
 use ReflectionClass;
-use ItalyStrap\Config\Config;
+use InvalidArgumentException;
+use ItalyStrap\Config\Config_Interface;
 
 /**
  * Class description
@@ -29,25 +30,44 @@ use ItalyStrap\Config\Config;
 abstract class Asset implements Asset_Interface {
 
 	/**
-	 * Configuration array
+	 * Configuration for the class
 	 *
-	 * @var array
+	 * @var Config_Interface
 	 */
-	private $config = array();
+	protected $config;
+
+	/**
+	 *
+	 * @var string
+	 */
+	protected $handle = '';
 
 	/**
 	 * The Class name without namespace
 	 *
 	 * @var string
 	 */
-	private $class_name = '';
+	protected $class_name = '';
 
 	/**
-	 * Init the constructor
+	 * Get the default structure.
 	 *
-	 * @param array $config Configuration array.
+	 * @return array
 	 */
-	function __construct( Config $config ) {
+	abstract protected function get_default_structure();
+
+	abstract protected function deregister( $handle );
+
+	abstract protected function pre_register( array $config = [] );
+
+	abstract protected function enqueue( array $config = [] );
+
+	/**
+	 * Asset constructor.
+	 * @param Config_Interface $config
+	 * @throws \ReflectionException
+	 */
+	public function __construct( Config_Interface $config ) {
 
 		/**
 		 * Credits:
@@ -58,15 +78,54 @@ abstract class Asset implements Asset_Interface {
 		$class_name = new ReflectionClass( $this );
 		$this->class_name =  $class_name->getShortName();
 
-		/**
-		 * With this hook you can filter the enqueue script and style config
-		 * Filters name:
-		 * 'italystrap_config_enqueue_style'
-		 * 'italystrap_config_enqueue_script'
-		 *
-		 * @var array
-		 */
-		$this->config = apply_filters( 'italystrap_config_enqueue_' . strtolower( $this->class_name ) , $config->all() );
+		$this->config = $config;
+		$this->handle = (string) $config->get( 'handle' );
+
+		$this->validate_asset();
+	}
+
+	/**
+	 * Register each of the asset (enqueues it)
+	 *
+	 * @return null
+	 */
+	public function register() {
+
+		$config = array_merge( $this->get_default_structure(), $this->config->all() );
+
+		if ( isset( $config['deregister'] ) ) {
+			$this->deregister($this->handle);
+		}
+
+		if ( isset( $config['pre_register'] ) ) {
+			$this->pre_register( $config );
+			return; // <- This will continue and it wont load the localized object.
+		}
+
+		if ( $this->is_load_on( $config ) ) {
+			$this->enqueue( $config );
+		}
+
+		if ( empty( $config['localize'] ) ) {
+			return;
+		}
+
+		if ( is_array( $config['localize'] ) ) {
+			$this->localize_script( $config );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Optional. Status of the script to check. Default 'enqueued'.
+	 * Accepts 'enqueued', 'registered', 'queue', 'to_do', and 'done'.
+	 *
+	 * @return bool
+	 */
+	private function _is( $list = 'enqueued' ) {
+		$func = sprintf( 'wp_%s_is', $this->class_name );
+		return (bool) $func( $this->handle, $list );
 	}
 
 	/**
@@ -75,56 +134,17 @@ abstract class Asset implements Asset_Interface {
 	 * @return bool
 	 */
 	public function is_enqueued() {
-		return wp_script_is( $config['handle'], 'enqueued' );
+		return $this->_is( 'enqueued' );
 	}
 
 	/**
-	 * Register each of the asset (enqueues it)
+	 * Checks if an asset has been registered
 	 *
-	 * @return null
+	 * @return bool
 	 */
-	public function register_all() {
-
-		foreach ( $this->config as $config ) {
-
-			$config = wp_parse_args( $config, $this->get_default_structure() );
-
-			if ( isset( $config['deregister'] ) ) {
-				$this->deregister( $config['handle'] );
-			}
-
-			if ( isset( $config['pre_register'] ) ) {
-				$this->pre_register( $config );
-				continue; // <- This will continue and it wont load the localized object.
-			}
-
-			if ( $this->is_load_on( $config ) ) {
-				$this->enqueue( $config );
-			}
-
-			if ( empty( $config['localize'] ) ) {
-				continue;
-			}
-
-			if ( is_array( $config['localize'] ) ) {
-				$this->localize_script( $config );
-			}
-		}
+	public function is_registered() {
+		return $this->_is( 'registered' );
 	}
-
-	/**
-	 * Register each of the asset (enqueues it)
-	 *
-	 * @return null
-	 */
-	public function register() {}
-
-	/**
-	 * De-register each of the asset
-	 *
-	 * @return null
-	 */
-	// abstract public function deregister( $handle );
 
 	/**
 	 * Loading asset conditionally.
@@ -152,5 +172,27 @@ abstract class Asset implements Asset_Interface {
 		}
 
 		return (bool) call_user_func( $config['load_on'] );
+	}
+
+	/**
+	 * Validates the asset.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool
+	 * @throws InvalidArgumentException
+	 */
+	protected function validate_asset() {
+		$message = '';
+
+		if ( ! $this->handle ) {
+			$message = __( 'A unique ID is required for the asset.', 'italystrap' );
+		}
+
+		if ( $message ) {
+			throw new InvalidArgumentException( $message );
+		}
+
+		return true;
 	}
 }

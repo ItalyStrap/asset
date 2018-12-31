@@ -27,9 +27,10 @@ class Script extends Asset {
 	/**
 	 * De-register the script
 	 *
+	 * @param $handle
 	 * @return null
 	 */
-	public function deregister( $handle ) {
+	protected function deregister($handle) {
 		wp_dequeue_script( $handle );
 		wp_deregister_script( $handle );
 	}
@@ -37,7 +38,7 @@ class Script extends Asset {
 	/**
 	 * Pre register the script
 	 */
-	protected function pre_register( array $config = array()  ) {
+	protected function pre_register( array $config = array() ) {
 
 		wp_register_script(
 			$config['handle'],
@@ -69,9 +70,25 @@ class Script extends Asset {
 	 *
 	 * @return null
 	 */
+	protected function add_inline_script( array $config = array() ) {
+
+		return wp_add_inline_script(
+			$config['handle'],
+			$config['data'],
+			$config['position']
+		);
+	}
+
+	/**
+	 * Localize the script
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/wp_localize_script/
+	 *
+	 * @return null
+	 */
 	protected function localize_script( array $config = array() ) {
 
-		wp_localize_script(
+		return wp_localize_script(
 			$config['handle'],
 			$config['localize']['object_name'],
 			$config['localize']['params']
@@ -85,13 +102,14 @@ class Script extends Asset {
 	 */
 	protected function get_default_structure() {
 
-		return array(
+		return [
 			'handle'	=> '',
 			'file'		=> null,
 			'deps'		=> null,
 			'version'	=> null,
 			'in_footer'	=> true,
 			'localize'  => '',
-		);
+			'position'  => 'after',
+		];
 	}
 }

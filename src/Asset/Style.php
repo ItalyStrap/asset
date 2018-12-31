@@ -26,8 +26,9 @@ class Style extends Asset {
 
 	/**
 	 * De-register the style
+	 * @param $handle
 	 */
-	public function deregister( $handle ) {
+	protected function deregister($handle) {
 		wp_dequeue_style( $handle );
 		wp_deregister_style( $handle );
 	}
@@ -67,12 +68,12 @@ class Style extends Asset {
 	 */
 	protected function get_default_structure() {
 
-		return array(
+		return [
 			'handle'	=> '',
 			'file'		=> null,
 			'deps'		=> null,
 			'version'	=> null,
 			'media'		=> null,
-		);
+		];
 	}
 }
