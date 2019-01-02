@@ -76,7 +76,7 @@ abstract class Asset implements Asset_Interface {
 		 * $this->class_name =  ( new \ReflectionClass( $this ) )->getShortName();
 		 */
 		$class_name = new ReflectionClass( $this );
-		$this->class_name =  $class_name->getShortName();
+		$this->class_name =  strtolower( $class_name->getShortName() );
 
 		$this->config = $config;
 		$this->handle = (string) $config->get( 'handle' );
@@ -94,7 +94,7 @@ abstract class Asset implements Asset_Interface {
 		$config = array_merge( $this->get_default_structure(), $this->config->all() );
 
 		if ( isset( $config['deregister'] ) ) {
-			$this->deregister($this->handle);
+			$this->deregister( $this->handle );
 		}
 
 		if ( isset( $config['pre_register'] ) ) {
@@ -118,17 +118,6 @@ abstract class Asset implements Asset_Interface {
 	}
 
 	/**
-	 * Optional. Status of the script to check. Default 'enqueued'.
-	 * Accepts 'enqueued', 'registered', 'queue', 'to_do', and 'done'.
-	 *
-	 * @return bool
-	 */
-	private function _is( $list = 'enqueued' ) {
-		$func = sprintf( 'wp_%s_is', $this->class_name );
-		return (bool) $func( $this->handle, $list );
-	}
-
-	/**
 	 * Checks if an asset has been enqueued
 	 *
 	 * @return bool
@@ -147,14 +136,38 @@ abstract class Asset implements Asset_Interface {
 	}
 
 	/**
-	 * Loading asset conditionally.
+	 * Optional. Status of the script to check. Default 'enqueued'.
+	 * Accepts 'enqueued', 'registered', 'queue', 'to_do', and 'done'.
 	 *
 	 * @return bool
 	 */
-	protected function is_load_on( $config ) {
+	private function _is( $list = 'enqueued' ) {
+		$func = sprintf( 'wp_%s_is', $this->class_name );
+		return (bool) $func( $this->handle, $list );
+	}
+
+	/**
+	 * Loading asset conditionally.
+	 *
+	 * @param $config
+	 * @return bool
+	 */
+	private function is_load_on($config) {
+//codecept_debug($this->handle);
+//codecept_debug($config['load_on'] ? 'true' : 'false' );
+		/**
+		 * Default. Return true
+		 *
+		 * @var bool
+		 */
+		$bool = true;
 
 		if ( ! isset( $config['load_on'] ) ) {
-			return true;
+			return $bool;
+		}
+
+		if ( is_callable( $config['load_on'] ) ) {
+			return (bool) call_user_func( $config['load_on'] );
 		}
 
 		/**
@@ -163,15 +176,7 @@ abstract class Asset implements Asset_Interface {
 		 * 'load_on'		=> true,
 		 * 'load_on'		=> is_my_function\return_bool(),
 		 */
-		if ( is_bool( $config['load_on'] ) ) {
-			return $config['load_on'];
-		}
-
-		if ( ! is_string( $config['load_on'] ) ) {
-			return true;
-		}
-
-		return (bool) call_user_func( $config['load_on'] );
+		return (bool) $config['load_on'];
 	}
 
 	/**
@@ -182,7 +187,7 @@ abstract class Asset implements Asset_Interface {
 	 * @return bool
 	 * @throws InvalidArgumentException
 	 */
-	protected function validate_asset() {
+	private function validate_asset() {
 		$message = '';
 
 		if ( ! $this->handle ) {

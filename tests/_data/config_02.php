@@ -7,8 +7,14 @@
  */
 
 return [
+	'style'	=> [
+		'handle'		=> 'handle_style',
+		'file'			=> 'style.css',
+		'load_on'		=> is_single(),
+//		'pre_register'	=> true,
+	],
 	'script'	=> [
 		'handle'		=> 'comment-reply',
-		'load_on'		=> is_single( $this->post_id ),
+		'load_on'		=> is_single(),
 	],
 ];

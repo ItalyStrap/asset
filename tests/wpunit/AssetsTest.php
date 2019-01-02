@@ -8,6 +8,8 @@ class AssetsTest extends \Codeception\TestCase\WPTestCase
         // before
         parent::setUp();
 
+		$this->config_array = require __DIR__ . '/../_data/config.php';
+
         // your set up methods here
 
 		$this->page_id = $this->factory()->post->create([ 'post_type' => 'page', 'post_title' => 'Page' ]);
@@ -21,26 +23,6 @@ class AssetsTest extends \Codeception\TestCase\WPTestCase
         // then
         parent::tearDown();
     }
-
-	/**
-	 * @test
-	 */
-	public function it_should_thrown_exception_if_type_is_not_correct()
-	{
-		$this->expectException( InvalidArgumentException::class );
-		\ItalyStrap\Asset\Asset_Factory::make( [], 'styles' );
-		\ItalyStrap\Asset\Asset_Factory::make( [], 'scripts' );
-	}
-
-	/**
-	 * @test
-	 */
-	public function it_should_thrown_exception_if_handle_is_not_provided()
-	{
-		$this->expectException( InvalidArgumentException::class );
-		\ItalyStrap\Asset\Asset_Factory::make( [], 'style' );
-		\ItalyStrap\Asset\Asset_Factory::make( [], 'script' );
-	}
 
 	private function get_config_array( $n = '01' )
 	{
@@ -71,20 +53,6 @@ class AssetsTest extends \Codeception\TestCase\WPTestCase
 	/**
 	 * @test
 	 */
-    public function it_should_be_instantiable()
-    {
-    	$expected = '\ItalyStrap\Asset\Asset_Interface';
-    	$this->assertInstanceOf( $expected, $this->get_instance( 'style' ) );
-    	$this->assertInstanceOf( $expected, $this->get_instance( 'script' ) );
-
-    	$expected = '\ItalyStrap\Asset\Asset_Interface';
-    	$this->assertInstanceOf( $expected, $this->_make( 'style' ) );
-    	$this->assertInstanceOf( $expected, $this->_make( 'script' ) );
-    }
-
-	/**
-	 * @test
-	 */
 	public function it_should_have_asset_enqueued()
 	{
 		$assets = $this->get_config_array();
@@ -101,8 +69,14 @@ class AssetsTest extends \Codeception\TestCase\WPTestCase
 	 */
 	public function it_should_not_have_asset_enqueued()
 	{
+		$this->go_to( get_permalink( $this->page_id ) );
 
 		$assets = $this->get_config_array( '02' );
+//		codecept_debug($assets);
+		$sut = $this->_make( 'style', $assets );
+//		codecept_debug($sut);
+		codecept_debug($sut->is_enqueued());
+//		$this->assertFalse( $sut->is_enqueued() );
 
 		$sut = $this->_make( 'script', $assets );
 		$this->assertFalse( $sut->is_enqueued() );
@@ -118,6 +92,9 @@ class AssetsTest extends \Codeception\TestCase\WPTestCase
 		$assets = $this->get_config_array( '02' );
 
 		$sut = $this->_make( 'script', $assets );
+		$this->assertTrue( $sut->is_enqueued() );
+
+		$sut = $this->_make( 'style', $assets );
 		$this->assertTrue( $sut->is_enqueued() );
     }
 }

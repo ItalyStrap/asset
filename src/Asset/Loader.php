@@ -18,19 +18,15 @@ namespace ItalyStrap\Asset;
 /**
  * Asset_Loader
  */
-class Loader {
-
-	public function __construct( array $assets )
-	{
-		$this->assets = $assets;
-	}
+class Loader implements Loader_Interface {
 
 	/**
 	 * Init script and style
 	 */
-	public function add_assets() {
+	public function run( array $assets ) {
 
-		foreach ( $this->assets as $type => $items ) {
+		foreach ( $assets as $type => $items ) {
+
 			/**
 			 * With this hook you can filter the enqueue script and style config
 			 * Filters name:
@@ -39,7 +35,12 @@ class Loader {
 			 *
 			 * @var array
 			 */
-			$items = apply_filters( 'italystrap_config_enqueue_' . strtolower( $type ) , $items );
+			$items = (array) apply_filters(
+				'italystrap_config_enqueue_' . strtolower( $type ),
+				$items,
+				current_filter()
+			);
+
 			foreach ( $items as $item ) {
 				Asset_Factory::make( $item, $type )->register();
 			}

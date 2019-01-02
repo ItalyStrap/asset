@@ -41,7 +41,7 @@ class Script extends Asset {
 	protected function pre_register( array $config = array() ) {
 
 		wp_register_script(
-			$config['handle'],
+			$this->handle,
 			$config['file'],
 			$config['deps'],
 			$config['version'],
@@ -55,7 +55,7 @@ class Script extends Asset {
 	protected function enqueue( array $config = array() ) {
 
 		wp_enqueue_script(
-			$config['handle'],
+			$this->handle,
 			$config['file'],
 			$config['deps'],
 			$config['version'],
@@ -73,7 +73,7 @@ class Script extends Asset {
 	protected function add_inline_script( array $config = array() ) {
 
 		return wp_add_inline_script(
-			$config['handle'],
+			$this->handle,
 			$config['data'],
 			$config['position']
 		);
@@ -89,7 +89,7 @@ class Script extends Asset {
 	protected function localize_script( array $config = array() ) {
 
 		return wp_localize_script(
-			$config['handle'],
+			$this->handle,
 			$config['localize']['object_name'],
 			$config['localize']['params']
 		);

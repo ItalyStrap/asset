@@ -39,7 +39,7 @@ class Style extends Asset {
 	protected function pre_register( array $config = array() ) {
 
 		wp_register_style(
-			$config['handle'],
+			$this->handle,
 			$config['file'],
 			$config['deps'],
 			$config['version'],
@@ -51,9 +51,9 @@ class Style extends Asset {
 	 * Enqueue the style
 	 */
 	protected function enqueue( array $config = array() ) {
-
+codecept_debug($this->handle);
 		wp_enqueue_style(
-			$config['handle'],
+			$this->handle,
 			$config['file'],
 			$config['deps'],
 			$config['version'],
