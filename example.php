@@ -185,11 +185,11 @@ function load_assets() {
 		],
 	];
 
-	$loader = new Asset\Loader( $config );
-
-	add_action( 'wp_enqueue_scripts', [ $loader, 'add_assets' ], 10, 1 );
-	add_action( 'admin_enqueue_scripts', [ $loader, 'add_assets' ], 10, 1 );
-	add_action( 'login_enqueue_scripts', [ $loader, 'add_assets' ], 10, 1 );
+//	$loader = ( new Asset\Loader() )->run( $config );
+//
+//	add_action( 'wp_enqueue_scripts', [ $loader, 'add_assets' ], 10, 1 );
+//	add_action( 'admin_enqueue_scripts', [ $loader, 'add_assets' ], 10, 1 );
+//	add_action( 'login_enqueue_scripts', [ $loader, 'add_assets' ], 10, 1 );
 }
 
 add_action( 'after_setup_theme', 'load_assets' );

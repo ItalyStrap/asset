@@ -12,12 +12,9 @@
  *
  * @package ItalyStrap\Asset
  */
+declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
-
-if ( ! defined( 'ABSPATH' ) or ! ABSPATH ) {
-	die();
-}
 
 use ReflectionClass;
 use InvalidArgumentException;
@@ -75,13 +72,12 @@ abstract class Asset implements Asset_Interface {
 		 * @php54
 		 * $this->class_name =  ( new \ReflectionClass( $this ) )->getShortName();
 		 */
-		$class_name = new ReflectionClass( $this );
-		$this->class_name =  strtolower( $class_name->getShortName() );
+		$this->class_name =  strtolower( ( new \ReflectionClass( $this ) )->getShortName() );
 
 		$this->config = $config;
 		$this->handle = (string) $config->get( 'handle' );
 
-		$this->validate_asset();
+		$this->validateAsset();
 	}
 
 	/**
@@ -99,7 +95,7 @@ abstract class Asset implements Asset_Interface {
 
 		if ( isset( $config['pre_register'] ) ) {
 			$this->pre_register( $config );
-			return; // <- This will continue and it wont load the localized object.
+			return true; // <- This will continue and it wont load the localized object.
 		}
 
 		if ( $this->is_load_on( $config ) ) {
@@ -107,7 +103,7 @@ abstract class Asset implements Asset_Interface {
 		}
 
 		if ( empty( $config['localize'] ) ) {
-			return;
+			return true;
 		}
 
 		if ( is_array( $config['localize'] ) ) {
@@ -152,9 +148,7 @@ abstract class Asset implements Asset_Interface {
 	 * @param $config
 	 * @return bool
 	 */
-	private function is_load_on($config) {
-//codecept_debug($this->handle);
-//codecept_debug($config['load_on'] ? 'true' : 'false' );
+	private function is_load_on( $config ) {
 		/**
 		 * Default. Return true
 		 *
@@ -187,7 +181,7 @@ abstract class Asset implements Asset_Interface {
 	 * @return bool
 	 * @throws InvalidArgumentException
 	 */
-	private function validate_asset() {
+	private function validateAsset() {
 		$message = '';
 
 		if ( ! $this->handle ) {
