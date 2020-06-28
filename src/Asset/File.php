@@ -9,7 +9,7 @@ use function rtrim;
 use function str_replace;
 use function strval;
 
-class File
+class File implements FileInterface
 {
 	/**
 	 * @var SplFileInfo
@@ -36,9 +36,6 @@ class File
 		$this->base_path = rtrim( $base_path, '\/');
 	}
 
-	/**
-	 * @return string
-	 */
 	public function version(): string {
 		if ( $this->version->hasVersion() ) {
 			return $this->version->version();
@@ -47,9 +44,6 @@ class File
 		return strval( $this->file->getMTime() );
 	}
 
-	/**
-	 * @return string
-	 */
 	public function url(): string {
 		return $this->generateUrl();
 	}
