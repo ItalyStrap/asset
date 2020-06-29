@@ -43,7 +43,7 @@ final class Script extends Asset {
 	 *
 	 * @return null
 	 */
-	protected function add_inline_script( array $config = array() ) {
+	protected function addInlineScript( array $config = array() ) {
 
 		return \wp_add_inline_script(
 			$this->handle,
@@ -59,7 +59,7 @@ final class Script extends Asset {
 	 *
 	 * @return null
 	 */
-	protected function localize_script( array $config = array() ) {
+	protected function localizeScript( array $config = array() ) {
 
 		return \wp_localize_script(
 			$this->handle,

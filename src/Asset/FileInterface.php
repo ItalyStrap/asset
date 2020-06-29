@@ -2,8 +2,8 @@
 
 namespace ItalyStrap\Asset;
 
-interface FileInterface
-{
+interface FileInterface {
+
 	/**
 	 * @return string
 	 */

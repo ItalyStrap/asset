@@ -2,8 +2,8 @@
 
 namespace ItalyStrap\Asset\Version;
 
-interface VersionInterface
-{
+interface VersionInterface {
+
 	/**
 	 * @return bool
 	 */

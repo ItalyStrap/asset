@@ -9,8 +9,8 @@ use function rtrim;
 use function str_replace;
 use function strval;
 
-class File implements FileInterface
-{
+class File implements FileInterface {
+
 	/**
 	 * @var SplFileInfo
 	 */
