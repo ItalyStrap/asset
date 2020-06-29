@@ -1,65 +1,38 @@
 <?php
-/**
- * Script Class API
- *
- * Handle the JS regiter and enque
- *
- * @author      hellofromTonya
- * @link        http://hellofromtonya.github.io/Fulcrum/
- * @license     GPL-2.0+
- *
- * @version 0.0.1-alpha
- *
- * @package ItalyStrap\Asset
- */
+declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
-
-if ( ! defined( 'ABSPATH' ) or ! ABSPATH ) {
-	die();
-}
 
 /**
  * Child class API for Script
  */
-class Script extends Asset {
-
-	/**
-	 * De-register the script
-	 *
-	 * @param $handle
-	 * @return null
-	 */
-	protected function deregister($handle) {
-		wp_dequeue_script( $handle );
-		wp_deregister_script( $handle );
-	}
+final class Script extends Asset {
 
 	/**
 	 * Pre register the script
+	 * @param array $config
+	 * @return bool
 	 */
-	protected function pre_register( array $config = array() ) {
-
-		wp_register_script(
+	public function register(): bool {
+		return \wp_register_script(
 			$this->handle,
-			$config['file'],
-			$config['deps'],
-			$config['version'],
-			$config['in_footer']
+			$this->file->url(),
+			$this->config->get('deps', []),
+			$this->file->version(),
+			$this->config->get('in_footer', false)
 		);
 	}
 
 	/**
 	 * Enqueue the script
 	 */
-	protected function enqueue( array $config = array() ) {
-
-		wp_enqueue_script(
+	public function enqueue(): void {
+		\wp_enqueue_script(
 			$this->handle,
-			$config['file'],
-			$config['deps'],
-			$config['version'],
-			$config['in_footer']
+			$this->file->url(),
+			$this->config->get('deps', []),
+			$this->file->version(),
+			$this->config->get('in_footer', false)
 		);
 	}
 
@@ -72,7 +45,7 @@ class Script extends Asset {
 	 */
 	protected function add_inline_script( array $config = array() ) {
 
-		return wp_add_inline_script(
+		return \wp_add_inline_script(
 			$this->handle,
 			$config['data'],
 			$config['position']
@@ -88,7 +61,7 @@ class Script extends Asset {
 	 */
 	protected function localize_script( array $config = array() ) {
 
-		return wp_localize_script(
+		return \wp_localize_script(
 			$this->handle,
 			$config['localize']['object_name'],
 			$config['localize']['params']
@@ -100,7 +73,7 @@ class Script extends Asset {
 	 *
 	 * @return array
 	 */
-	protected function get_default_structure() {
+	protected function getDefaultStructure() {
 
 		return [
 			'handle'	=> '',

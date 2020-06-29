@@ -4,11 +4,9 @@
  *
  * Handle the CSS and JS regiter and enque
  *
- * @author      hellofromTonya
- * @link        http://hellofromtonya.github.io/Fulcrum/
- * @license     GPL-2.0+
+ * @credits      [hellofromTonya](http://hellofromtonya.github.io/Fulcrum/)
  *
- * @version 0.0.1-alpha
+ * @version 1.0.0
  *
  * @package ItalyStrap\Asset
  */
@@ -17,19 +15,22 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset;
 
 use ReflectionClass;
+use ReflectionException;
 use InvalidArgumentException;
-use ItalyStrap\Config\Config_Interface;
+use ItalyStrap\Config\ConfigInterface;
 
 /**
  * Class description
  * @todo http://wordpress.stackexchange.com/questions/195864/most-elegant-way-to-enqueue-scripts-in-function-php-with-foreach-loop
  */
-abstract class Asset implements Asset_Interface {
+abstract class Asset implements AssetStatusInterface {
+
+	use AssetStatusTrait;
 
 	/**
 	 * Configuration for the class
 	 *
-	 * @var Config_Interface
+	 * @var ConfigInterface
 	 */
 	protected $config;
 
@@ -47,24 +48,24 @@ abstract class Asset implements Asset_Interface {
 	protected $class_name = '';
 
 	/**
+	 * @var FileInterface
+	 */
+	protected $file;
+
+	/**
 	 * Get the default structure.
 	 *
 	 * @return array
 	 */
-	abstract protected function get_default_structure();
-
-	abstract protected function deregister( $handle );
-
-	abstract protected function pre_register( array $config = [] );
-
-	abstract protected function enqueue( array $config = [] );
+	abstract protected function getDefaultStructure();
 
 	/**
 	 * Asset constructor.
-	 * @param Config_Interface $config
-	 * @throws \ReflectionException
+	 * @param FileInterface $file
+	 * @param ConfigInterface $config
+	 * @throws ReflectionException
 	 */
-	public function __construct( Config_Interface $config ) {
+	public function __construct( FileInterface $file, ConfigInterface $config ) {
 
 		/**
 		 * Credits:
@@ -72,126 +73,26 @@ abstract class Asset implements Asset_Interface {
 		 * @php54
 		 * $this->class_name =  ( new \ReflectionClass( $this ) )->getShortName();
 		 */
-		$this->class_name =  strtolower( ( new \ReflectionClass( $this ) )->getShortName() );
+		$this->class_name =  strtolower( ( new ReflectionClass( $this ) )->getShortName() );
 
+		$this->file = $file;
 		$this->config = $config;
-		$this->handle = (string) $config->get( 'handle' );
+		$this->assertHasHandle();
 
-		$this->validateAsset();
-	}
-
-	/**
-	 * Register each of the asset (enqueues it)
-	 *
-	 * @return null
-	 */
-	public function register() {
-
-		$config = array_merge( $this->get_default_structure(), $this->config->all() );
-
-		if ( isset( $config['deregister'] ) ) {
-			$this->deregister( $this->handle );
-		}
-
-		if ( isset( $config['pre_register'] ) ) {
-			$this->pre_register( $config );
-			return true; // <- This will continue and it wont load the localized object.
-		}
-
-		if ( $this->is_load_on( $config ) ) {
-			$this->enqueue( $config );
-		}
-
-		if ( empty( $config['localize'] ) ) {
-			return true;
-		}
-
-		if ( is_array( $config['localize'] ) ) {
-			$this->localize_script( $config );
-		}
-
-		return true;
-	}
-
-	/**
-	 * Checks if an asset has been enqueued
-	 *
-	 * @return bool
-	 */
-	public function is_enqueued() {
-		return $this->_is( 'enqueued' );
-	}
-
-	/**
-	 * Checks if an asset has been registered
-	 *
-	 * @return bool
-	 */
-	public function is_registered() {
-		return $this->_is( 'registered' );
-	}
-
-	/**
-	 * Optional. Status of the script to check. Default 'enqueued'.
-	 * Accepts 'enqueued', 'registered', 'queue', 'to_do', and 'done'.
-	 *
-	 * @return bool
-	 */
-	private function _is( $list = 'enqueued' ) {
-		$func = sprintf( 'wp_%s_is', $this->class_name );
-		return (bool) $func( $this->handle, $list );
-	}
-
-	/**
-	 * Loading asset conditionally.
-	 *
-	 * @param $config
-	 * @return bool
-	 */
-	private function is_load_on( $config ) {
-		/**
-		 * Default. Return true
-		 *
-		 * @var bool
-		 */
-		$bool = true;
-
-		if ( ! isset( $config['load_on'] ) ) {
-			return $bool;
-		}
-
-		if ( is_callable( $config['load_on'] ) ) {
-			return (bool) call_user_func( $config['load_on'] );
-		}
-
-		/**
-		 * Example:
-		 * 'load_on'		=> false,
-		 * 'load_on'		=> true,
-		 * 'load_on'		=> is_my_function\return_bool(),
-		 */
-		return (bool) $config['load_on'];
+		$this->handle = (string) $config->handle;
 	}
 
 	/**
 	 * Validates the asset.
 	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool
 	 * @throws InvalidArgumentException
 	 */
-	private function validateAsset() {
-		$message = '';
-
-		if ( ! $this->handle ) {
-			$message = __( 'A unique ID is required for the asset.', 'italystrap' );
+	private function assertHasHandle() {
+		if ( ! $this->config->has( 'handle' ) ){
+			throw new InvalidArgumentException( \sprintf(
+				'A unique "handle" ID is required for the %s',
+				$this->class_name
+			) );
 		}
-
-		if ( $message ) {
-			throw new InvalidArgumentException( $message );
-		}
-
-		return true;
 	}
 }

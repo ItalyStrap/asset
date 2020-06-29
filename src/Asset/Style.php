@@ -1,63 +1,38 @@
 <?php
-/**
- * Style Class API
- *
- * Handle the JS regiter and enque
- *
- * @author      hellofromTonya
- * @link        http://hellofromtonya.github.io/Fulcrum/
- * @license     GPL-2.0+
- *
- * @version 0.0.1-alpha
- *
- * @package ItalyStrap\Asset
- */
+declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
-
-if ( ! defined( 'ABSPATH' ) or ! ABSPATH ) {
-	die();
-}
 
 /**
  * Child class API for Style
  */
-class Style extends Asset {
-
-	/**
-	 * De-register the style
-	 * @param $handle
-	 */
-	protected function deregister($handle) {
-		wp_dequeue_style( $handle );
-		wp_deregister_style( $handle );
-	}
+final class Style extends Asset {
 
 	/**
 	 * Pre register the style
+	 * @param array $config
+	 * @return bool
 	 */
-	protected function pre_register( array $config = array() ) {
-
-		wp_register_style(
+	public function register() {
+		return \wp_register_style(
 			$this->handle,
-			$config['file'],
-			$config['deps'],
-			$config['version'],
-			$config['media']
+			$this->file->url(),
+			$this->config->get('deps', []),
+			$this->file->version(),
+			$this->config->get('media', 'all')
 		);
 	}
 
 	/**
 	 * Enqueue the style
 	 */
-	protected function enqueue( array $config = array() ) {
-codecept_debug($this->handle);
-		wp_enqueue_style(
+	public function enqueue() {
+		\wp_enqueue_style(
 			$this->handle,
-			$config['file'],
-			$config['deps'],
-			$config['version'],
-			$config['media']
+			$this->file->url(),
+			$this->config->get('deps', []),
+			$this->file->version(),
+			$this->config->get('media', 'all')
 		);
 	}
 
@@ -66,7 +41,7 @@ codecept_debug($this->handle);
 	 *
 	 * @return array
 	 */
-	protected function get_default_structure() {
+	protected function getDefaultStructure() {
 
 		return [
 			'handle'	=> '',
