@@ -36,6 +36,9 @@ class File implements FileInterface
 		$this->base_path = rtrim( $base_path, '\/');
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function version(): string {
 		if ( $this->version->hasVersion() ) {
 			return $this->version->version();
@@ -44,6 +47,9 @@ class File implements FileInterface
 		return strval( $this->file->getMTime() );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function url(): string {
 		return $this->generateUrl();
 	}
