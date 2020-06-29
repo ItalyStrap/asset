@@ -25,8 +25,6 @@ use ItalyStrap\Config\ConfigInterface;
  */
 abstract class Asset implements AssetStatusInterface {
 
-	use AssetStatusTrait;
-
 	/**
 	 * Configuration for the class
 	 *
@@ -81,6 +79,30 @@ abstract class Asset implements AssetStatusInterface {
 
 		$this->handle = (string) $config->handle;
 	}
+	/**
+	 * @inheritDoc
+	 */
+	public function isEnqueued(): bool {
+		return $this->is( 'enqueued' );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function isRegistered(): bool {
+		return $this->is( 'registered' );
+	}
+
+	/**
+	 * Optional. Status of the script to check. Default 'enqueued'.
+	 * Accepts 'enqueued', 'registered', 'queue', 'to_do', and 'done'.
+	 *
+	 * @return bool
+	 */
+	private function is( $list = 'enqueued' ): bool {
+		$func = \sprintf( 'wp_%s_is', $this->class_name );
+		return (bool) $func( $this->handle, $list );
+	}
 
 	/**
 	 * Validates the asset.
@@ -88,7 +110,7 @@ abstract class Asset implements AssetStatusInterface {
 	 * @throws InvalidArgumentException
 	 */
 	private function assertHasHandle() {
-		if ( ! $this->config->has( 'handle' ) ){
+		if ( ! $this->config->has( 'handle' ) ) {
 			throw new InvalidArgumentException( \sprintf(
 				'A unique "handle" ID is required for the %s',
 				$this->class_name
