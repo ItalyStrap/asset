@@ -7,3 +7,4 @@ codeception.yml
 *.lock
 /src/Finder/
 *.phar
+infection.json.dist
