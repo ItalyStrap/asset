@@ -6,3 +6,4 @@
 codeception.yml
 *.lock
 /src/Finder/
+*.phar
