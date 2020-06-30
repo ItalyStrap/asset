@@ -10,7 +10,6 @@ final class Style extends Asset {
 
 	/**
 	 * Pre register the style
-	 * @param array $config
 	 * @return bool
 	 */
 	public function register() {

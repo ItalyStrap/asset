@@ -10,7 +10,6 @@ final class Script extends Asset {
 
 	/**
 	 * Pre register the script
-	 * @param array $config
 	 * @return bool
 	 */
 	public function register(): bool {

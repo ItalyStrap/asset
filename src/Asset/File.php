@@ -26,10 +26,15 @@ class File implements FileInterface {
 	 * File constructor.
 	 * @param SplFileInfo $splFileInfo
 	 * @param Version\VersionInterface $version
-	 * @param $base_url
-	 * @param $base_path
+	 * @param string $base_url
+	 * @param string $base_path
 	 */
-	public function __construct( SplFileInfo $splFileInfo, VersionInterface $version, $base_url, $base_path ) {
+	public function __construct(
+		SplFileInfo $splFileInfo,
+		VersionInterface $version,
+		string $base_url,
+		string $base_path
+	) {
 		$this->file = $splFileInfo;
 		$this->version = $version;
 		$this->base_url = rtrim( $base_url, '\/' );
@@ -58,7 +63,7 @@ class File implements FileInterface {
 	 * @return string
 	 */
 	private function normalizedString(): string {
-		return str_replace( '\\', '/', $this->file->getRealPath() );
+		return str_replace( '\\', '/', \strval( $this->file->getRealPath() ) );
 	}
 
 	/**

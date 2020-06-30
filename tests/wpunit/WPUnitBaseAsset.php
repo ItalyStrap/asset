@@ -6,7 +6,7 @@ namespace ItalyStrap\Asset\Test;
 use ItalyStrap\Asset\AssetFinder;
 use ItalyStrap\Asset\AssetStatusInterface;
 
-abstract class BaseAsset extends \Codeception\TestCase\WPTestCase {
+abstract class WPUnitBaseAsset extends \Codeception\TestCase\WPTestCase {
 
 
 	public function setUp(): void {

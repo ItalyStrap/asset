@@ -3,16 +3,24 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
+use Codeception\Test\Unit;
+use InvalidArgumentException;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\FileInterface;
+use ItalyStrap\Config\ConfigInterface;
 use PHPUnit\Framework\Assert;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
+use ReflectionException;
+use UnitTester;
+use function sprintf;
+use function tad\FunctionMockerLe\undefineAll;
 
-abstract class BaseAsset extends \Codeception\Test\Unit {
+abstract class UnitBaseAsset extends Unit {
 
 	/**
-	 * @var \UnitTester
+	 * @var UnitTester
 	 */
 	protected $tester;
 
@@ -20,19 +28,19 @@ abstract class BaseAsset extends \Codeception\Test\Unit {
 	protected $in_footer_or_media;
 
 	/**
-	 * @var \Prophecy\Prophecy\ObjectProphecy
+	 * @var ObjectProphecy
 	 */
 	protected $config;
 
 	/**
-	 * @var \Prophecy\Prophecy\ObjectProphecy
+	 * @var ObjectProphecy
 	 */
 	protected $file;
 
 	/**
-	 * @return \ItalyStrap\Config\ConfigInterface
+	 * @return ConfigInterface
 	 */
-	public function getConfig(): \ItalyStrap\Config\ConfigInterface {
+	public function getConfig(): ConfigInterface {
 		return $this->config->reveal();
 	}
 
@@ -45,22 +53,23 @@ abstract class BaseAsset extends \Codeception\Test\Unit {
 
 	/**
 	 * @return Asset
-	 * @throws \ReflectionException
+	 * @throws ReflectionException
 	 */
 	abstract protected function getInstance();
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _before() {
-		$this->config = $this->prophesize( \ItalyStrap\Config\ConfigInterface::class );
+		$this->config = $this->prophesize( ConfigInterface::class );
 		$this->file = $this->prophesize( File::class );
 
 		$this->config->has('handle')->willReturn(true);
-		$this->config->handle = 'handle';
+		$this->config->get('handle')->willReturn('handle');
+//		$this->config->handle = 'handle';
 	}
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _after() {
-		\tad\FunctionMockerLe\undefineAll([
+		undefineAll([
 			'wp_script_is',
 			'wp_style_is',
 			'wp_register_script',
@@ -75,7 +84,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit {
 	 */
 	public function instanceOk() {
 		$sut = $this->getInstance();
-		$this->assertInstanceOf( \ItalyStrap\Asset\Asset::class, $sut, '' );
+		$this->assertInstanceOf( Asset::class, $sut, '' );
 		return $sut;
 	}
 
@@ -85,7 +94,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit {
 	public function itShouldThrownInvalidArgumentExceptionIfHandleIsNotDefined() {
 		$this->config->has('handle')->willReturn(false);
 
-		$this->expectException( \InvalidArgumentException::class );
+		$this->expectException( InvalidArgumentException::class );
 		$this->getInstance();
 	}
 
@@ -94,7 +103,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit {
 	 */
 	public function itShouldBeRegistered() {
 
-		$func_name = \sprintf(
+		$func_name = sprintf(
 			'wp_%s_is',
 			$this->type
 		);
@@ -119,7 +128,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit {
 	 */
 	public function itShouldBeEnqueued() {
 
-		$func_name = \sprintf(
+		$func_name = sprintf(
 			'wp_%s_is',
 			$this->type
 		);
@@ -156,7 +165,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit {
 		 */
 		$this->config->get( 'media', 'all' )->willReturn( 'all' );
 
-		$func_name = \sprintf(
+		$func_name = sprintf(
 			$func_name_pattern,
 			$this->type
 		);

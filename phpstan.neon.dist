@@ -12,12 +12,11 @@ parameters:
         - %currentWorkingDirectory%/src/
     excludes_analyse:
         #- %currentWorkingDirectory%/src/Config/
-        - %currentWorkingDirectory%/src/Asset/from_theme/
     autoload_files:
         # Procedural code
         #- %currentWorkingDirectory%/functions/autoload.php
     ignoreErrors:
         # Uses func_get_args()
-        - '#^Function apply_filters invoked with [34567] parameters, 2 required\.$#'
+        #- '#^Function apply_filters invoked with [34567] parameters, 2 required\.$#'
         #- '#Access to an undefined property ItalyStrap\\Config\\Config::\$[a-zA-Z0-9_]+#'
         #- '#Access to an undefined property ItalyStrap\\Config\\ConfigInterface::\$[a-zA-Z0-9_]+#'

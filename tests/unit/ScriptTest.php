@@ -6,9 +6,11 @@ namespace ItalyStrap\Asset\Test;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\Script;
 
-include_once 'BaseAsset.php';
+// phpcs:disable
+include_once 'UnitBaseAsset.php';
+// phpcs:enable
 
-class ScriptTest extends BaseAsset {
+class ScriptTest extends UnitBaseAsset {
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _before() {

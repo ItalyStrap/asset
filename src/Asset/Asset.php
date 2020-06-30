@@ -72,7 +72,7 @@ abstract class Asset {
 		$this->config = $config;
 		$this->assertHasHandle();
 
-		$this->handle = \strval( $config->handle );
+		$this->handle = \strval( $config->get('handle') );
 	}
 	/**
 	 * @inheritDoc
@@ -97,6 +97,14 @@ abstract class Asset {
 	 */
 	private function is( $list = 'enqueued' ): bool {
 		$func = \sprintf( 'wp_%s_is', $this->class_name );
+
+		if ( ! is_callable( $func ) ) {
+			throw new \BadFunctionCallException(\sprintf(
+				'The function wp_%s_is does not exists',
+				$this->class_name
+			));
+		}
+
 		return $func( $this->handle, $list );
 	}
 

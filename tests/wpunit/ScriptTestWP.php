@@ -7,11 +7,11 @@ use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\Version\EmptyVersion;
 
-if ( ! \class_exists( \ItalyStrap\Asset\Test\BaseAsset::class ) ) {
-	require 'BaseAsset.php';
-}
+// phpcs:disable
+include_once 'WPUnitBaseAsset.php';
+// phpcs:enable
 
-class ScriptTest extends \ItalyStrap\Asset\Test\BaseAsset {
+class ScriptTestWP extends WPUnitBaseAsset {
 
 	/**
 	 * @var \WpunitTester
