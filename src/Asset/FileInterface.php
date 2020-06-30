@@ -5,9 +5,9 @@ namespace ItalyStrap\Asset;
 interface FileInterface {
 
 	/**
-	 * @return string
+	 * @return mixed
 	 */
-	public function version(): string;
+	public function version();
 
 	/**
 	 * @return string

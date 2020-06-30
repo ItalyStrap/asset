@@ -113,7 +113,7 @@ abstract class Asset {
 	 *
 	 * @throws InvalidArgumentException
 	 */
-	private function assertHasHandle() {
+	private function assertHasHandle(): void {
 		if ( ! $this->config->has( self::HANDLE_KEY ) ) {
 			throw new InvalidArgumentException( \sprintf(
 				'A unique "handle" ID is required for the %s',

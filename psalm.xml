@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <psalm
     totallyTyped="false"
-    errorLevel="7"
+    errorLevel="4"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
@@ -16,9 +16,10 @@
     <issueHandlers>
         <UndefinedFunction>
             <errorLevel type="suppress">
-                <referencedFunction name="get_transient"/>
-                <referencedFunction name="set_transient"/>
-                <referencedFunction name="delete_transient"/>
+                <referencedFunction name="wp_register_script"/>
+                <referencedFunction name="wp_enqueue_script"/>
+                <referencedFunction name="wp_register_style"/>
+                <referencedFunction name="wp_enqueue_style"/>
             </errorLevel>
         </UndefinedFunction>
     </issueHandlers>

@@ -12,7 +12,7 @@ final class Style extends Asset {
 	 * Pre register the style
 	 * @return bool
 	 */
-	public function register() {
+	public function register(): bool {
 		return \wp_register_style(
 			$this->handle,
 			$this->file->url(),
@@ -25,7 +25,7 @@ final class Style extends Asset {
 	/**
 	 * Enqueue the style
 	 */
-	public function enqueue() {
+	public function enqueue(): void {
 		\wp_enqueue_style(
 			$this->handle,
 			$this->file->url(),

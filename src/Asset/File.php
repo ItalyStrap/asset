@@ -15,8 +15,17 @@ class File implements FileInterface {
 	 * @var SplFileInfo
 	 */
 	private $file;
+
+	/**
+	 * @var string
+	 */
 	private $base_url;
+
+	/**
+	 * @var string
+	 */
 	private $base_path;
+
 	/**
 	 * @var VersionInterface
 	 */
@@ -44,7 +53,7 @@ class File implements FileInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function version(): string {
+	public function version() {
 		if ( $this->version->hasVersion() ) {
 			return $this->version->version();
 		}
