@@ -35,20 +35,4 @@ final class Style extends Asset {
 			$this->config->get('media', 'all')
 		);
 	}
-
-	/**
-	 * Get the default structure.
-	 *
-	 * @return array
-	 */
-	protected function getDefaultStructure() {
-
-		return [
-			'handle'	=> '',
-			'file'		=> null,
-			'deps'		=> null,
-			'version'	=> null,
-			'media'		=> null,
-		];
-	}
 }

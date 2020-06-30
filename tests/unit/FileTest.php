@@ -48,7 +48,7 @@ class FileTest extends Unit
 
 	protected function _before()
     {
-    	$this->file = new SplFileInfo( \codecept_data_dir( 'fixtures/parent' ) . '/style.css' );
+    	$this->file = new SplFileInfo( \codecept_data_dir( 'fixtures/parent/css' ) . '/style.css' );
     	$this->fakeFile = $this->prophesize( SplFileInfo::class );
     	$this->version = $this->prophesize( VersionInterface::class );
     }
@@ -145,7 +145,7 @@ class FileTest extends Unit
     	$this->base_url = $base_url;
 		$this->fakeFile->getRealPath()->willReturn($this->file->getRealPath());
 
-		$expected = \rtrim( $base_url, '\/' ) . '/wp-content/plugins/asset/tests/_data/fixtures/parent/style.css';
+		$expected = \rtrim( $base_url, '\/' ) . '/wp-content/plugins/asset/tests/_data/fixtures/parent/css/style.css';
     	$sut = $this->getInstance();
     	$this->assertEquals( $expected, $sut->url(), '' );
     }

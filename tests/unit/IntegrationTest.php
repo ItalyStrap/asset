@@ -21,8 +21,8 @@ class IntegrationTest extends Unit
     protected function _before()
     {
 		$this->paths = [
-			'childPath'		=> \codecept_data_dir( 'fixtures/child' ),
-			'parentPath'	=> \codecept_data_dir( 'fixtures/parent' ),
+			'childPath'		=> \codecept_data_dir( 'fixtures/child/css' ),
+			'parentPath'	=> \codecept_data_dir( 'fixtures/parent/css' ),
 		];
 
 		$this->finder = new AssetFinder();

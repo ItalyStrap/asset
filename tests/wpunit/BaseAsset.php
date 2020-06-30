@@ -17,8 +17,8 @@ abstract class BaseAsset extends \Codeception\TestCase\WPTestCase
         // your set up methods here
 
 		$this->paths = [
-			'childPath'		=> \codecept_data_dir( 'fixtures/child' ),
-			'parentPath'	=> \codecept_data_dir( 'fixtures/parent' ),
+			'childPath'		=> \codecept_data_dir( 'fixtures/child/css' ),
+			'parentPath'	=> \codecept_data_dir( 'fixtures/parent/css' ),
 		];
 
 		$this->finder = new AssetFinder();
@@ -52,6 +52,32 @@ abstract class BaseAsset extends \Codeception\TestCase\WPTestCase
 
 		$sut->enqueue();
 		$this->assertTrue( $sut->isEnqueued() );
+    }
+
+	/**
+	 * @test
+	 */
+	public function itfgnsfgnfsx()
+	{
+		\wp_enqueue_script(
+			'ciao',
+			'url',
+			[],
+			'42',
+			true
+		);
+		\wp_enqueue_script(
+			'bello',
+			'url',
+			[],
+			'4242',
+			true
+		);
+
+//		codecept_debug( wp_scripts()->registered['bello'] );
+//		codecept_debug( wp_scripts()->queue );
+//		codecept_debug( wp_scripts()->get_data('bello', 'group') );
+//		codecept_debug( wp_scripts()->in_footer );
     }
 
 	/**

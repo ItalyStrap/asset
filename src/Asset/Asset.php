@@ -20,10 +20,12 @@ use InvalidArgumentException;
 use ItalyStrap\Config\ConfigInterface;
 
 /**
- * Class description
- * @todo http://wordpress.stackexchange.com/questions/195864/most-elegant-way-to-enqueue-scripts-in-function-php-with-foreach-loop
+ * Class Asset
+ * @package ItalyStrap\Asset
  */
-abstract class Asset implements AssetStatusInterface {
+abstract class Asset {
+
+	const HANDLE_KEY = 'handle';
 
 	/**
 	 * Configuration for the class
@@ -51,13 +53,6 @@ abstract class Asset implements AssetStatusInterface {
 	protected $file;
 
 	/**
-	 * Get the default structure.
-	 *
-	 * @return array
-	 */
-	abstract protected function getDefaultStructure();
-
-	/**
 	 * Asset constructor.
 	 * @param FileInterface $file
 	 * @param ConfigInterface $config
@@ -77,7 +72,7 @@ abstract class Asset implements AssetStatusInterface {
 		$this->config = $config;
 		$this->assertHasHandle();
 
-		$this->handle = (string) $config->handle;
+		$this->handle = \strval( $config->handle );
 	}
 	/**
 	 * @inheritDoc
@@ -97,11 +92,12 @@ abstract class Asset implements AssetStatusInterface {
 	 * Optional. Status of the script to check. Default 'enqueued'.
 	 * Accepts 'enqueued', 'registered', 'queue', 'to_do', and 'done'.
 	 *
+	 * @param string $list
 	 * @return bool
 	 */
 	private function is( $list = 'enqueued' ): bool {
 		$func = \sprintf( 'wp_%s_is', $this->class_name );
-		return (bool) $func( $this->handle, $list );
+		return $func( $this->handle, $list );
 	}
 
 	/**
@@ -110,7 +106,7 @@ abstract class Asset implements AssetStatusInterface {
 	 * @throws InvalidArgumentException
 	 */
 	private function assertHasHandle() {
-		if ( ! $this->config->has( 'handle' ) ) {
+		if ( ! $this->config->has( self::HANDLE_KEY ) ) {
 			throw new InvalidArgumentException( \sprintf(
 				'A unique "handle" ID is required for the %s',
 				$this->class_name

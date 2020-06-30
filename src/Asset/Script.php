@@ -43,14 +43,14 @@ final class Script extends Asset {
 	 *
 	 * @return null
 	 */
-	protected function addInlineScript( array $config = array() ) {
-
-		return \wp_add_inline_script(
-			$this->handle,
-			$config['data'],
-			$config['position']
-		);
-	}
+//	protected function addInlineScript( array $config = array() ) {
+//
+//		return \wp_add_inline_script(
+//			$this->handle,
+//			$config['data'],
+//			$config['position']
+//		);
+//	}
 
 	/**
 	 * Localize the script
@@ -59,30 +59,12 @@ final class Script extends Asset {
 	 *
 	 * @return null
 	 */
-	protected function localizeScript( array $config = array() ) {
-
-		return \wp_localize_script(
-			$this->handle,
-			$config['localize']['object_name'],
-			$config['localize']['params']
-		);
-	}
-
-	/**
-	 * Get the default structure.
-	 *
-	 * @return array
-	 */
-	protected function getDefaultStructure() {
-
-		return [
-			'handle'	=> '',
-			'file'		=> null,
-			'deps'		=> null,
-			'version'	=> null,
-			'in_footer'	=> true,
-			'localize'  => '',
-			'position'  => 'after',
-		];
-	}
+//	protected function localizeScript( array $config = array() ) {
+//
+//		return \wp_localize_script(
+//			$this->handle,
+//			$config['localize']['object_name'],
+//			$config['localize']['params']
+//		);
+//	}
 }
