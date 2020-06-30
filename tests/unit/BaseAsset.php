@@ -9,15 +9,15 @@ use ItalyStrap\Asset\FileInterface;
 use PHPUnit\Framework\Assert;
 use Prophecy\Argument;
 
-abstract class BaseAsset extends \Codeception\Test\Unit
-{
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
+abstract class BaseAsset extends \Codeception\Test\Unit {
 
-    protected $type;
-    protected $in_footer_or_media;
+	/**
+	 * @var \UnitTester
+	 */
+	protected $tester;
+
+	protected $type;
+	protected $in_footer_or_media;
 
 	/**
 	 * @var \Prophecy\Prophecy\ObjectProphecy
@@ -49,18 +49,26 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 	 */
 	abstract protected function getInstance();
 
-	protected function _before()
-    {
-    	$this->config = $this->prophesize( \ItalyStrap\Config\ConfigInterface::class );
-    	$this->file = $this->prophesize( File::class );
+	// phpcs:ignore -- Method from Codeception
+	protected function _before() {
+		$this->config = $this->prophesize( \ItalyStrap\Config\ConfigInterface::class );
+		$this->file = $this->prophesize( File::class );
 
 		$this->config->has('handle')->willReturn(true);
 		$this->config->handle = 'handle';
-    }
+	}
 
-    protected function _after()
-    {
-    }
+	// phpcs:ignore -- Method from Codeception
+	protected function _after() {
+		\tad\FunctionMockerLe\undefineAll([
+			'wp_script_is',
+			'wp_style_is',
+			'wp_register_script',
+			'wp_register_style',
+			'wp_enqueue_script',
+			'wp_enqueue_style',
+		]);
+	}
 
 	/**
 	 * @test
@@ -69,7 +77,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 		$sut = $this->getInstance();
 		$this->assertInstanceOf( \ItalyStrap\Asset\Asset::class, $sut, '' );
 		return $sut;
-    }
+	}
 
 	/**
 	 * @test
@@ -79,7 +87,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 
 		$this->expectException( \InvalidArgumentException::class );
 		$this->getInstance();
-    }
+	}
 
 	/**
 	 * @test
@@ -93,7 +101,8 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 
 		$called = 0;
 		\tad\FunctionMockerLe\define( $func_name, function (
-			$handle, $list = 'enqueued'
+			$handle,
+			$list = 'enqueued'
 		) use ( &$called ) {
 			$called++;
 			return true;
@@ -117,7 +126,8 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 
 		$called = 0;
 		\tad\FunctionMockerLe\define( $func_name, function (
-			$handle, $list = 'enqueued'
+			$handle,
+			$list = 'enqueued'
 		) use ( &$called ) {
 			$called++;
 			return true;
@@ -129,27 +139,25 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 		$this->assertEquals(1, $called, '');
 	}
 
-	/**
-	 * @test
-	 */
-	public function itShouldRegister() {
 
-		$this->file->url()->willReturn('url');
-		$this->file->version()->willReturn('42');
+
+	private function commonRegisterEnqueue( string $func_name_pattern ): void {
+		$this->file->url()->willReturn( 'url' );
+		$this->file->version()->willReturn( '42' );
 
 		/**
 		 * Only for Script
 		 */
-		$this->config->get( 'deps', Argument::type('array') )->willReturn([]);
-		$this->config->get( 'in_footer', Argument::type('bool') )->willReturn(true);
+		$this->config->get( 'deps', [] )->willReturn( [] );
+		$this->config->get( 'in_footer', false )->willReturn( true );
 
 		/**
 		 * Only for Style
 		 */
-		$this->config->get( 'media', Argument::type('string') )->willReturn('all');
+		$this->config->get( 'media', 'all' )->willReturn( 'all' );
 
 		$func_name = \sprintf(
-			'wp_register_%s',
+			$func_name_pattern,
 			$this->type
 		);
 
@@ -158,15 +166,22 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 			string $src,
 			array $deps = [],
 			$ver = false,
-			$in_footer_or_media = false ) {
-			Assert::assertStringContainsString('handle', $handle, '');
-			Assert::assertStringContainsString('url', $src, '');
-			Assert::assertIsArray($deps, '');
-			Assert::assertStringContainsString('42', (string)$ver, '');
-			Assert::assertEquals($this->in_footer_or_media, $in_footer_or_media, '');
+			$in_footer_or_media = false
+) {
+			Assert::assertStringContainsString( 'handle', $handle, '' );
+			Assert::assertStringContainsString( 'url', $src, '' );
+			Assert::assertIsArray( $deps, '' );
+			Assert::assertStringContainsString( '42', (string)$ver, '' );
+			Assert::assertEquals( $this->in_footer_or_media, $in_footer_or_media, '' );
 			return true;
 		} );
+	}
 
+	/**
+	 * @test
+	 */
+	public function itShouldRegister() {
+		$this->commonRegisterEnqueue('wp_register_%s');
 		$sut = $this->getInstance();
 		$sut->register();
 	}
@@ -175,40 +190,7 @@ abstract class BaseAsset extends \Codeception\Test\Unit
 	 * @test
 	 */
 	public function itShouldEnqueue() {
-
-		$this->file->url()->willReturn('url');
-		$this->file->version()->willReturn('42');
-
-		/**
-		 * Only for Script
-		 */
-		$this->config->get( 'deps', Argument::type('array') )->willReturn([]);
-		$this->config->get( 'in_footer', Argument::type('bool') )->willReturn(true);
-
-		/**
-		 * Only for Style
-		 */
-		$this->config->get( 'media', Argument::type('string') )->willReturn('all');
-
-		$func_name = \sprintf(
-			'wp_enqueue_%s',
-			$this->type
-		);
-
-		\tad\FunctionMockerLe\define( $func_name, function (
-			string $handle,
-			string $src,
-			array $deps = [],
-			$ver = false,
-			$in_footer_or_media = false ) {
-			Assert::assertStringContainsString('handle', $handle, '');
-			Assert::assertStringContainsString('url', $src, '');
-			Assert::assertIsArray($deps, '');
-			Assert::assertStringContainsString('42', (string)$ver, '');
-			Assert::assertEquals($this->in_footer_or_media, $in_footer_or_media, '');
-			return true;
-		} );
-
+		$this->commonRegisterEnqueue('wp_enqueue_%s');
 		$sut = $this->getInstance();
 		$sut->enqueue();
 	}

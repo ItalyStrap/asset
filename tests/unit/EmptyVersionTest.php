@@ -8,54 +8,51 @@ use ItalyStrap\Asset\Version\EmptyVersion;
 use ItalyStrap\Asset\Version\VersionInterface;
 use UnitTester;
 
-class EmptyVersionTest extends Unit
-{
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
-    
-    protected function _before()
-    {
-    }
+class EmptyVersionTest extends Unit {
 
-    protected function _after()
-    {
-    }
+	/**
+	 * @var UnitTester
+	 */
+	protected $tester;
+
+	// phpcs:ignore -- Method from Codeception
+	protected function _before() {
+	}
+
+	// phpcs:ignore -- Method from Codeception
+	protected function _after() {
+	}
 
 	/**
 	 * @return EmptyVersion
 	 */
 	private function getInstance() {
-    	$sut = new EmptyVersion();
-    	$this->assertInstanceOf( VersionInterface::class, $sut, '' );
-    	$this->assertInstanceOf( EmptyVersion::class, $sut, '' );
-    	return $sut;
+		$sut = new EmptyVersion();
+		$this->assertInstanceOf( VersionInterface::class, $sut, '' );
+		$this->assertInstanceOf( EmptyVersion::class, $sut, '' );
+		return $sut;
 	}
 
 	/**
 	 * @test
 	 */
-    public function instanceOk()
-    {
+	public function instanceOk() {
 		$sut = $this->getInstance();
-    }
+	}
 
 	/**
 	 * @test
 	 */
-    public function itShouldNotHaveVersion()
-    {
+	public function itShouldNotHaveVersion() {
 		$sut = $this->getInstance();
 		$this->assertFalse( $sut->hasVersion(), '');
-    }
+	}
 
 	/**
 	 * @test
 	 */
-    public function itShouldReturnEmptyVersion()
-    {
+	public function itShouldReturnEmptyVersion() {
 		$sut = $this->getInstance();
 		$this->assertEmpty( $sut->version(), '' );
-    }
+	}
 }

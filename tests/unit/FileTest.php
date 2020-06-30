@@ -8,12 +8,12 @@ use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Version\VersionInterface;
 use SplFileInfo;
 
-class FileTest extends Unit
-{
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
+class FileTest extends Unit {
+
+	/**
+	 * @var \UnitTester
+	 */
+	protected $tester;
 
 	/**
 	 * @var SplFileInfo
@@ -46,16 +46,16 @@ class FileTest extends Unit
 		return $this->fakeFile->reveal();
 	}
 
-	protected function _before()
-    {
-    	$this->file = new SplFileInfo( \codecept_data_dir( 'fixtures/parent/css' ) . '/style.css' );
-    	$this->fakeFile = $this->prophesize( SplFileInfo::class );
-    	$this->version = $this->prophesize( VersionInterface::class );
-    }
+	// phpcs:ignore -- Method from Codeception
+	protected function _before() {
+		$this->file = new SplFileInfo( \codecept_data_dir( 'fixtures/parent/css' ) . '/style.css' );
+		$this->fakeFile = $this->prophesize( SplFileInfo::class );
+		$this->version = $this->prophesize( VersionInterface::class );
+	}
 
-    protected function _after()
-    {
-    }
+	// phpcs:ignore -- Method from Codeception
+	protected function _after() {
+	}
 
 	/**
 	 * @return File
@@ -64,43 +64,40 @@ class FileTest extends Unit
 		$sut = new File( $this->getFakeFile(), $this->getVersion(), $this->base_url, $this->base_path );
 		$this->assertInstanceOf( File::class, $sut, '');
 		return $sut;
-    }
+	}
 
 	/**
 	 * @test
 	 */
-    public function instanceOk()
-    {
-    	return $this->getInstance();
-    }
+	public function instanceOk() {
+		return $this->getInstance();
+	}
 
 	/**
 	 * @test
 	 */
-    public function itShouldReturnTheFileVersionFromGetMTIme()
-    {
+	public function itShouldReturnTheFileVersionFromGetMTIme() {
 		$expected = time();
 
-    	$this->fakeFile->getMTime()->willReturn($expected);
+		$this->fakeFile->getMTime()->willReturn($expected);
 		$this->version->hasVersion()->willReturn(false);
 
-    	$sut = $this->getInstance();
-    	$this->assertEquals( \strval( $expected ), $sut->version(), '' );
-    }
+		$sut = $this->getInstance();
+		$this->assertEquals( \strval( $expected ), $sut->version(), '' );
+	}
 
 	/**
 	 * @test
 	 */
-    public function itShouldReturnTheVersionFromMock()
-    {
+	public function itShouldReturnTheVersionFromMock() {
 		$expected = '42';
 
 		$this->version->hasVersion()->willReturn(true);
 		$this->version->version()->willReturn('42');
 
-    	$sut = $this->getInstance();
-    	$this->assertEquals( \strval( $expected ), $sut->version(), '' );
-    }
+		$sut = $this->getInstance();
+		$this->assertEquals( \strval( $expected ), $sut->version(), '' );
+	}
 
 	public function baseStringProvider() {
 		return [
@@ -133,28 +130,26 @@ class FileTest extends Unit
 				$_SERVER['TEST_SITE_WP_URL'] . '/',
 			],
 		];
-    }
+	}
 
 	/**
 	 * @test
 	 * @dataProvider baseStringProvider()
 	 */
-    public function itShouldReturnTheFileUrl( $base_path, $base_url )
-    {
-    	$this->base_path = $base_path;
-    	$this->base_url = $base_url;
+	public function itShouldReturnTheFileUrl( $base_path, $base_url ) {
+		$this->base_path = $base_path;
+		$this->base_url = $base_url;
 		$this->fakeFile->getRealPath()->willReturn($this->file->getRealPath());
 
 		$expected = \rtrim( $base_url, '\/' ) . '/wp-content/plugins/asset/tests/_data/fixtures/parent/css/style.css';
-    	$sut = $this->getInstance();
-    	$this->assertEquals( $expected, $sut->url(), '' );
-    }
+		$sut = $this->getInstance();
+		$this->assertEquals( $expected, $sut->url(), '' );
+	}
 
 	/**
 	 * @test
 	 */
-    public function file()
-    {
+	public function file() {
 //		codecept_debug( $this->file->getPathInfo() );
 //		codecept_debug( $this->file->getPath() );
 //		codecept_debug( $this->file->getFilename() );
@@ -166,5 +161,5 @@ class FileTest extends Unit
 //		codecept_debug( $this->file->getCTime() );
 //		codecept_debug( $this->file->getMTime() );
 //		codecept_debug( $this->file->getExtension() );
-    }
+	}
 }

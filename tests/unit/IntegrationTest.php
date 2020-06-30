@@ -11,15 +11,15 @@ use ItalyStrap\Asset\Version\EmptyVersion;
 use ItalyStrap\Config\ConfigFactory;
 use UnitTester;
 
-class IntegrationTest extends Unit
-{
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
-    
-    protected function _before()
-    {
+class IntegrationTest extends Unit {
+
+	/**
+	 * @var UnitTester
+	 */
+	protected $tester;
+
+	// phpcs:ignore -- Method from Codeception
+	protected function _before() {
 		$this->paths = [
 			'childPath'		=> \codecept_data_dir( 'fixtures/child/css' ),
 			'parentPath'	=> \codecept_data_dir( 'fixtures/parent/css' ),
@@ -27,11 +27,11 @@ class IntegrationTest extends Unit
 
 		$this->finder = new AssetFinder();
 		$this->finder->in( $this->paths );
-    }
+	}
 
-    protected function _after()
-    {
-    }
+	// phpcs:ignore -- Method from Codeception
+	protected function _after() {
+	}
 
 	public function configProvider() {
 		return [
@@ -50,32 +50,30 @@ class IntegrationTest extends Unit
 				]
 			],
 		];
-    }
+	}
 
 	/**
 	 * @test
 	 * @dataProvider configProvider()
 	 */
-    public function integration( array $config )
-    {
-    	codecept_debug( $files_to_search = array_reverse( explode( '.', $config['file'] ) ) );
+	public function integration( array $config ) {
+		codecept_debug( $files_to_search = array_reverse( explode( '.', $config['file'] ) ) );
 
-    	$extension = array_shift( $files_to_search );
-    	codecept_debug('AFTER SHIFT');
-		codecept_debug( $files_to_search );
-		codecept_debug( $extension );
+		$extension = array_shift( $files_to_search );
+//		codecept_debug('AFTER SHIFT');
+//		codecept_debug( $files_to_search );
+//		codecept_debug( $extension );
 
 //    	codecept_debug( array_reverse( $config ) );
 
-    	$file = new File(
+		$file = new File(
 //    		new \SplFileInfo( $this->finder->find( $files_to_search, $extension) ),
-    		new \SplFileInfo( $this->finder->find( $files_to_search, $extension) ),
+			new \SplFileInfo( $this->finder->find( $files_to_search, $extension) ),
 			new EmptyVersion(),
 			$_SERVER['TEST_SITE_WP_URL'],
 			$_SERVER['WP_ROOT_FOLDER']
 		);
 
-    	$style = new Style( $file, ConfigFactory::make( $config ) );
-
-    }
+		$style = new Style( $file, ConfigFactory::make( $config ) );
+	}
 }

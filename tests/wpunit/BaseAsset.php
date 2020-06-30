@@ -6,15 +6,14 @@ namespace ItalyStrap\Asset\Test;
 use ItalyStrap\Asset\AssetFinder;
 use ItalyStrap\Asset\AssetStatusInterface;
 
-abstract class BaseAsset extends \Codeception\TestCase\WPTestCase
-{
+abstract class BaseAsset extends \Codeception\TestCase\WPTestCase {
 
-    public function setUp(): void
-    {
-        // before
-        parent::setUp();
 
-        // your set up methods here
+	public function setUp(): void {
+		// before
+		parent::setUp();
+
+		// your set up methods here
 
 		$this->paths = [
 			'childPath'		=> \codecept_data_dir( 'fixtures/child/css' ),
@@ -23,27 +22,24 @@ abstract class BaseAsset extends \Codeception\TestCase\WPTestCase
 
 		$this->finder = new AssetFinder();
 		$this->finder->in( $this->paths );
+	}
 
-    }
+	public function tearDown(): void {
+		// your tear down methods here
 
-    public function tearDown(): void
-    {
-        // your tear down methods here
-
-        // then
-        parent::tearDown();
-    }
+		// then
+		parent::tearDown();
+	}
 
 	/**
 	 * @return AssetStatusInterface
 	 */
-    abstract protected function getInstance();
+	abstract protected function getInstance();
 
 	/**
 	 * @test
 	 */
-	public function itShouldHaveAssetEnqueued()
-	{
+	public function itShouldHaveAssetEnqueued() {
 		$sut = $this->getInstance();
 
 		$sut->register();
@@ -52,13 +48,12 @@ abstract class BaseAsset extends \Codeception\TestCase\WPTestCase
 
 		$sut->enqueue();
 		$this->assertTrue( $sut->isEnqueued() );
-    }
+	}
 
 	/**
 	 * @test
 	 */
-	public function itfgnsfgnfsx()
-	{
+	public function itfgnsfgnfsx() {
 		\wp_enqueue_script(
 			'ciao',
 			'url',
@@ -78,7 +73,7 @@ abstract class BaseAsset extends \Codeception\TestCase\WPTestCase
 //		codecept_debug( wp_scripts()->queue );
 //		codecept_debug( wp_scripts()->get_data('bello', 'group') );
 //		codecept_debug( wp_scripts()->in_footer );
-    }
+	}
 
 	/**
 	 * @test

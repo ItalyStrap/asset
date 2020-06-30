@@ -11,31 +11,28 @@ if ( ! \class_exists( \ItalyStrap\Asset\Test\BaseAsset::class ) ) {
 	require 'BaseAsset.php';
 }
 
-class ScriptTest extends \ItalyStrap\Asset\Test\BaseAsset
-{
-    /**
-     * @var \WpunitTester
-     */
-    protected $tester;
-    
-    public function setUp(): void
-    {
-        // Before...
-        parent::setUp();
+class ScriptTest extends \ItalyStrap\Asset\Test\BaseAsset {
 
-        // Your set up methods here.
-    }
+	/**
+	 * @var \WpunitTester
+	 */
+	protected $tester;
+	
+	public function setUp(): void {
+		// Before...
+		parent::setUp();
 
-    public function tearDown(): void
-    {
-        // Your tear down methods here.
+		// Your set up methods here.
+	}
 
-        // Then...
-        parent::tearDown();
-    }
+	public function tearDown(): void {
+		// Your tear down methods here.
 
-	protected function getInstance()
-	{
+		// Then...
+		parent::tearDown();
+	}
+
+	protected function getInstance() {
 		$config = \ItalyStrap\Config\ConfigFactory::make([
 			'handle'	=> 'handle',
 		]);

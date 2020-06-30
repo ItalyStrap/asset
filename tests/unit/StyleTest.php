@@ -6,14 +6,12 @@ namespace ItalyStrap\Asset\Test;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\Style;
 
-if ( ! \class_exists( \ItalyStrap\Asset\Test\BaseAsset::class ) ) {
-	require 'BaseAsset.php';
-}
+include_once 'BaseAsset.php';
 
-class StyleTest extends BaseAsset
-{
-	protected function _before()
-	{
+class StyleTest extends BaseAsset {
+
+	// phpcs:ignore -- Method from Codeception
+	protected function _before() {
 		parent::_before();
 		$this->type = 'style';
 		$this->in_footer_or_media = 'all';
@@ -21,9 +19,9 @@ class StyleTest extends BaseAsset
 
 	/**
 	 * @return Asset
+	 * @throws \ReflectionException
 	 */
-	protected function getInstance()
-	{
+	protected function getInstance() {
 		$sut = new Style( $this->getFile(), $this->getConfig() );
 		return $sut;
 	}
