@@ -57,7 +57,8 @@ class IntegrationTest extends Unit {
 	 * @dataProvider configProvider()
 	 */
 	public function integration( array $config ) {
-		codecept_debug( $files_to_search = array_reverse( explode( '.', $config['file'] ) ) );
+		$files_to_search = array_reverse( explode( '.', $config['file'] ) );
+//		codecept_debug( $files_to_search  );
 
 		$extension = array_shift( $files_to_search );
 //		codecept_debug('AFTER SHIFT');
