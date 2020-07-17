@@ -1,14 +1,14 @@
 <?php
-/*
-Plugin Name: Asset
-Description: Classes and functions for handling debugging
-Plugin URI: https://italystrap.com
-Author: Enea Overclokk
-Author URI: https://italystrap.com
-Version: 1.0
-License: GPL2
-Text Domain: Text Domain
-Domain Path: Domain Path
+/**
+ * Plugin Name: Asset
+ * Description:
+ * Plugin URI: https://italystrap.com
+ * Author: Enea Overclokk
+ * Author URI: https://italystrap.com
+ * Version: 0.0.1
+ * License: MIT
+ * Text Domain: italystrap
+ * Domain Path: languages
 */
 
 /*

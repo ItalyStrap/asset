@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset\Test;
 
 use Codeception\Test\Unit;
-use ItalyStrap\Asset\AssetFinder;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Style;
 use ItalyStrap\Asset\Version\EmptyVersion;
@@ -25,8 +24,9 @@ class IntegrationTest extends Unit {
 			'parentPath'	=> \codecept_data_dir( 'fixtures/parent/css' ),
 		];
 
-		$this->finder = new AssetFinder();
-		$this->finder->in( $this->paths );
+//		$this->finder = new AssetFinder();
+		$this->finder = $this->prophesize(\ItalyStrap\Finder\FinderInterface::class);
+		$this->finder->in( $this->paths )->willReturn($this->finder);
 	}
 
 	// phpcs:ignore -- Method from Codeception
@@ -45,15 +45,14 @@ class IntegrationTest extends Unit {
 			'02'	=> [
 				[
 					'handle'	=> 'handle_style_01',
-					'file'		=> 'style.css',
-//					'file'		=> 'style.min.css',
+//					'file'		=> 'style.css',
+					'file'		=> 'custom.min.css',
 				]
 			],
 		];
 	}
 
 	/**
-	 * @test
 	 * @dataProvider configProvider()
 	 */
 	public function integration( array $config ) {
@@ -69,12 +68,13 @@ class IntegrationTest extends Unit {
 
 		$file = new File(
 //    		new \SplFileInfo( $this->finder->find( $files_to_search, $extension) ),
-			new \SplFileInfo( $this->finder->find( $files_to_search, $extension) ),
+			new \SplFileInfo( $this->finder->reveal()->find( array_reverse($files_to_search), $extension) ),
 			new EmptyVersion(),
 			$_SERVER['TEST_SITE_WP_URL'],
 			$_SERVER['WP_ROOT_FOLDER']
 		);
 
 		$style = new Style( $file, ConfigFactory::make( $config ) );
+		$style->enqueue();
 	}
 }
