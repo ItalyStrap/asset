@@ -6,18 +6,19 @@ namespace ItalyStrap\Asset\Test;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\Version\EmptyVersion;
+use ItalyStrap\Finder\Finder;
 
 // phpcs:disable
 include_once 'WPUnitBaseAsset.php';
 // phpcs:enable
 
-class ScriptTestWP extends WPUnitBaseAsset {
+class ScriptTest extends WPUnitBaseAsset {
 
 	/**
 	 * @var \WpunitTester
 	 */
 	protected $tester;
-	
+
 	public function setUp(): void {
 		// Before...
 		parent::setUp();
@@ -37,7 +38,7 @@ class ScriptTestWP extends WPUnitBaseAsset {
 			'handle'	=> 'handle',
 		]);
 		$file = new File(
-			new \SplFileInfo($this->finder->find( 'style', 'css') ),
+			$this->finder->firstFile( 'style', 'css'),
 			new EmptyVersion(),
 			$_SERVER['TEST_SITE_WP_URL'],
 			$_SERVER['WP_ROOT_FOLDER']

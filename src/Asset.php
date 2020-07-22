@@ -23,7 +23,7 @@ use ItalyStrap\Config\ConfigInterface;
  * Class Asset
  * @package ItalyStrap\Asset
  */
-abstract class Asset {
+abstract class Asset implements AssetInterface {
 
 	const HANDLE_KEY = 'handle';
 
@@ -74,6 +74,7 @@ abstract class Asset {
 
 		$this->handle = \strval( $config->get('handle') );
 	}
+
 	/**
 	 * @inheritDoc
 	 */

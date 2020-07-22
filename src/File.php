@@ -71,14 +71,18 @@ class File implements FileInterface {
 	/**
 	 * @return string
 	 */
-	private function normalizedString(): string {
-		return str_replace( '\\', '/', \strval( $this->file->getRealPath() ) );
+	private function normalizePath( string $path ): string {
+		return str_replace( '\\', '/', $path );
 	}
 
 	/**
 	 * @return string
 	 */
 	private function generateUrl(): string {
-		return str_replace( $this->base_path, $this->base_url, $this->normalizedString() );
+		return str_replace(
+			$this->normalizePath( $this->base_path ),
+			$this->base_url,
+			$this->normalizePath( strval( $this->file->getRealPath() ) )
+		);
 	}
 }

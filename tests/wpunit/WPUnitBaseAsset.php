@@ -3,11 +3,18 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
-use ItalyStrap\Asset\AssetFinder;
-use ItalyStrap\Asset\AssetStatusInterface;
+use Codeception\TestCase\WPTestCase;
+use ItalyStrap\Finder\Finder;
+use ItalyStrap\Finder\FinderFactory;
+use function codecept_data_dir;
+use function wp_enqueue_script;
 
-abstract class WPUnitBaseAsset extends \Codeception\TestCase\WPTestCase {
+abstract class WPUnitBaseAsset extends WPTestCase {
 
+	/**
+	 * @var Finder
+	 */
+	protected $finder;
 
 	public function setUp(): void {
 		// before
@@ -16,11 +23,11 @@ abstract class WPUnitBaseAsset extends \Codeception\TestCase\WPTestCase {
 		// your set up methods here
 
 		$this->paths = [
-			'childPath'		=> \codecept_data_dir( 'fixtures/child/css' ),
-			'parentPath'	=> \codecept_data_dir( 'fixtures/parent/css' ),
+			'childPath'		=> codecept_data_dir( 'fixtures/child/css' ),
+			'parentPath'	=> codecept_data_dir( 'fixtures/parent/css' ),
 		];
 
-		$this->finder = new AssetFinder();
+		$this->finder = ( new FinderFactory() )->make();
 		$this->finder->in( $this->paths );
 	}
 
@@ -54,14 +61,14 @@ abstract class WPUnitBaseAsset extends \Codeception\TestCase\WPTestCase {
 	 * @test
 	 */
 	public function itfgnsfgnfsx() {
-		\wp_enqueue_script(
+		wp_enqueue_script(
 			'ciao',
 			'url',
 			[],
 			'42',
 			true
 		);
-		\wp_enqueue_script(
+		wp_enqueue_script(
 			'bello',
 			'url',
 			[],

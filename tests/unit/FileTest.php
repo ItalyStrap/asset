@@ -139,27 +139,12 @@ class FileTest extends Unit {
 	public function itShouldReturnTheFileUrl( $base_path, $base_url ) {
 		$this->base_path = $base_path;
 		$this->base_url = $base_url;
-		$this->fakeFile->getRealPath()->willReturn($this->file->getRealPath());
+		$this->fakeFile->getRealPath()->willReturn(
+			\codecept_data_dir( 'fixtures/parent/css' ) . '\style.css'
+		);
 
 		$expected = \rtrim( $base_url, '\/' ) . '/wp-content/plugins/asset/tests/_data/fixtures/parent/css/style.css';
 		$sut = $this->getInstance();
 		$this->assertEquals( $expected, $sut->url(), '' );
-	}
-
-	/**
-	 * @test
-	 */
-	public function file() {
-//		codecept_debug( $this->file->getPathInfo() );
-//		codecept_debug( $this->file->getPath() );
-//		codecept_debug( $this->file->getFilename() );
-//		codecept_debug( $this->file->getPathname() );
-//		codecept_debug( $this->file->getRealPath() );
-//		codecept_debug( $this->file->getType() );
-//		codecept_debug( $this->file->getBasename() );
-//		codecept_debug( $this->file->getATime() );
-//		codecept_debug( $this->file->getCTime() );
-//		codecept_debug( $this->file->getMTime() );
-//		codecept_debug( $this->file->getExtension() );
 	}
 }
