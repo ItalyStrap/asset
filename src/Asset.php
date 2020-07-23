@@ -25,7 +25,11 @@ use ItalyStrap\Config\ConfigInterface;
  */
 abstract class Asset implements AssetInterface {
 
-	const HANDLE_KEY = 'handle';
+	const HANDLE	= 'handle';
+	const URL		= 'url';
+	const VERSION	= 'version';
+	const IN_FOOTER	= 'in_footer';
+	const LOCALIZE	= 'localize';
 
 	/**
 	 * Configuration for the class
@@ -115,7 +119,7 @@ abstract class Asset implements AssetInterface {
 	 * @throws InvalidArgumentException
 	 */
 	private function assertHasHandle(): void {
-		if ( ! $this->config->has( self::HANDLE_KEY ) ) {
+		if ( ! $this->config->has( self::HANDLE ) ) {
 			throw new InvalidArgumentException( \sprintf(
 				'A unique "handle" ID is required for the %s',
 				$this->class_name

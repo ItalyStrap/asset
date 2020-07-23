@@ -18,7 +18,7 @@ namespace ItalyStrap\Asset;
 /**
  * Asset_Loader
  */
-class Loader {
+class Loader_Theme {
 
 	/**
 	 * Returns an array of hooks that this subscriber wants to register with
@@ -28,7 +28,7 @@ class Loader {
 	 *
 	 * @return array
 	 */
-	public function getSubscribedEvents(): array {
+	public static function get_subscribed_events() {
 
 		return array(
 			// 'hook_name'				=> 'method_name',
@@ -104,8 +104,8 @@ class Loader {
 				'handle'	=> CURRENT_TEMPLATE_SLUG,
 				'file'		=>
 					file_exists( CHILDPATH . '/css/' . $dev_dir . CURRENT_TEMPLATE_SLUG . '.css' )
-					? STYLESHEETURL . '/css/' . $dev_dir . CURRENT_TEMPLATE_SLUG . '.css'
-					: STYLESHEETURL . '/css/' . $dev_dir . 'custom.css',
+						? STYLESHEETURL . '/css/' . $dev_dir . CURRENT_TEMPLATE_SLUG . '.css'
+						: STYLESHEETURL . '/css/' . $dev_dir . 'custom.css',
 				'version'	=> $ver,
 				'media'		=> null,
 			),
@@ -128,8 +128,8 @@ class Loader {
 				'handle'		=> CURRENT_TEMPLATE_SLUG,
 				'file'			=>
 					file_exists( CHILDPATH . '/js/' . CURRENT_TEMPLATE_SLUG . $min . '.js' )
-					? STYLESHEETURL . '/js/' . CURRENT_TEMPLATE_SLUG . $min . '.js'
-					: STYLESHEETURL . '/js/custom' . $min . '.js',
+						? STYLESHEETURL . '/js/' . CURRENT_TEMPLATE_SLUG . $min . '.js'
+						: STYLESHEETURL . '/js/custom' . $min . '.js',
 				'deps'			=> array( 'jquery' ),
 				'version'		=> $ver,
 				'in_footer'		=> true,

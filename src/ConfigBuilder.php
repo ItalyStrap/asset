@@ -44,16 +44,10 @@ class ConfigBuilder {
 
 	public function parsedConfig(): \Generator {
 
-		$requiredFields = [
-			'type',
-			'url',
-			'handle',
-		];
-
 		foreach ( $this->config as $config ) {
 			$config['url'] = $config['file'] = $config['file'] ?? '';
 
-			if ( 'comment-reply' === $config['handle'] ) {
+			if ( 'comment-reply' === $config[ Asset::HANDLE ] ) {
 				$config['file'] = 'comment-reply.js';
 			}
 
