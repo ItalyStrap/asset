@@ -51,8 +51,23 @@ class AssetSubscriberTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function instanceOkfgf() {
+	public function itShouldRun() {
 		$sut = $this->getInstance();
+		$subscriberd_events = $sut->getSubscribedEvents();
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldNotThrownAnyErrors() {
+		\tad\FunctionMockerLe\define('add_filter', function (){return true;});
+
+		$event_dispatcher = new \ItalyStrap\Event\EventDispatcher();
+		$event_subscriber = new \ItalyStrap\Event\SubscriberRegister( $event_dispatcher );
+		$sut = $this->getInstance();
+
+		$event_subscriber->addSubscriber( $sut );
+
 		$sut->getSubscribedEvents();
 	}
 }
