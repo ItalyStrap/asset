@@ -17,8 +17,7 @@
         "php" : ">=7.2",
         "italystrap/config": "^2.0",
         "italystrap/finder": "dev-master",
-        "inpsyde/assets": "^2.2",
-        "italystrap/event": "dev-master"
+        "inpsyde/assets": "^2.2"
     },
     "require-dev": {
         "lucatume/wp-browser": "^2.4",
@@ -43,7 +42,8 @@
         "infection/infection": "^0.15.3",
         "phpmetrics/phpmetrics": "^2.5",
         "nunomaduro/phpinsights": "^1.14.0",
-        "dg/bypass-finals": "^1.2"
+        "dg/bypass-finals": "^1.2",
+        "italystrap/event": "dev-master"
     },
     "autoload": {
         "psr-4": {

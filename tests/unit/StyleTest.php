@@ -24,7 +24,7 @@ class StyleTest extends UnitBaseAsset {
 	 * @throws \ReflectionException
 	 */
 	protected function getInstance() {
-		$sut = new Style( $this->getFile(), $this->getConfig() );
+		$sut = new Style( $this->getConfig() );
 		return $sut;
 	}
 

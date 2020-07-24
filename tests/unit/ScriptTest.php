@@ -24,7 +24,7 @@ class ScriptTest extends UnitBaseAsset {
 	 * @throws \ReflectionException
 	 */
 	protected function getInstance() {
-		$sut = new Script( $this->getFile(), $this->getConfig() );
+		$sut = new Script( $this->getConfig() );
 		return $sut;
 	}
 
@@ -34,5 +34,31 @@ class ScriptTest extends UnitBaseAsset {
 	public function instanceOk() {
 		$sut = parent::instanceOk();
 		$this->assertInstanceOf( Script::class, $sut, '' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldAddLocalizedScript() {
+
+		$called = 0;
+		\tad\FunctionMockerLe\define(
+			'wp_localize_script',
+			function ( string $handle, string $object_name, array $l10n ) use ( &$called ) {
+				$this->assertStringContainsString('handle', $handle, '');
+				$this->assertStringContainsString('object_name', $object_name, '');
+				$this->assertArrayHasKey('key', $l10n, '');
+				$this->assertSame(42, $l10n['key']);
+				$called++;
+				return true;
+			}
+		);
+
+		$this->config->get("localize.object_name")->willReturn('object_name');
+		$this->config->get("localize.params")->willReturn(['key' => 42]);
+
+		$sut = $this->getInstance();
+
+		$sut->localizeScript();
 	}
 }

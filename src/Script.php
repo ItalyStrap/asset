@@ -9,34 +9,57 @@ namespace ItalyStrap\Asset;
 final class Script extends Asset {
 
 	/**
-	 * Pre register the script
-	 * @return bool
+	 * @inheritDoc
 	 */
 	public function register(): bool {
+		$this->shouldLocalize();
 		return \wp_register_script(
 			$this->handle,
-			$this->file->url(),
-			$this->config->get('deps', []),
-			$this->file->version(),
-			$this->config->get('in_footer', false)
+			$this->config->get( Asset::URL ),
+			$this->config->get(Asset::DEPENDENCIES, []),
+			$this->config->get( Asset::VERSION ),
+			$this->config->get(Asset::IN_FOOTER, false)
 		);
 	}
 
 	/**
-	 * Enqueue the script
+	 * @inheritDoc
 	 */
 	public function enqueue(): void {
+		$this->shouldLocalize();
 		\wp_enqueue_script(
 			$this->handle,
-			$this->file->url(),
-			$this->config->get('deps', []),
-			$this->file->version(),
-			$this->config->get('in_footer', false)
+			$this->config->get( Asset::URL ),
+			$this->config->get(Asset::DEPENDENCIES, []),
+			$this->config->get( Asset::VERSION ),
+			$this->config->get(Asset::IN_FOOTER, false)
 		);
 	}
 
 	/**
 	 * Localize the script
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/wp_localize_script/
+	 *
+	 * @return bool
+	 */
+	public function localizeScript(): bool {
+		return \wp_localize_script(
+			$this->handle,
+			$this->config->get( Asset::LOCALIZE . '.object_name' ),
+			$this->config->get( Asset::LOCALIZE . '.params' )
+		);
+	}
+
+	private function shouldLocalize(): void {
+		if ( $this->config->has( Asset::LOCALIZE ) ) {
+			$this->localizeScript();
+		}
+	}
+
+	/**
+	 * Localize the script
+	 * @TODO Add inline script
 	 *
 	 * @link https://developer.wordpress.org/reference/functions/wp_localize_script/
 	 *
@@ -48,22 +71,6 @@ final class Script extends Asset {
 //			$this->handle,
 //			$config['data'],
 //			$config['position']
-//		);
-//	}
-
-	/**
-	 * Localize the script
-	 *
-	 * @link https://developer.wordpress.org/reference/functions/wp_localize_script/
-	 *
-	 * @return null
-	 */
-//	protected function localizeScript( array $config = array() ) {
-//
-//		return \wp_localize_script(
-//			$this->handle,
-//			$config['localize']['object_name'],
-//			$config['localize']['params']
 //		);
 //	}
 }

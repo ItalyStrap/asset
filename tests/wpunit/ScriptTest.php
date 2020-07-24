@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
+use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\Version\EmptyVersion;
@@ -34,15 +35,19 @@ class ScriptTest extends WPUnitBaseAsset {
 	}
 
 	protected function getInstance() {
-		$config = \ItalyStrap\Config\ConfigFactory::make([
-			'handle'	=> 'handle',
-		]);
+
 		$file = new File(
 			$this->finder->firstFile( 'style', 'css'),
 			new EmptyVersion(),
 			$_SERVER['TEST_SITE_WP_URL'],
 			$_SERVER['WP_ROOT_FOLDER']
 		);
+
+		$config = \ItalyStrap\Config\ConfigFactory::make([
+			Asset::HANDLE	=> 'handle',
+			Asset::URL		=> $file->url(),
+			Asset::VERSION	=> $file->version(),
+		]);
 
 		$sut = new Script( $file, $config );
 

@@ -33,22 +33,10 @@ abstract class UnitBaseAsset extends Unit {
 	protected $config;
 
 	/**
-	 * @var ObjectProphecy
-	 */
-	protected $file;
-
-	/**
 	 * @return ConfigInterface
 	 */
 	public function getConfig(): ConfigInterface {
 		return $this->config->reveal();
-	}
-
-	/**
-	 * @return FileInterface
-	 */
-	public function getFile(): FileInterface {
-		return $this->file->reveal();
 	}
 
 	/**
@@ -60,11 +48,9 @@ abstract class UnitBaseAsset extends Unit {
 	// phpcs:ignore -- Method from Codeception
 	protected function _before() {
 		$this->config = $this->prophesize( ConfigInterface::class );
-		$this->file = $this->prophesize( File::class );
 
 		$this->config->has('handle')->willReturn(true);
 		$this->config->get('handle')->willReturn('handle');
-//		$this->config->handle = 'handle';
 	}
 
 	// phpcs:ignore -- Method from Codeception
@@ -76,6 +62,7 @@ abstract class UnitBaseAsset extends Unit {
 			'wp_register_style',
 			'wp_enqueue_script',
 			'wp_enqueue_style',
+			'wp_localize_script',
 		]);
 	}
 
@@ -93,9 +80,27 @@ abstract class UnitBaseAsset extends Unit {
 	 */
 	public function itShouldThrownInvalidArgumentExceptionIfHandleIsNotDefined() {
 		$this->config->has('handle')->willReturn(false);
+		$this->config->get('url')->willReturn('file-name.' . $this->type);
 
 		$this->expectException( InvalidArgumentException::class );
+		$this->expectExceptionMessage(
+			\sprintf(
+				'A unique "handle" ID is required for the file-name.%s',
+				$this->type
+			)
+		);
 		$this->getInstance();
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldHaveDefaultLocation() {
+
+		$this->config->get(Asset::LOCATION, Argument::type('string'))->willReturn('wp_enqueue_scripts');
+
+		$sut = $this->getInstance();
+		$this->assertSame( 'wp_enqueue_scripts', $sut->location(), '' );
 	}
 
 	/**
@@ -120,7 +125,7 @@ abstract class UnitBaseAsset extends Unit {
 		$sut = $this->getInstance();
 
 		$this->assertTrue( $sut->isRegistered(), '' );
-		$this->assertEquals(1, $called, '');
+		$this->assertEquals(1, $called, "{$func_name} is not called");
 	}
 
 	/**
@@ -148,11 +153,11 @@ abstract class UnitBaseAsset extends Unit {
 		$this->assertEquals(1, $called, '');
 	}
 
-
-
 	private function commonRegisterEnqueue( string $func_name_pattern ): void {
-		$this->file->url()->willReturn( 'url' );
-		$this->file->version()->willReturn( '42' );
+		$this->config->has( Asset::LOCALIZE )->willReturn(false);
+
+		$this->config->get( Asset::URL )->willReturn( 'url' );
+		$this->config->get( Asset::VERSION )->willReturn( '42' );
 
 		/**
 		 * Only for Script
@@ -192,7 +197,8 @@ abstract class UnitBaseAsset extends Unit {
 	public function itShouldRegister() {
 		$this->commonRegisterEnqueue('wp_register_%s');
 		$sut = $this->getInstance();
-		$sut->register();
+		$result = $sut->register();
+		$this->assertTrue($result, '');
 	}
 
 	/**
@@ -202,5 +208,38 @@ abstract class UnitBaseAsset extends Unit {
 		$this->commonRegisterEnqueue('wp_enqueue_%s');
 		$sut = $this->getInstance();
 		$sut->enqueue();
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldLoad() {
+		$sut = $this->getInstance();
+
+		$this->config->get("load_on")->willReturn(true);
+		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+
+		$this->config->get("load_on")->willReturn([]);
+		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+
+		$this->config->get("load_on")->willReturn(function () {
+			return true;
+		});
+		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldNotLoad() {
+		$sut = $this->getInstance();
+
+		$this->config->get("load_on")->willReturn(false);
+		$this->assertFalse( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+
+		$this->config->get("load_on")->willReturn(function () {
+			return false;
+		});
+		$this->assertFalse( $sut->shouldEnqueue(), 'Should enqueue the asset' );
 	}
 }

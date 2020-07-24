@@ -15,10 +15,10 @@ final class Style extends Asset {
 	public function register(): bool {
 		return \wp_register_style(
 			$this->handle,
-			$this->file->url(),
-			$this->config->get('deps', []),
-			$this->file->version(),
-			$this->config->get('media', 'all')
+			$this->config->get( Asset::URL ),
+			$this->config->get(Asset::DEPENDENCIES, []),
+			$this->config->get( Asset::VERSION ),
+			$this->config->get(Asset::MEDIA, 'all')
 		);
 	}
 
@@ -28,10 +28,10 @@ final class Style extends Asset {
 	public function enqueue(): void {
 		\wp_enqueue_style(
 			$this->handle,
-			$this->file->url(),
-			$this->config->get('deps', []),
-			$this->file->version(),
-			$this->config->get('media', 'all')
+			$this->config->get( Asset::URL ),
+			$this->config->get(Asset::DEPENDENCIES, []),
+			$this->config->get( Asset::VERSION ),
+			$this->config->get(Asset::MEDIA, 'all')
 		);
 	}
 }

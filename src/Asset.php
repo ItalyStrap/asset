@@ -25,11 +25,14 @@ use ItalyStrap\Config\ConfigInterface;
  */
 abstract class Asset implements AssetInterface {
 
-	const HANDLE	= 'handle';
-	const URL		= 'url';
-	const VERSION	= 'version';
-	const IN_FOOTER	= 'in_footer';
-	const LOCALIZE	= 'localize';
+	const HANDLE		= 'handle';
+	const URL			= 'url';
+	const VERSION		= 'version';
+	const DEPENDENCIES	= 'deps';
+	const IN_FOOTER		= 'in_footer';
+	const LOCALIZE		= 'localize';
+	const MEDIA			= 'media';
+	const LOCATION		= 'location';
 
 	/**
 	 * Configuration for the class
@@ -58,11 +61,10 @@ abstract class Asset implements AssetInterface {
 
 	/**
 	 * Asset constructor.
-	 * @param FileInterface $file
 	 * @param ConfigInterface $config
 	 * @throws ReflectionException
 	 */
-	public function __construct( FileInterface $file, ConfigInterface $config ) {
+	public function __construct( ConfigInterface $config ) {
 
 		/**
 		 * Credits:
@@ -72,11 +74,41 @@ abstract class Asset implements AssetInterface {
 		 */
 		$this->class_name =  strtolower( ( new ReflectionClass( $this ) )->getShortName() );
 
-		$this->file = $file;
 		$this->config = $config;
 		$this->assertHasHandle();
+		$this->handle = \strval( $config->get(Asset::HANDLE ) );
+	}
 
-		$this->handle = \strval( $config->get('handle') );
+	/**
+	 * @inheritDoc
+	 */
+	public function location(): string {
+		return $this->config->get( Asset::LOCATION, 'wp_enqueue_scripts' );
+	}
+
+	/**
+	 * Loading asset conditionally.
+	 *
+	 * @return bool
+	 */
+	public function shouldEnqueue(): bool {
+		$to_load = $this->config->get('load_on' );
+
+		/**
+		 * Example:
+		 * 'load_on'		=> false,
+		 * 'load_on'		=> true,
+		 * 'load_on'		=> is_my_function\return_bool(),
+		 */
+		if ( \is_bool( $to_load ) ) {
+			return $to_load;
+		}
+
+		if ( ! is_callable( $to_load ) ) {
+			return true;
+		}
+
+		return (bool) call_user_func( $to_load );
 	}
 
 	/**
@@ -122,7 +154,7 @@ abstract class Asset implements AssetInterface {
 		if ( ! $this->config->has( self::HANDLE ) ) {
 			throw new InvalidArgumentException( \sprintf(
 				'A unique "handle" ID is required for the %s',
-				$this->class_name
+				$this->config->get( Asset::URL )
 			) );
 		}
 	}

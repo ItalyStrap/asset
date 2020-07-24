@@ -5,6 +5,8 @@ namespace ItalyStrap\Tests;
 
 use ItalyStrap\Asset\ConfigBuilder;
 use ItalyStrap\Config\ConfigInterface;
+use ItalyStrap\Finder\Finder;
+use ItalyStrap\Finder\FinderFactory;
 
 class InpsydeIntegrationTest extends \Codeception\TestCase\WPTestCase {
 
@@ -30,9 +32,11 @@ class InpsydeIntegrationTest extends \Codeception\TestCase\WPTestCase {
 	/**
 	 * @test
 	 */
-	public function integration() {
+	public function integrationWithOldAssetConfig() {
 
-		$config_builder = new ConfigBuilder();
+		$finder = (new FinderFactory())->make();
+
+		$config_builder = new ConfigBuilder($finder);
 		$config_builder->addConfig( require codecept_data_dir('/fixtures/_config/styles.php') );
 		$config_builder->addConfig( require codecept_data_dir('/fixtures/_config/scripts.php') );
 
