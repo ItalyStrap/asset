@@ -49,7 +49,7 @@ class ScriptTest extends WPUnitBaseAsset {
 			Asset::VERSION	=> $file->version(),
 		]);
 
-		$sut = new Script( $file, $config );
+		$sut = new Script( $config );
 
 		return $sut;
 	}

@@ -55,11 +55,6 @@ abstract class Asset implements AssetInterface {
 	protected $class_name = '';
 
 	/**
-	 * @var FileInterface
-	 */
-	protected $file;
-
-	/**
 	 * Asset constructor.
 	 * @param ConfigInterface $config
 	 * @throws ReflectionException

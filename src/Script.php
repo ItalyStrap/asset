@@ -12,7 +12,6 @@ final class Script extends Asset {
 	 * @inheritDoc
 	 */
 	public function register(): bool {
-		$this->shouldLocalize();
 		return \wp_register_script(
 			$this->handle,
 			$this->config->get( Asset::URL ),
@@ -26,7 +25,6 @@ final class Script extends Asset {
 	 * @inheritDoc
 	 */
 	public function enqueue(): void {
-		$this->shouldLocalize();
 		\wp_enqueue_script(
 			$this->handle,
 			$this->config->get( Asset::URL ),
@@ -34,6 +32,8 @@ final class Script extends Asset {
 			$this->config->get( Asset::VERSION ),
 			$this->config->get(Asset::IN_FOOTER, false)
 		);
+
+		$this->shouldLocalize();
 	}
 
 	/**
