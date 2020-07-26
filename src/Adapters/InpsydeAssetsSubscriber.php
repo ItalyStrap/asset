@@ -1,28 +1,29 @@
 <?php
 declare(strict_types=1);
 
-namespace ItalyStrap\Asset;
+namespace ItalyStrap\Asset\Adapters;
 
 use Inpsyde\Assets\AssetManager;
+use Inpsyde\Assets\Loader\LoaderInterface;
 use ItalyStrap\Event\ParameterKeys;
 use ItalyStrap\Event\SubscriberInterface;
 
-class AssetsSubscriberInpsydeAdapter implements SubscriberInterface {
+class InpsydeAssetsSubscriber implements SubscriberInterface {
 
 	const CALLBACK_METHOD_NAME = 'loadAssets';
 
 	/**
-	 * @var \Inpsyde\Assets\Loader\LoaderInterface
+	 * @var LoaderInterface
 	 */
 	private $loader;
 	private $resource;
 
 	/**
 	 * AssetsSubscriberInpsydeAdapter constructor.
-	 * @param \Inpsyde\Assets\Loader\LoaderInterface $loader
+	 * @param LoaderInterface $loader
 	 * @param $resource
 	 */
-	public function __construct( \Inpsyde\Assets\Loader\LoaderInterface $loader, $resource ) {
+	public function __construct( LoaderInterface $loader, $resource ) {
 		$this->loader = $loader;
 		$this->resource = $resource;
 	}

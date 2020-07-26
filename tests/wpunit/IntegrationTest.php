@@ -6,56 +6,82 @@ namespace ItalyStrap\Tests;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\AssetManager;
 use ItalyStrap\Asset\AssetsSubscriber;
+use ItalyStrap\Asset\ConfigBuilder;
+use ItalyStrap\Asset\Loader\GeneratorLoader;
+use ItalyStrap\Asset\Script;
+use ItalyStrap\Asset\Style;
+use ItalyStrap\Asset\Version\EmptyVersion;
 use ItalyStrap\Config\ConfigFactory;
+use ItalyStrap\Finder\Finder;
+use ItalyStrap\Finder\FinderFactory;
 use PHPUnit\Framework\Assert;
 
-class IntegrationTest extends \Codeception\TestCase\WPTestCase
-{
-    /**
-     * @var \WpunitTester
-     */
-    protected $tester;
-    
-    public function setUp(): void
-    {
-        // Before...
-        parent::setUp();
+class IntegrationTest extends \Codeception\TestCase\WPTestCase {
 
-        // Your set up methods here.
-    }
+	/**
+	 * @var \WpunitTester
+	 */
+	protected $tester;
+	
+	public function setUp(): void {
+		// Before...
+		parent::setUp();
 
-    public function tearDown(): void
-    {
-        // Your tear down methods here.
+		// Your set up methods here.
 
-        // Then...
-        parent::tearDown();
-    }
+		global $wp_scripts;
+		$wp_scripts = null;
+		global $wp_styles;
+		$wp_styles = null;
+	}
+
+	public function tearDown(): void {
+		// Your tear down methods here.
+
+		// Then...
+		parent::tearDown();
+	}
 
 	/**
 	 * @test
 	 */
-    public function itShouldRunAssets()
-    {
+	public function itShouldRunAssets() {
 		$event_dispatcher = new \ItalyStrap\Event\EventDispatcher();
 		$event_subscriber = new \ItalyStrap\Event\SubscriberRegister( $event_dispatcher );
 
-		$assets = [];
-		$assets[] = new \ItalyStrap\Asset\Style( ConfigFactory::make( [
-			Asset::HANDLE	=> 'handle',
-			Asset::URL		=> 'url',
-		] ) );
-		$assets[] = new \ItalyStrap\Asset\Script( ConfigFactory::make( [
-			Asset::HANDLE	=> 'handle',
-			Asset::URL		=> 'url',
-			Asset::LOCALIZE	=> [
-				'object_name'	=> 'pluginParams',
-				'params'		=> [
-					'ajaxurl'		=> \admin_url( '/admin-ajax.php' ),
-					'ajaxnonce'		=> \wp_create_nonce( 'ajaxnonce' ),
-				],
+		$config = [
+			[
+				Asset::HANDLE	=> 'handle',
+				Asset::URL		=> 'file/url.css',
 			],
-		] ) );
+			[
+				Asset::HANDLE	=> 'handle',
+				Asset::URL		=> 'file/url.js',
+				Asset::LOCALIZE	=> [
+					'object_name'	=> 'pluginParams',
+					'params'		=> [
+						'ajaxurl'		=> \admin_url( '/admin-ajax.php' ),
+						'ajaxnonce'		=> \wp_create_nonce( 'ajaxnonce' ),
+					],
+				],
+			]
+		];
+
+		$finder = (new FinderFactory())->make();
+//		$finder->in();
+
+		$config_builder = new ConfigBuilder(
+			$finder,
+			new EmptyVersion(),
+			$_SERVER['TEST_SITE_WP_URL'],
+			$_SERVER['WP_ROOT_FOLDER']
+		);
+
+		$config_builder->withType('css', Style::class );
+		$config_builder->withType('js', Script::class );
+		$config_builder->addConfig( $config );
+
+		$assets = ( new GeneratorLoader() )->load( $config_builder->parsedConfig() );
 
 		$assets_manager = new AssetManager();
 		$assets_manager->withAssets(...$assets);
@@ -69,10 +95,8 @@ class IntegrationTest extends \Codeception\TestCase\WPTestCase
 
 		\ob_start();
 		\do_action('wp_head');
-//		\do_action('wp_enqueue_scripts');
 		\do_action('wp_footer');
 		$output = \ob_get_clean();
-		codecept_debug( $output );
 
 		$enqueued = \wp_style_is('handle', 'enqueued');
 		Assert::assertTrue( $enqueued, '' );
@@ -81,6 +105,7 @@ class IntegrationTest extends \Codeception\TestCase\WPTestCase
 		Assert::assertTrue( $done, '' );
 
 		Assert::assertStringContainsString("id='handle-css'", $output, '');
+		Assert::assertStringContainsString("file/url.js", $output, '');
 		Assert::assertStringContainsString("pluginParams", $output, '');
-    }
+	}
 }

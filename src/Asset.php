@@ -33,6 +33,7 @@ abstract class Asset implements AssetInterface {
 	const LOCALIZE		= 'localize';
 	const MEDIA			= 'media';
 	const LOCATION		= 'location';
+	const SHOULD_LOAD	= 'load_on';
 
 	/**
 	 * Configuration for the class
@@ -129,14 +130,6 @@ abstract class Asset implements AssetInterface {
 	 */
 	private function is( $list = 'enqueued' ): bool {
 		$func = \sprintf( 'wp_%s_is', $this->class_name );
-
-		if ( ! is_callable( $func ) ) {
-			throw new \BadFunctionCallException(\sprintf(
-				'The function wp_%s_is does not exists',
-				$this->class_name
-			));
-		}
-
 		return $func( $this->handle, $list );
 	}
 

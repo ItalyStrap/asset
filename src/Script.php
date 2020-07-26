@@ -43,7 +43,7 @@ final class Script extends Asset {
 	 *
 	 * @return bool
 	 */
-	public function localizeScript(): bool {
+	private function localizeScript(): bool {
 		return \wp_localize_script(
 			$this->handle,
 			$this->config->get( Asset::LOCALIZE . '.object_name' ),

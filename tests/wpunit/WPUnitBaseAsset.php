@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset\Test;
 
 use Codeception\TestCase\WPTestCase;
+use ItalyStrap\Asset\AssetInterface;
 use ItalyStrap\Finder\Finder;
 use ItalyStrap\Finder\FinderFactory;
 use function codecept_data_dir;
@@ -22,6 +23,11 @@ abstract class WPUnitBaseAsset extends WPTestCase {
 
 		// your set up methods here
 
+		global $wp_scripts;
+		$wp_scripts = null;
+		global $wp_styles;
+		$wp_styles = null;
+
 		$this->paths = [
 			'childPath'		=> codecept_data_dir( 'fixtures/child/css' ),
 			'parentPath'	=> codecept_data_dir( 'fixtures/parent/css' ),
@@ -39,7 +45,7 @@ abstract class WPUnitBaseAsset extends WPTestCase {
 	}
 
 	/**
-	 * @return AssetStatusInterface
+	 * @return AssetInterface
 	 */
 	abstract protected function getInstance();
 

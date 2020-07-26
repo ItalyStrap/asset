@@ -6,6 +6,9 @@ namespace ItalyStrap\Tests;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\ConfigBuilder;
+use ItalyStrap\Asset\Script;
+use ItalyStrap\Asset\Style;
+use ItalyStrap\Asset\Version\EmptyVersion;
 use ItalyStrap\Finder\Finder;
 use ItalyStrap\Finder\FinderInterface;
 use Prophecy\Argument;
@@ -31,15 +34,19 @@ class ConfigParserTest extends Unit {
 	}
 
 	protected function _before() {
-//		$this->finder = $this->prophesize( FinderInterface::class );
-		$this->finder = $this->prophesize( Finder::class );
+		$this->finder = $this->prophesize( FinderInterface::class );
 	}
 
 	protected function _after() {
 	}
 
 	private function getInstance(): ConfigBuilder {
-		$sut = new ConfigBuilder( $this->getFinder() );
+		$sut = new ConfigBuilder(
+			$this->getFinder(),
+			new EmptyVersion(),
+			$_SERVER['TEST_SITE_WP_URL'],
+			$_SERVER['WP_ROOT_FOLDER']
+		);
 		$this->assertInstanceOf( ConfigBuilder::class, $sut, '' );
 		return $sut;
 	}
@@ -64,14 +71,54 @@ class ConfigParserTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function itShouldGetParsedConfig() {
+	public function itShouldThrownRunTimeExceptionIfTypeIsAlreadyRegistered() {
 		$sut = $this->getInstance();
-		$sut->addConfig( require codecept_data_dir('/fixtures/_config/styles.php') );
-		$sut->addConfig( require codecept_data_dir('/fixtures/_config/scripts.php') );
-		$configs = $sut->parsedConfig();
+		$sut->withType( 'css', Style::class );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'css as already been registered' );
+		$sut->withType( 'css', Style::class );
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldGetParsedConfigWithDefaultValues() {
+		$sut = $this->getInstance();
+		$sut->withType( 'css', Style::class );
+
+		$sut->addConfig([
+			[
+				Asset::HANDLE	=> 'handle',
+				Asset::URL		=> 'url.css',
+			]
+		]);
 
 		$is_called = 0;
-		foreach ( $configs as $items ) {
+		foreach ( $sut->parsedConfig() as $items ) {
+			$this->assertSame('', $items['file_name'], '');
+			$this->assertSame(true, $items['load_on'], '');
+			$this->assertSame([], $items[ Asset::DEPENDENCIES ], '');
+			$this->assertSame( true, $items[Asset::IN_FOOTER], '');
+
+			$is_called++;
+		}
+
+		$this->assertTrue(\boolval( $is_called ), '$configs is empty');
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldGetParsedConfig() {
+		$sut = $this->getInstance();
+		$sut->withType( 'css', Style::class );
+		$sut->withType( 'js', Script::class );
+		$sut->addConfig( require codecept_data_dir('/fixtures/_config/styles.php') );
+		$sut->addConfig( require codecept_data_dir('/fixtures/_config/scripts.php') );
+
+		$is_called = 0;
+		foreach ( $sut->parsedConfig() as $items ) {
 			$this->assertArrayHasKey('handle', $items, '');
 			$this->assertArrayHasKey('url', $items, '');
 			$this->assertArrayHasKey('type', $items, '');
@@ -92,12 +139,10 @@ class ConfigParserTest extends Unit {
 			]
 		] );
 
-		$configs = $sut->parsedConfig();
-
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('Url must not be empty');
 
-		foreach ( $configs as $items ) {
+		foreach ( $sut->parsedConfig() as $items ) {
 		}
 	}
 
@@ -105,6 +150,9 @@ class ConfigParserTest extends Unit {
 	 * @test
 	 */
 	public function itShouldThrownInvalidArgumentExceptionIfExtensionIsMissing() {
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('File extension is missing for test-with-no-extension');
+
 		$sut = $this->getInstance();
 		$sut->addConfig( [
 			[
@@ -113,19 +161,14 @@ class ConfigParserTest extends Unit {
 			]
 		] );
 
-		$configs = $sut->parsedConfig();
-
-		$this->expectException(\InvalidArgumentException::class);
-		$this->expectExceptionMessage('File extension is missing');
-
-		foreach ( $configs as $items ) {
+		foreach ( $sut->parsedConfig() as $items ) {
 		}
 	}
 
 	/**
 	 * @test
 	 */
-	public function itShouldThrownInvalidArgumentExceptionIfExtensionIsMissingytjtyjt() {
+	public function itShouldThrownInvalidArgumentExceptionIfExtensionIsNotRegistered() {
 		$sut = $this->getInstance();
 		$sut->addConfig( [
 			[
@@ -134,12 +177,10 @@ class ConfigParserTest extends Unit {
 			]
 		] );
 
-		$configs = $sut->parsedConfig();
-
 		$this->expectException(\RuntimeException::class);
 		$this->expectExceptionMessage('test extension is not registered');
 
-		foreach ( $configs as $items ) {
+		foreach ( $sut->parsedConfig() as $items ) {
 		}
 	}
 
@@ -149,7 +190,7 @@ class ConfigParserTest extends Unit {
 	public function itShouldIterate() {
 		$config = require codecept_data_dir('/fixtures/_config/new-assets-config.php');
 
-		codecept_debug( $config[0]['file_name'] );
+//		codecept_debug( $config[0]['file_name'] );
 
 		$style_css = codecept_data_dir('/fixtures/parent/css/style.css');
 
@@ -169,12 +210,14 @@ class ConfigParserTest extends Unit {
 
 
 		$sut = $this->getInstance();
+		$sut->withType( 'css', Style::class );
+
 		$sut->addConfig( $config );
 		$parsedConfig = $sut->parsedConfig();
 
 		$is_called = 0;
 		foreach ( $parsedConfig as $items ) {
-			codecept_debug($items);
+//			codecept_debug($items);
 			$this->assertArrayHasKey('url', $items, '');
 			$this->assertArrayHasKey('version', $items, '');
 

@@ -51,7 +51,7 @@ class AssetSubscriberTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function itShouldRun() {
+	public function itShouldHaveEventsSubscribed() {
 		$sut = $this->getInstance();
 		$subscriberd_events = $sut->getSubscribedEvents();
 	}
@@ -59,15 +59,23 @@ class AssetSubscriberTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function itShouldNotThrownAnyErrors() {
-		\tad\FunctionMockerLe\define('add_filter', function (){return true;});
+	public function itShouldExecute() {
+		$sut = $this->getInstance();
+		$sut->execute();
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldNotThrownAnyErrorsWhenSutIsSubscribedOnEvent() {
+		\tad\FunctionMockerLe\define('add_filter', function () {
+			return true;
+		});
 
 		$event_dispatcher = new \ItalyStrap\Event\EventDispatcher();
 		$event_subscriber = new \ItalyStrap\Event\SubscriberRegister( $event_dispatcher );
 		$sut = $this->getInstance();
 
 		$event_subscriber->addSubscriber( $sut );
-
-		$sut->getSubscribedEvents();
 	}
 }

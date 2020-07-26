@@ -162,13 +162,13 @@ abstract class UnitBaseAsset extends Unit {
 		/**
 		 * Only for Script
 		 */
-		$this->config->get( 'deps', [] )->willReturn( [] );
-		$this->config->get( 'in_footer', false )->willReturn( true );
+		$this->config->get( Asset::DEPENDENCIES, [] )->willReturn( [] );
+		$this->config->get( Asset::IN_FOOTER, false )->willReturn( true );
 
 		/**
 		 * Only for Style
 		 */
-		$this->config->get( 'media', 'all' )->willReturn( 'all' );
+		$this->config->get( Asset::MEDIA, 'all' )->willReturn( 'all' );
 
 		$func_name = sprintf(
 			$func_name_pattern,

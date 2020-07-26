@@ -8,7 +8,7 @@ use DG\BypassFinals;
 use Inpsyde\Assets\Asset;
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\LoaderInterface;
-use ItalyStrap\Asset\AssetsSubscriberInpsydeAdapter;
+use ItalyStrap\Asset\Adapters\InpsydeAssetsSubscriber;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use UnitTester;
@@ -71,11 +71,11 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit {
 	}
 
 	/**
-	 * @return AssetsSubscriberInpsydeAdapter
+	 * @return InpsydeAssetsSubscriber
 	 */
-	private function getAssetsSubscriberInpsydeAdapter(): AssetsSubscriberInpsydeAdapter {
-		$sut = new AssetsSubscriberInpsydeAdapter( $this->getAssetLoader(), [] );
-		$this->assertInstanceOf( AssetsSubscriberInpsydeAdapter::class, $sut, '' );
+	private function getAssetsSubscriberInpsydeAdapter(): InpsydeAssetsSubscriber {
+		$sut = new InpsydeAssetsSubscriber( $this->getAssetLoader(), [] );
+		$this->assertInstanceOf( InpsydeAssetsSubscriber::class, $sut, '' );
 		return $sut;
 	}
 
@@ -96,7 +96,7 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit {
 		$this->assertArrayHasKey( AssetManager::ACTION_SETUP, $array, '');
 		foreach ( $array as $item ) {
 			$this->assertTrue(
-				\in_array( AssetsSubscriberInpsydeAdapter::CALLBACK_METHOD_NAME, $item, true ),
+				\in_array( InpsydeAssetsSubscriber::CALLBACK_METHOD_NAME, $item, true ),
 				''
 			);
 		}
