@@ -216,13 +216,13 @@ abstract class UnitBaseAsset extends Unit {
 	public function itShouldLoad() {
 		$sut = $this->getInstance();
 
-		$this->config->get("load_on")->willReturn(true);
+		$this->config->get(Asset::SHOULD_LOAD)->willReturn(true);
 		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
 
-		$this->config->get("load_on")->willReturn([]);
+		$this->config->get(Asset::SHOULD_LOAD)->willReturn([]);
 		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
 
-		$this->config->get("load_on")->willReturn(function () {
+		$this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
 			return true;
 		});
 		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
@@ -234,10 +234,10 @@ abstract class UnitBaseAsset extends Unit {
 	public function itShouldNotLoad() {
 		$sut = $this->getInstance();
 
-		$this->config->get("load_on")->willReturn(false);
+		$this->config->get(Asset::SHOULD_LOAD)->willReturn(false);
 		$this->assertFalse( $sut->shouldEnqueue(), 'Should enqueue the asset' );
 
-		$this->config->get("load_on")->willReturn(function () {
+		$this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
 			return false;
 		});
 		$this->assertFalse( $sut->shouldEnqueue(), 'Should enqueue the asset' );

@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Loader;
 
-
 use ItalyStrap\Asset\AssetFactory;
 
-class GeneratorLoader
-{
+class GeneratorLoader {
+
 	public function load( \Generator $configs ) {
 
 		$assets = [];

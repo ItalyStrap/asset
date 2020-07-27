@@ -41,10 +41,12 @@ class InpsydeIntegrationTest extends \Codeception\TestCase\WPTestCase {
 
 		$finder = (new FinderFactory())->make();
 
-		$config_builder = new ConfigBuilder($finder,
+		$config_builder = new ConfigBuilder(
+			$finder,
 			new EmptyVersion(),
 			$_SERVER['TEST_SITE_WP_URL'],
-			$_SERVER['WP_ROOT_FOLDER']);
+			$_SERVER['WP_ROOT_FOLDER']
+		);
 
 		$config_builder->withType('css', Style::class);
 		$config_builder->withType('js', Script::class);
@@ -62,6 +64,5 @@ class InpsydeIntegrationTest extends \Codeception\TestCase\WPTestCase {
 		}
 
 		$assets_mamager->setup();
-
 	}
 }

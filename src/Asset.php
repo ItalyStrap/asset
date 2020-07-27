@@ -1,15 +1,4 @@
 <?php
-/**
- * Abstract Asset Class API
- *
- * Handle the CSS and JS regiter and enque
- *
- * @credits      [hellofromTonya](http://hellofromtonya.github.io/Fulcrum/)
- *
- * @version 1.0.0
- *
- * @package ItalyStrap\Asset
- */
 declare(strict_types=1);
 
 namespace ItalyStrap\Asset;

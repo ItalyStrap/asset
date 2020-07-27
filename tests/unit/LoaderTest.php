@@ -36,14 +36,13 @@ class LoaderTest extends Unit {
 	/**
 	 * @test
 	 */
-    public function instanceOk()
-    {
+	public function instanceOk() {
 		$sut = $this->getInstance();
-    }
+	}
 
-    function getConfig() {
-    	yield ConfigFactory::make([
-    		Asset::HANDLE	=> 'handle',
+	function getConfig() {
+		yield ConfigFactory::make([
+			Asset::HANDLE	=> 'handle',
 			'type'			=> Style::class,
 		]);
 	}
@@ -51,8 +50,7 @@ class LoaderTest extends Unit {
 	/**
 	 * @test
 	 */
-    public function itShouldLoad()
-    {
+	public function itShouldLoad() {
 		$sut = $this->getInstance();
 		$assets = $sut->load( $this->getConfig() );
 
@@ -63,5 +61,5 @@ class LoaderTest extends Unit {
 		}
 
 		$this->assertTrue(\boolval( $should_load ), '$assets is empty');
-    }
+	}
 }

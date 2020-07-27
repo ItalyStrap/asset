@@ -8,20 +8,18 @@ use Inpsyde\Assets\Loader\LoaderInterface;
 use ItalyStrap\Asset\Adapters\InpsydeGeneratorLoader;
 use UnitTester;
 
-class InpsydeGeneratorLoaderTest extends Unit
-{
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
-    
-    protected function _before()
-    {
-    }
+class InpsydeGeneratorLoaderTest extends Unit {
 
-    protected function _after()
-    {
-    }
+	/**
+	 * @var UnitTester
+	 */
+	protected $tester;
+	
+	protected function _before() {
+	}
+
+	protected function _after() {
+	}
 
 	/**
 	 * @return InpsydeGeneratorLoader
@@ -36,8 +34,7 @@ class InpsydeGeneratorLoaderTest extends Unit
 	/**
 	 * @test
 	 */
-    public function instanceOk()
-    {
+	public function instanceOk() {
 		$sut = $this->getInstance();
 	}
 }

@@ -5,8 +5,8 @@ namespace ItalyStrap\Asset;
 
 use ItalyStrap\Config\ConfigInterface;
 
-final class AssetFactory
-{
+final class AssetFactory {
+
 	public function make( ConfigInterface $config ) {
 		$type = $config->get( 'type' );
 

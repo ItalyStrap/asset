@@ -12,26 +12,23 @@ use ItalyStrap\Config\ConfigFactory;
 use stdClass;
 use UnitTester;
 
-class AssetFactoryTest extends Unit
-{
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
-    
-    protected function _before()
-    {
-    }
+class AssetFactoryTest extends Unit {
 
-    protected function _after()
-    {
-    }
+	/**
+	 * @var UnitTester
+	 */
+	protected $tester;
+	
+	protected function _before() {
+	}
+
+	protected function _after() {
+	}
 
 	/**
 	 * @test
 	 */
-    public function instanceOk()
-    {
+	public function instanceOk() {
 		$asset = ( new AssetFactory() )->make( ConfigFactory::make([
 			'type'	=> Style::class,
 			Asset::HANDLE	=> 'handle',
@@ -39,18 +36,17 @@ class AssetFactoryTest extends Unit
 
 		$this->assertInstanceOf( AssetInterface::class, $asset, '' );
 		$this->assertInstanceOf( Asset::class, $asset, '' );
-    }
+	}
 
 	/**
 	 * @test
 	 */
-    public function itShouldThrownInvalidArgumentExceptionIfTypeIsNotAssetInterface()
-    {
+	public function itShouldThrownInvalidArgumentExceptionIfTypeIsNotAssetInterface() {
 		$this->expectException( \InvalidArgumentException::class );
 		$this->expectExceptionMessage('The class stdClass must implements ItalyStrap\Asset\AssetInterface');
 
 		$asset = ( new AssetFactory() )->make( ConfigFactory::make([
 			'type'	=> stdClass::class,
 		]) );
-    }
+	}
 }
