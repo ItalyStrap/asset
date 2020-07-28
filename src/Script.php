@@ -8,6 +8,8 @@ namespace ItalyStrap\Asset;
  */
 final class Script extends Asset {
 
+	public const EXTENSION = 'js';
+
 	/**
 	 * @inheritDoc
 	 */

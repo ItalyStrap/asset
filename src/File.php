@@ -54,8 +54,8 @@ class File implements FileInterface {
 	 * @inheritDoc
 	 */
 	public function version() {
-		if ( $this->version->hasVersion() ) {
-			return $this->version->version();
+		if ( $version = $this->version->version($this->file, []) ) {
+			return $version;
 		}
 
 		return strval( $this->file->getMTime() );

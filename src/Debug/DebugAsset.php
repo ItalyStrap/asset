@@ -3,12 +3,19 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Debug;
 
+use InvalidArgumentException;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\AssetInterface;
-use ItalyStrap\Asset\Style;
 use ItalyStrap\Config\ConfigInterface;
+use ReflectionException;
+use function is_wp_error;
+use function sprintf;
+use function strval;
+use function wp_remote_get;
 
-abstract class DebugAsset implements \ItalyStrap\Asset\AssetInterface {
+abstract class DebugAsset implements AssetInterface
+{
+	public const M_URL_NOT_ACCESSIBLE = 'The url "%s" is not accessible';
 
 	/**
 	 * @var AssetInterface
@@ -24,17 +31,24 @@ abstract class DebugAsset implements \ItalyStrap\Asset\AssetInterface {
 
 		$url = $config->get( Asset::URL );
 
-		$response = \wp_remote_get( $url );
-		if ( \is_wp_error( $response ) ) {
-			throw new \InvalidArgumentException(
-				\sprintf(
-					'The url "%s" is not accessible',
-					\strval( $url )
+		$response = wp_remote_get( $url );
+		if ( is_wp_error( $response ) ) {
+			throw new InvalidArgumentException(
+				sprintf(
+					self::M_URL_NOT_ACCESSIBLE,
+					strval( $url )
 				)
 			);
 		}
 
 		$this->getAssetInstance( $config );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function handle(): string {
+		return $this->asset->handle();
 	}
 
 	/**
@@ -81,7 +95,7 @@ abstract class DebugAsset implements \ItalyStrap\Asset\AssetInterface {
 
 	/**
 	 * @param ConfigInterface $config
-	 * @throws \ReflectionException
+	 * @throws ReflectionException
 	 */
 	abstract protected function getAssetInstance( ConfigInterface $config ): void;
 }

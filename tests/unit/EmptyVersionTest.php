@@ -43,16 +43,8 @@ class EmptyVersionTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function itShouldNotHaveVersion() {
-		$sut = $this->getInstance();
-		$this->assertFalse( $sut->hasVersion(), '');
-	}
-
-	/**
-	 * @test
-	 */
 	public function itShouldReturnEmptyVersion() {
 		$sut = $this->getInstance();
-		$this->assertEmpty( $sut->version(), '' );
+		$this->assertEmpty( $sut->version( new \SplFileInfo(''), [] ), '' );
 	}
 }

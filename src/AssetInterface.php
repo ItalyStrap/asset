@@ -8,6 +8,11 @@ interface AssetInterface {
 	/**
 	 * @return string
 	 */
+	public function handle(): string;
+
+	/**
+	 * @return string
+	 */
 	public function location(): string;
 
 	/**

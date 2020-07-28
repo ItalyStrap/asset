@@ -5,12 +5,9 @@ namespace ItalyStrap\Asset\Version;
 interface VersionInterface {
 
 	/**
-	 * @return bool
-	 */
-	public function hasVersion(): bool;
-
-	/**
+	 * @param \SplFileInfo $fileInfo
+	 * @param array $config
 	 * @return mixed|string|bool|null
 	 */
-	public function version();
+	public function version( \SplFileInfo $fileInfo, array $config );
 }

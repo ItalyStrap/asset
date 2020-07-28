@@ -67,6 +67,13 @@ abstract class Asset implements AssetInterface {
 	/**
 	 * @inheritDoc
 	 */
+	public function handle(): string {
+		return $this->handle;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public function location(): string {
 		return $this->config->get( Asset::LOCATION, 'wp_enqueue_scripts' );
 	}

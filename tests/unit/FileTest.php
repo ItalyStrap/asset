@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
+use cli\arguments\Argument;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Version\VersionInterface;
@@ -80,7 +81,6 @@ class FileTest extends Unit {
 		$expected = time();
 
 		$this->fakeFile->getMTime()->willReturn($expected);
-		$this->version->hasVersion()->willReturn(false);
 
 		$sut = $this->getInstance();
 		$this->assertEquals( \strval( $expected ), $sut->version(), '' );
@@ -92,8 +92,7 @@ class FileTest extends Unit {
 	public function itShouldReturnTheVersionFromMock() {
 		$expected = '42';
 
-		$this->version->hasVersion()->willReturn(true);
-		$this->version->version()->willReturn('42');
+		$this->version->version( \Prophecy\Argument::any(), \Prophecy\Argument::any() )->willReturn($expected);
 
 		$sut = $this->getInstance();
 		$this->assertEquals( \strval( $expected ), $sut->version(), '' );

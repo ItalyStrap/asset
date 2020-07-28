@@ -8,14 +8,7 @@ class EmptyVersion implements VersionInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function version() {
+	public function version( \SplFileInfo $fileInfo, array $config ) {
 		return '';
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function hasVersion(): bool {
-		return false;
 	}
 }

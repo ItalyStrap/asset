@@ -8,6 +8,8 @@ namespace ItalyStrap\Asset;
  */
 final class Style extends Asset {
 
+	public const EXTENSION = 'css';
+
 	/**
 	 * Pre register the style
 	 * @return bool

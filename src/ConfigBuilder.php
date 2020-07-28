@@ -9,6 +9,8 @@ use ItalyStrap\Finder\FinderInterface;
 
 class ConfigBuilder {
 
+	public const FILE_NAME = 'file_name';
+
 	/**
 	 * @var array
 	 */
@@ -28,9 +30,9 @@ class ConfigBuilder {
 	private $types = [];
 
 	/**
-	 * @var FinderInterface
+	 * @var FinderInterface[]
 	 */
-	private $finder;
+	private $finder = [];
 
 	/**
 	 * @var VersionInterface
@@ -55,13 +57,10 @@ class ConfigBuilder {
 	 * @param string $base_path
 	 */
 	public function __construct(
-		FinderInterface $finder,
 		VersionInterface $version,
 		string $base_url,
 		string $base_path
 	) {
-		$this->finder = $finder;
-		$this->version = $version;
 		$this->base_url = $base_url;
 		$this->base_path = $base_path;
 	}
@@ -82,29 +81,55 @@ class ConfigBuilder {
 	}
 
 	/**
+	 * @param string $key
+	 * @param FinderInterface $finder
+	 */
+	public function withFinderForType( string $key, FinderInterface $finder ) {
+		if ( \array_key_exists( $key, $this->finder ) ) {
+			throw new \RuntimeException(\sprintf(
+				'%s for %s as already been registered',
+				get_class($finder),
+				$key
+			));
+		}
+
+		$this->finder[ $key ] = $finder;
+	}
+
+	public function withVersion( VersionInterface $version ) {
+		$this->version = $version;
+	}
+
+	/**
 	 * @param array ...$configs
 	 */
 	public function addConfig( array $configs ): void {
 		$this->config = \array_merge( $this->config, $configs );
 	}
 
+	/**
+	 * @return \Generator
+	 */
 	public function parsedConfig(): \Generator {
 
 		$default = [
-			'file_name'			=> '',
-			Asset::SHOULD_LOAD	=> true,
-			Asset::DEPENDENCIES	=> [],
-			Asset::IN_FOOTER	=> true,
+			'file'					=> '',
+			self::FILE_NAME			=> '',
+			Asset::URL				=> '',
+			Asset::VERSION			=> null,
+			Asset::SHOULD_LOAD		=> true,
+			Asset::DEPENDENCIES		=> [],
+			Asset::IN_FOOTER		=> true,
 		];
 
 		foreach ( $this->config as $config ) {
 			$config = \array_replace($default, $config);
 
-			$config = $this->generateFileUrl( $config );
-
 			if ( 'comment-reply' === $config[ Asset::HANDLE ] ) {
-				$config[ Asset::URL ] = 'comment-reply.js';
+				$config[ Asset::URL ] = '//comment-reply.js';
 			}
+
+			$config = $this->generateFileUrl( $config );
 
 			$config['type'] = $this->getType( $config[ Asset::URL ] );
 			$config['enqueue'] = $config[ Asset::SHOULD_LOAD ];
@@ -120,21 +145,26 @@ class ConfigBuilder {
 	 * @return mixed
 	 */
 	private function generateFileUrl( array $config ) {
-		$config[ Asset::URL ] = $config[ 'file' ] ?? ($config[ Asset::URL ] ?? '');
 
-		if ( $config[ Asset::URL ] || ! $config['file_name'] ) {
+		/**
+		 * In case the url is relative
+		 */
+		if ( \strpos( $config[ Asset::URL ], '//' ) !== false ) {
 			return $config;
 		}
 
-		$this->finder->names( $config['file_name'] );
-
-		/** @var \SplFileInfo $fileInfo */
-		foreach ( $this->finder as $fileInfo ) {
-			break;
+		/**
+		 * Back compat with old key
+		 */
+		if ( \strpos( $config[ 'file' ], '//' ) !== false ) {
+			$config[ Asset::URL ] = $config[ 'file' ];
+			return $config;
 		}
 
+		$fileInfo = $this->getFileInfo( $config[ self::FILE_NAME ] );
+
 		$config[ Asset::URL ] = $this->url( $fileInfo );
-		$config[ Asset::VERSION ] = $this->version( $fileInfo );
+		$config[ Asset::VERSION ] = $this->version( $fileInfo, $config );
 
 		return $config;
 	}
@@ -142,12 +172,20 @@ class ConfigBuilder {
 	/**
 	 * @return mixed
 	 */
-	private function version( \SplFileInfo $fileInfo ) {
+	private function version1( \SplFileInfo $fileInfo ) {
 		if ( $this->version->hasVersion() ) {
 			return $this->version->version();
 		}
 
 		return \strval( $fileInfo->getMTime() );
+	}
+
+	private function version( \SplFileInfo $fileInfo, array $config ) {
+		if ( ! $this->version ) {
+			return \strval( $fileInfo->getMTime() );
+		}
+
+		return $this->version->version( $fileInfo, $config );
 	}
 
 	/**
@@ -165,6 +203,7 @@ class ConfigBuilder {
 	}
 
 	/**
+	 * @param \SplFileInfo $fileInfo
 	 * @return string
 	 */
 	private function generateUrl( \SplFileInfo $fileInfo ): string {
@@ -173,6 +212,37 @@ class ConfigBuilder {
 			$this->base_url,
 			$this->normalizePath( strval( $fileInfo->getRealPath() ) )
 		);
+	}
+
+	/**
+	 * @param string[] $file_name
+	 * @return \SplFileInfo
+	 */
+	private function getFileInfo( $file_name ): \SplFileInfo {
+
+		foreach ( (array) $file_name as $item ) {
+			$extension = $this->fileExtension( $item );
+			break;
+		}
+
+		if ( ! \array_key_exists( $extension, $this->finder ) ) {
+			throw new \RuntimeException(
+				\sprintf(
+					'A finder for %s extension is not registered',
+					$extension
+				)
+			);
+		}
+
+		$this->finder[ $extension ]
+			->names( $file_name );
+
+		/** @var \SplFileInfo $fileInfo */
+		foreach ( $this->finder[ $extension ] as $fileInfo) {
+			break;
+		}
+
+		return $fileInfo;
 	}
 
 	/**
@@ -196,21 +266,21 @@ class ConfigBuilder {
 
 	/**
 	 * https://paulund.co.uk/get-the-file-extension-in-php
-	 * @param string $url
+	 * @param string $file_name_or_url
 	 * @return string
 	 */
-	private function fileExtension( string $url ): string {
+	private function fileExtension( string $file_name_or_url ): string {
 
-		if ( empty( $url ) ) {
-			throw new \InvalidArgumentException( 'Url must not be empty' );
+		if ( empty( $file_name_or_url ) ) {
+			throw new \InvalidArgumentException( 'File name or url must not be empty' );
 		}
 
-		$array = explode( ".", $url );
+		$array = explode( ".", $file_name_or_url );
 
 		if ( \count( $array ) === 1 ) {
 			throw new \InvalidArgumentException(\sprintf(
 				'File extension is missing for %s',
-				$url
+				$file_name_or_url
 			));
 		}
 

@@ -5,6 +5,8 @@ namespace ItalyStrap\Asset;
 
 class AssetManager {
 
+	public const EVENT_NAME = 'wp_enqueue_scripts';
+
 	/**
 	 * @var array Asset
 	 */

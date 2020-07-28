@@ -26,14 +26,17 @@ class AssetsSubscriber implements SubscriberInterface {
 	 */
 	public function getSubscribedEvents(): array {
 		return [
-			'wp_enqueue_scripts'	=> [
+			AssetManager::EVENT_NAME	=> [
 //				ParameterKeys::CALLBACK => [ $this->manager, 'register' ]
 				ParameterKeys::CALLBACK => 'execute'
 			],
 		];
 	}
 
-	public function execute() {
+	/**
+	 *
+	 */
+	public function execute(): void {
 		$this->manager->setup();
 	}
 }

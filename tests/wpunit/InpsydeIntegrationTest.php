@@ -42,7 +42,6 @@ class InpsydeIntegrationTest extends \Codeception\TestCase\WPTestCase {
 		$finder = (new FinderFactory())->make();
 
 		$config_builder = new ConfigBuilder(
-			$finder,
 			new EmptyVersion(),
 			$_SERVER['TEST_SITE_WP_URL'],
 			$_SERVER['WP_ROOT_FOLDER']
