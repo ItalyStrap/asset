@@ -23,6 +23,7 @@ abstract class Asset implements AssetInterface {
 	const MEDIA			= 'media';
 	const LOCATION		= 'location';
 	const SHOULD_LOAD	= 'load_on';
+	const TYPE			= 'type';
 
 	/**
 	 * Configuration for the class
@@ -75,7 +76,7 @@ abstract class Asset implements AssetInterface {
 	 * @inheritDoc
 	 */
 	public function location(): string {
-		return $this->config->get( Asset::LOCATION, 'wp_enqueue_scripts' );
+		return \strval( $this->config->get( Asset::LOCATION, 'wp_enqueue_scripts' ) );
 	}
 
 	/**
@@ -84,7 +85,8 @@ abstract class Asset implements AssetInterface {
 	 * @return bool
 	 */
 	public function shouldEnqueue(): bool {
-		$to_load = $this->config->get('load_on' );
+		/** @var bool|callable $to_load */
+		$to_load = $this->config->get(self::SHOULD_LOAD );
 
 		/**
 		 * Example:
@@ -124,9 +126,9 @@ abstract class Asset implements AssetInterface {
 	 * @param string $list
 	 * @return bool
 	 */
-	private function is( $list = 'enqueued' ): bool {
+	private function is( string $list = 'enqueued' ): bool {
 		$func = \sprintf( 'wp_%s_is', $this->class_name );
-		return $func( $this->handle, $list );
+		return \boolval( $func( $this->handle, $list ) );
 	}
 
 	/**
@@ -138,7 +140,7 @@ abstract class Asset implements AssetInterface {
 		if ( ! $this->config->has( self::HANDLE ) ) {
 			throw new InvalidArgumentException( \sprintf(
 				'A unique "handle" ID is required for the %s',
-				$this->config->get( Asset::URL )
+				\strval( $this->config->get( Asset::URL ) )
 			) );
 		}
 	}

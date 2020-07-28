@@ -15,13 +15,16 @@ final class Style extends Asset {
 	 * @return bool
 	 */
 	public function register(): bool {
-		return \wp_register_style(
+		/** @var bool $registered */
+		$registered = \wp_register_style(
 			$this->handle,
 			$this->config->get( Asset::URL ),
 			$this->config->get(Asset::DEPENDENCIES, []),
 			$this->config->get( Asset::VERSION ),
 			$this->config->get(Asset::MEDIA, 'all')
 		);
+
+		return \boolval( $registered );
 	}
 
 	/**

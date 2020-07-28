@@ -10,8 +10,10 @@ use function sprintf;
 final class AssetFactory {
 
 	public function make( ConfigInterface $config ): AssetInterface {
-		$type = $config->get( 'type' );
+		/** @var string $type */
+		$type = $config->get( Asset::TYPE );
 
+		/** @var AssetInterface $instance */
 		$instance = new $type( $config );
 
 		if ( ! $instance instanceof AssetInterface ) {

@@ -12,13 +12,6 @@ use function array_map;
 
 class InpsydeGeneratorLoader implements LoaderInterface {
 
-
-	/**
-	 * InpsydeGeneratorLoader constructor.
-	 */
-	public function __construct() {
-	}
-
 	/**
 	 * @inheritDoc
 	 */
@@ -31,8 +24,11 @@ class InpsydeGeneratorLoader implements LoaderInterface {
 			$assets[] = AssetFactory::create($config->toArray());
 		}
 
+		/**
+		 * @psalm-suppress ArgumentTypeCoercion
+		 */
 		$assets = array_map(
-			static function (BaseAsset $asset): Asset {
+			static function (BaseAsset $asset): BaseAsset {
 				return $asset->disableAutodiscoverVersion();
 			},
 			$assets

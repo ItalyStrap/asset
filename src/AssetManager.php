@@ -15,16 +15,16 @@ class AssetManager {
 	/**
 	 * @param AssetInterface ...$assets
 	 */
-	public function withAssets( AssetInterface ...$assets ) {
+	public function withAssets( AssetInterface ...$assets ): void {
 		$this->assets = \array_merge($assets, $this->assets);
 	}
 
-	public function setup() {
+	public function setup(): void {
 		if ( empty( $this->assets ) ) {
 			throw new \RuntimeException('No assets are provided');
 		}
 
-		\array_walk($this->assets, function ( AssetInterface $asset, $key ) {
+		\array_walk($this->assets, function ( AssetInterface $asset ) {
 			if ( $asset->shouldEnqueue() ) {
 				$asset->enqueue();
 			} else {

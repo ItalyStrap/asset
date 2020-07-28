@@ -106,16 +106,22 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit {
 	 * @test
 	 */
 	public function itShouldHaveEventFromGetSubscribedEventsfd() {
+		$return_value = [
+			$this->getAssetAsset(),
+			$this->getAssetAsset(),
+		];
+
 		$this->asset_loader
 			->load(Argument::any())
-			->willReturn(
-				[
-					$this->getAssetAsset()
-				]
-			)
+			->willReturn( $return_value )
 			->shouldBeCalled(1);
 
-		$this->asset_manager->register( Argument::any() )->shouldBeCalled(1);
+		$obj = $this;
+		$this->asset_manager->register( ...$return_value )->will(
+			function () use ( $obj ): AssetManager {
+				return $obj->getAssetManager();
+			}
+		)->shouldBeCalled(1);
 
 		$sut = $this->getAssetsSubscriberInpsydeAdapter();
 		$sut->loadAssets( $this->getAssetManager() );

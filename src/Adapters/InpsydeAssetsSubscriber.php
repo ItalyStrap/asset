@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Adapters;
 
+use Inpsyde\Assets\Asset;
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\LoaderInterface;
 use ItalyStrap\Event\ParameterKeys;
@@ -16,12 +17,16 @@ class InpsydeAssetsSubscriber implements SubscriberInterface {
 	 * @var LoaderInterface
 	 */
 	private $loader;
+
+	/**
+	 * @var mixed
+	 */
 	private $resource;
 
 	/**
 	 * AssetsSubscriberInpsydeAdapter constructor.
 	 * @param LoaderInterface $loader
-	 * @param $resource
+	 * @param mixed $resource
 	 */
 	public function __construct( LoaderInterface $loader, $resource ) {
 		$this->loader = $loader;
@@ -42,11 +47,11 @@ class InpsydeAssetsSubscriber implements SubscriberInterface {
 	/**
 	 * @param AssetManager $manager
 	 */
-	public function loadAssets( AssetManager $manager ) {
+	public function loadAssets( AssetManager $manager ): void {
+		/**
+		 * @var array<Asset>
+		 */
 		$assets = $this->loader->load($this->resource);
-
-		foreach ($assets as $asset ) {
-			$manager->register( $asset );
-		}
+		$manager->register( ...$assets );
 	}
 }

@@ -14,12 +14,20 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <referencedClass name="WP_Error" />
+            </errorLevel>
+        </UndefinedClass>
         <UndefinedFunction>
             <errorLevel type="suppress">
                 <referencedFunction name="wp_register_script"/>
                 <referencedFunction name="wp_enqueue_script"/>
                 <referencedFunction name="wp_register_style"/>
                 <referencedFunction name="wp_enqueue_style"/>
+                <referencedFunction name="wp_localize_script"/>
+                <referencedFunction name="wp_remote_get"/>
+                <referencedFunction name="is_wp_error"/>
             </errorLevel>
         </UndefinedFunction>
     </issueHandlers>

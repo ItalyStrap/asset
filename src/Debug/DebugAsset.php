@@ -19,6 +19,8 @@ abstract class DebugAsset implements AssetInterface
 
 	/**
 	 * @var AssetInterface
+	 * @psalm-suppress PropertyNotSetInConstructor
+	 *
 	 */
 	protected $asset;
 
@@ -31,6 +33,7 @@ abstract class DebugAsset implements AssetInterface
 
 		$url = $config->get( Asset::URL );
 
+		/** @var array|\WP_Error $response */
 		$response = wp_remote_get( $url );
 		if ( is_wp_error( $response ) ) {
 			throw new InvalidArgumentException(

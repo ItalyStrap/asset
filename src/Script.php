@@ -14,13 +14,16 @@ final class Script extends Asset {
 	 * @inheritDoc
 	 */
 	public function register(): bool {
-		return \wp_register_script(
+		/** @var bool $registered */
+		$registered = \wp_register_script(
 			$this->handle,
 			$this->config->get( Asset::URL ),
 			$this->config->get(Asset::DEPENDENCIES, []),
 			$this->config->get( Asset::VERSION ),
 			$this->config->get(Asset::IN_FOOTER, false)
 		);
+
+		return \boolval( $registered );
 	}
 
 	/**
@@ -46,11 +49,14 @@ final class Script extends Asset {
 	 * @return bool
 	 */
 	private function localizeScript(): bool {
-		return \wp_localize_script(
+		/** @var bool $localized */
+		$localized = \wp_localize_script(
 			$this->handle,
 			$this->config->get( Asset::LOCALIZE . '.object_name' ),
 			$this->config->get( Asset::LOCALIZE . '.params' )
 		);
+
+		return \boolval( $localized );
 	}
 
 	private function shouldLocalize(): void {

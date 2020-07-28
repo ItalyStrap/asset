@@ -45,7 +45,6 @@ class ConfigBuilderTest extends Unit
 
 	private function getInstance(): ConfigBuilder {
 		$sut = new ConfigBuilder(
-			new EmptyVersion(),
 			$_SERVER[ 'TEST_SITE_WP_URL' ],
 			$_SERVER[ 'WP_ROOT_FOLDER' ]
 		);
@@ -262,7 +261,7 @@ class ConfigBuilderTest extends Unit
 			]
 		) );
 		$this->finder->names( 'style.css' )->will( function () {
-		} )->shouldBeCalled( 0 );
+		} )->shouldBeCalled( 1 );
 
 		$sut = $this->getInstance();
 		$sut->addConfig( [

@@ -16,14 +16,6 @@ class ConfigBuilder {
 	 */
 	private $config = [];
 
-	private $schema = [
-		'handle'		=> '',
-		'file'			=> '',
-		'deps'			=> [],
-		'version'		=> '',
-		'in_footer'		=> true,
-	];
-
 	/**
 	 * @var array<string>
 	 */
@@ -35,7 +27,7 @@ class ConfigBuilder {
 	private $finder = [];
 
 	/**
-	 * @var VersionInterface
+	 * @var ?VersionInterface
 	 */
 	private $version;
 
@@ -51,13 +43,10 @@ class ConfigBuilder {
 
 	/**
 	 * ConfigBuilder constructor.
-	 * @param FinderInterface $finder
-	 * @param VersionInterface $version
 	 * @param string $base_url
 	 * @param string $base_path
 	 */
 	public function __construct(
-		VersionInterface $version,
 		string $base_url,
 		string $base_path
 	) {
@@ -84,7 +73,7 @@ class ConfigBuilder {
 	 * @param string $key
 	 * @param FinderInterface $finder
 	 */
-	public function withFinderForType( string $key, FinderInterface $finder ) {
+	public function withFinderForType( string $key, FinderInterface $finder ): void {
 		if ( \array_key_exists( $key, $this->finder ) ) {
 			throw new \RuntimeException(\sprintf(
 				'%s for %s as already been registered',
@@ -96,7 +85,7 @@ class ConfigBuilder {
 		$this->finder[ $key ] = $finder;
 	}
 
-	public function withVersion( VersionInterface $version ) {
+	public function withVersion( VersionInterface $version ): void {
 		$this->version = $version;
 	}
 
@@ -169,23 +158,12 @@ class ConfigBuilder {
 		return $config;
 	}
 
-	/**
-	 * @return mixed
-	 */
-	private function version1( \SplFileInfo $fileInfo ) {
-		if ( $this->version->hasVersion() ) {
-			return $this->version->version();
-		}
-
-		return \strval( $fileInfo->getMTime() );
-	}
-
-	private function version( \SplFileInfo $fileInfo, array $config ) {
+	private function version( \SplFileInfo $fileInfo, array $config ): string {
 		if ( ! $this->version ) {
 			return \strval( $fileInfo->getMTime() );
 		}
 
-		return $this->version->version( $fileInfo, $config );
+		return \strval( $this->version->version( $fileInfo, $config ) );
 	}
 
 	/**
@@ -219,9 +197,10 @@ class ConfigBuilder {
 	 * @return \SplFileInfo
 	 */
 	private function getFileInfo( $file_name ): \SplFileInfo {
+		$extension = '';
 
-		foreach ( (array) $file_name as $item ) {
-			$extension = $this->fileExtension( $item );
+		foreach ( (array) $file_name as $name ) {
+			$extension = $this->fileExtension( $name );
 			break;
 		}
 
@@ -239,17 +218,20 @@ class ConfigBuilder {
 
 		/** @var \SplFileInfo $fileInfo */
 		foreach ( $this->finder[ $extension ] as $fileInfo) {
-			break;
+			return $fileInfo;
 		}
 
-		return $fileInfo;
+		throw new \RuntimeException( \sprintf(
+			'%s file not found',
+			\implode(', ', $file_name)
+		) );
 	}
 
 	/**
-	 * @param $url
+	 * @param string $url
 	 * @return string
 	 */
-	private function getType( $url ): string {
+	private function getType( string $url ): string {
 		$extension = $this->fileExtension( $url );
 
 		if ( ! \array_key_exists( $extension, $this->types ) ) {
@@ -270,20 +252,19 @@ class ConfigBuilder {
 	 * @return string
 	 */
 	private function fileExtension( string $file_name_or_url ): string {
-
 		if ( empty( $file_name_or_url ) ) {
 			throw new \InvalidArgumentException( 'File name or url must not be empty' );
 		}
 
 		$array = explode( ".", $file_name_or_url );
 
-		if ( \count( $array ) === 1 ) {
+		if ( \count( $array ) <= 1 ) {
 			throw new \InvalidArgumentException(\sprintf(
 				'File extension is missing for %s',
 				$file_name_or_url
 			));
 		}
 
-		return end( $array );
+		return \strval( end( $array ) );
 	}
 }
