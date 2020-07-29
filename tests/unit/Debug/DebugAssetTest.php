@@ -23,15 +23,40 @@ class DebugAssetTest extends Unit {
 	 * @var bool
 	 */
 	protected $is_wp_error_return_value;
-	
+	protected $fake_asset_url = '';
+
 	protected function _before() {
+		$this->fake_asset_url = 'fake.asset.url';
+
 		\tad\FunctionMockerLe\define('wp_remote_get', function ( string $url ): array {
 			return [];
 		});
-
 		\tad\FunctionMockerLe\define('is_wp_error', function ( array $error ): bool {
 			return $this->is_wp_error_return_value;
 		});
+
+		$wp_is = function ( string $handle, $list = '' ): bool {
+			if ( 'registered' === $list ) {
+				codecept_debug($list);
+				return true;
+			}
+
+			return false;
+		};
+
+		\tad\FunctionMockerLe\define('wp_style_is', $wp_is );
+		\tad\FunctionMockerLe\define('wp_script_is', $wp_is );
+		\tad\FunctionMockerLe\define('wp_scripts', function () {
+			$std_class = new \stdClass();
+			$std_class->base_url = '';
+
+			$std_class->src = $this->fake_asset_url;
+
+			$std_class->registered = [
+				'handle'	=> $std_class,
+			];
+			return $std_class;
+		} );
 	}
 
 	protected function _after() {
@@ -60,6 +85,7 @@ class DebugAssetTest extends Unit {
 		$config = ConfigFactory::make([
 			Asset::HANDLE	=> 'handle',
 			Asset::URL		=> $url,
+			Asset::SHOULD_LOAD	=> false,
 		]);
 
 		$this->expectException( InvalidArgumentException::class);
@@ -97,6 +123,7 @@ class DebugAssetTest extends Unit {
 		$config = ConfigFactory::make([
 			Asset::HANDLE	=> 'handle',
 			Asset::URL		=> $url,
+			Asset::SHOULD_LOAD	=> false,
 		]);
 
 		$style = new $type($config);

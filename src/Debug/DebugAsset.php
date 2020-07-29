@@ -31,7 +31,18 @@ abstract class DebugAsset implements AssetInterface {
 	 */
 	public function __construct( ConfigInterface $config ) {
 
+		$this->getAssetInstance( $config );
+
 		$url = $config->get( Asset::URL );
+
+		if (
+			$this->isRegistered()
+			&& ! $this->isEnqueued()
+		) {
+			$url =
+				\wp_scripts()->base_url
+				. \wp_scripts()->registered[ $this->handle() ]->src;
+		}
 
 		/** @var array|\WP_Error $response */
 		$response = wp_remote_get( $url );
@@ -43,8 +54,6 @@ abstract class DebugAsset implements AssetInterface {
 				)
 			);
 		}
-
-		$this->getAssetInstance( $config );
 	}
 
 	/**

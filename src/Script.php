@@ -8,7 +8,9 @@ namespace ItalyStrap\Asset;
  */
 final class Script extends Asset {
 
-	public const EXTENSION = 'js';
+	public const EXTENSION		= 'js';
+	public const OBJECT_NAME	= 'object_name';
+	public const PARAMS			= 'params';
 
 	/**
 	 * @inheritDoc
@@ -52,8 +54,8 @@ final class Script extends Asset {
 		/** @var bool $localized */
 		$localized = \wp_localize_script(
 			$this->handle,
-			$this->config->get( Asset::LOCALIZE . '.object_name' ),
-			$this->config->get( Asset::LOCALIZE . '.params' )
+			$this->config->get( Asset::LOCALIZE . '.' . self::OBJECT_NAME ),
+			$this->config->get( Asset::LOCALIZE . '.' . self::PARAMS )
 		);
 
 		return \boolval( $localized );
