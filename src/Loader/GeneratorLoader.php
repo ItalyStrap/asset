@@ -10,10 +10,10 @@ use ItalyStrap\Config\ConfigInterface;
 class GeneratorLoader {
 
 	/**
-	 * @param \Generator $configs
+	 * @param iterable $configs
 	 * @return array<AssetInterface>
 	 */
-	public function load( \Generator $configs ): array {
+	public function load( iterable $configs ): array {
 
 		$assets = [];
 		/** @var ConfigInterface $config */

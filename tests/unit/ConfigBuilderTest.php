@@ -10,6 +10,7 @@ use ItalyStrap\Asset\ConfigBuilder;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\Style;
 use ItalyStrap\Asset\Version\EmptyVersion;
+use ItalyStrap\Asset\Version\VersionInterface;
 use ItalyStrap\Config\ConfigInterface;
 use ItalyStrap\Finder\Finder;
 use ItalyStrap\Finder\FinderInterface;
@@ -284,6 +285,46 @@ class ConfigBuilderTest extends Unit
 			);
 			$this->assertNotSame(42, $config->get( Asset::VERSION ), '');
 		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldHaveCustomVersion() {
+		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
+		$this->assertFileExists( $style_css,'');
+		$file_info = new \SplFileInfo( $style_css );
+		$this->finder->getIterator()->willReturn( new \ArrayIterator(
+			[
+				$file_info
+			]
+		) );
+		$this->finder->names( 'style.css' )->will( function () {
+		} )->shouldBeCalled( 1 );
+
+		$sut = $this->getInstance();
+		$config_ = [
+			Asset::HANDLE	=> 'test',
+			ConfigBuilder::FILE_NAME	=> 'style.css',
+//			Asset::VERSION	=> 42, // This will not be used
+		];
+		$sut->addConfig( [
+			$config_
+		] );
+
+		$sut->withType( Style::EXTENSION, Style::class );
+		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
+		$version = $this->prophesize( VersionInterface::class );
+		$version->version(Argument::any(), Argument::type('array'))->willReturn('55')->shouldBeCalled(1);
+		$sut->withVersion( $version->reveal() );
+
+		$called = 0;
+		/** @var ConfigInterface $config */
+		foreach ($sut->parsedConfig() as $config) {
+			$this->assertSame('55', $config->get( Asset::VERSION ), '');
+			$called++;
+		}
+		$this->assertTrue( \boolval( $called ) );
 	}
 
 	/**
