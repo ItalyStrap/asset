@@ -56,11 +56,13 @@ class IntegrationTest extends \Codeception\TestCase\WPTestCase {
 		$config = [
 			[
 				Asset::HANDLE	=> 'handle',
-				Asset::URL		=> 'file/url.css',
+//				Asset::URL		=> '//file/url.css',
+				ConfigBuilder::FILE_NAME	=> 'style.css',
 			],
 			[
 				Asset::HANDLE	=> 'handle',
-				Asset::URL		=> 'file/url.js',
+//				Asset::URL		=> '//file/url.js',
+				ConfigBuilder::FILE_NAME	=> 'script.js',
 				Asset::LOCALIZE	=> [
 					'object_name'	=> 'pluginParams',
 					'params'		=> [
@@ -71,25 +73,35 @@ class IntegrationTest extends \Codeception\TestCase\WPTestCase {
 			]
 		];
 
-		$finder = (new FinderFactory())->make();
-		$finder->in(
+		$js_finder = (new FinderFactory())->make();
+		$js_finder->in(
 			[
 				codecept_data_dir('/fixtures/child/js/'),
 				codecept_data_dir('/fixtures/parent/js/')
 			]
 		);
 
+		$css_finder = (new FinderFactory())->make();
+		$css_finder->in(
+			[
+				codecept_data_dir('/fixtures/child/css/'),
+				codecept_data_dir('/fixtures/parent/css/')
+			]
+		);
+
 		$config_builder = new ConfigBuilder(
-			new EmptyVersion(),
 			$_SERVER['TEST_SITE_WP_URL'],
 			$_SERVER['WP_ROOT_FOLDER']
 		);
 
-//		$config_builder->withType('css', Style::class );
-//		$config_builder->withType('js', Script::class );
+		$config_builder->withType(Style::EXTENSION, DebugStyle::class );
+//		$config_builder->withType(Style::EXTENSION, Style::class );
+		$config_builder->withFinderForType( Style::EXTENSION, $css_finder);
 
-		$config_builder->withType('css', DebugStyle::class );
-		$config_builder->withType('js', DebugScript::class );
+		$config_builder->withType(Script::EXTENSION, DebugScript::class );
+//		$config_builder->withType(Script::EXTENSION, Script::class );
+		$config_builder->withFinderForType( Script::EXTENSION, $js_finder);
+
 		$config_builder->addConfig( $config );
 
 		$assets = ( new GeneratorLoader() )->load( $config_builder->parsedConfig() );
@@ -118,9 +130,11 @@ class IntegrationTest extends \Codeception\TestCase\WPTestCase {
 		Assert::assertTrue( $done, '' );
 
 		Assert::assertStringContainsString("id='handle-css'", $output, '');
-		Assert::assertStringContainsString("file/url.js", $output, '');
+//		Assert::assertStringContainsString("file/url.js", $output, '');
+		Assert::assertStringContainsString("script.js", $output, '');
 		Assert::assertStringContainsString("pluginParams", $output, '');
 
+		$called = 0;
 		/** @var AssetInterface $asset */
 		foreach ( $assets as $asset ) {
 			Assert::assertTrue( $asset->isRegistered(), \sprintf(
@@ -131,6 +145,9 @@ class IntegrationTest extends \Codeception\TestCase\WPTestCase {
 				'The %s is not Enqueued',
 				$asset->handle()
 			) );
+			$called++;
 		}
+
+		Assert::assertTrue( \boolval( $called ), '$assets is empty' );
 	}
 }

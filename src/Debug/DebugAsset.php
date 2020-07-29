@@ -13,8 +13,8 @@ use function sprintf;
 use function strval;
 use function wp_remote_get;
 
-abstract class DebugAsset implements AssetInterface
-{
+abstract class DebugAsset implements AssetInterface {
+
 	public const M_URL_NOT_ACCESSIBLE = 'The url "%s" is not accessible';
 
 	/**

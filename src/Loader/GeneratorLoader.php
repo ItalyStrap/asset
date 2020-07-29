@@ -13,12 +13,13 @@ class GeneratorLoader {
 	 * @param iterable $configs
 	 * @return array<AssetInterface>
 	 */
-	public function load( iterable $configs ): array {
+	public function load( iterable $configs ): iterable {
 
 		$assets = [];
 		/** @var ConfigInterface $config */
 		foreach ( $configs as $config ) {
 			$assets[] = ( new AssetFactory() )->make($config);
+//			yield ( new AssetFactory() )->make($config);
 		}
 
 		return $assets;

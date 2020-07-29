@@ -17,8 +17,8 @@ use ItalyStrap\Finder\FinderInterface;
 use Prophecy\Argument;
 use UnitTester;
 
-class ConfigBuilderTest extends Unit
-{
+class ConfigBuilderTest extends Unit {
+
 
 	/**
 	 * @var UnitTester
@@ -144,7 +144,6 @@ class ConfigBuilderTest extends Unit
 				'file'			=> '//test-with-extension.css',
 			]
 		];
-
 	}
 
 	/**
@@ -179,7 +178,7 @@ class ConfigBuilderTest extends Unit
 	 */
 	public function itShouldGenerateUrlFromFileName() {
 		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
-		$this->assertFileExists( $style_css,'');
+		$this->assertFileExists( $style_css, '');
 		$this->finder->getIterator()->willReturn( new \ArrayIterator(
 			[
 				new \SplFileInfo( $style_css )
@@ -254,7 +253,7 @@ class ConfigBuilderTest extends Unit
 	 */
 	public function itShouldHaveVersionFromFileInfo() {
 		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
-		$this->assertFileExists( $style_css,'');
+		$this->assertFileExists( $style_css, '');
 		$file_info = new \SplFileInfo( $style_css );
 		$this->finder->getIterator()->willReturn( new \ArrayIterator(
 			[
@@ -292,7 +291,7 @@ class ConfigBuilderTest extends Unit
 	 */
 	public function itShouldHaveCustomVersion() {
 		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
-		$this->assertFileExists( $style_css,'');
+		$this->assertFileExists( $style_css, '');
 		$file_info = new \SplFileInfo( $style_css );
 		$this->finder->getIterator()->willReturn( new \ArrayIterator(
 			[

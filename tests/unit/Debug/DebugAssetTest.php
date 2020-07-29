@@ -12,32 +12,30 @@ use ItalyStrap\Asset\Debug\DebugStyle;
 use ItalyStrap\Config\ConfigFactory;
 use UnitTester;
 
-class DebugAssetTest extends Unit
-{
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
+class DebugAssetTest extends Unit {
+
+	/**
+	 * @var UnitTester
+	 */
+	protected $tester;
 
 	/**
 	 * @var bool
 	 */
-    protected $is_wp_error_return_value;
-    
-    protected function _before()
-    {
-    	\tad\FunctionMockerLe\define('wp_remote_get', function ( string $url ): array {
-    		return [];
+	protected $is_wp_error_return_value;
+	
+	protected function _before() {
+		\tad\FunctionMockerLe\define('wp_remote_get', function ( string $url ): array {
+			return [];
 		});
 
-    	\tad\FunctionMockerLe\define('is_wp_error', function ( array $error ): bool {
-    		return $this->is_wp_error_return_value;
+		\tad\FunctionMockerLe\define('is_wp_error', function ( array $error ): bool {
+			return $this->is_wp_error_return_value;
 		});
-    }
+	}
 
-    protected function _after()
-    {
-    }
+	protected function _after() {
+	}
 
 	public function assetNotAvailableProvider() {
 		return [

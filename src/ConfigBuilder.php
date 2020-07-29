@@ -97,9 +97,9 @@ class ConfigBuilder {
 	}
 
 	/**
-	 * @return \Generator
+	 * @return iterable
 	 */
-	public function parsedConfig(): \Generator {
+	public function parsedConfig(): iterable {
 
 		$default = [
 			'file'					=> '',
