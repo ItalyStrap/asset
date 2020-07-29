@@ -197,9 +197,10 @@ class ConfigBuilder {
 	 * @return \SplFileInfo
 	 */
 	private function getFileInfo( $file_name ): \SplFileInfo {
+		$file_name = (array) $file_name;
 		$extension = '';
 
-		foreach ( (array) $file_name as $name ) {
+		foreach ( $file_name as $name ) {
 			$extension = $this->fileExtension( $name );
 			break;
 		}

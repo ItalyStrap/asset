@@ -37,7 +37,6 @@ class DebugAssetTest extends Unit {
 
 		$wp_is = function ( string $handle, $list = '' ): bool {
 			if ( 'registered' === $list ) {
-				codecept_debug($list);
 				return true;
 			}
 

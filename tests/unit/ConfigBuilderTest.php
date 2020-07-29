@@ -184,7 +184,7 @@ class ConfigBuilderTest extends Unit {
 				new \SplFileInfo( $style_css )
 			]
 		) );
-		$this->finder->names( 'style.css' )->will( function () {
+		$this->finder->names( ['style.css'] )->will( function () {
 		} )->shouldBeCalled( 1 );
 
 
@@ -260,7 +260,7 @@ class ConfigBuilderTest extends Unit {
 				$file_info
 			]
 		) );
-		$this->finder->names( 'style.css' )->will( function () {
+		$this->finder->names( ['style.css'] )->will( function () {
 		} )->shouldBeCalled( 1 );
 
 		$sut = $this->getInstance();
@@ -298,7 +298,7 @@ class ConfigBuilderTest extends Unit {
 				$file_info
 			]
 		) );
-		$this->finder->names( 'style.css' )->will( function () {
+		$this->finder->names( ['style.css'] )->will( function () {
 		} )->shouldBeCalled( 1 );
 
 		$sut = $this->getInstance();
@@ -399,7 +399,7 @@ class ConfigBuilderTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function itShouldThrownInvalidArgumentExceptionIfExtensionIsNotRegistered() {
+	public function itShouldThrownRuntimeExceptionIfExtensionIsNotRegistered() {
 		$sut = $this->getInstance();
 		$sut->addConfig( [
 			[
@@ -410,6 +410,38 @@ class ConfigBuilderTest extends Unit {
 
 		$this->expectException( \RuntimeException::class );
 		$this->expectExceptionMessage( 'test extension is not registered' );
+
+		foreach ($sut->parsedConfig() as $items) {
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldThrownRuntimeExceptionIfFileDoesNotExists() {
+		$style_css = codecept_data_dir( '/fixtures/parent/css/no-style.css' );
+		$this->assertFileNotExists( $style_css, '');
+
+		$this->finder->getIterator()->willReturn( new \ArrayIterator(
+			[
+			]
+		) );
+		$this->finder->names( ['no-style.css'] )->will( function () {
+		} )->shouldBeCalled( 1 );
+
+		$sut = $this->getInstance();
+		$sut->withType( Style::EXTENSION, Style::class );
+		$sut->withFinderForType(Style::EXTENSION, $this->getFinder());
+
+		$sut->addConfig( [
+			[
+				Asset::HANDLE				=> 'test',
+				ConfigBuilder::FILE_NAME	=> 'no-style.css',
+			]
+		] );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'no-style.css file not found' );
 
 		foreach ($sut->parsedConfig() as $items) {
 		}
