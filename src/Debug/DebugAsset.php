@@ -44,16 +44,8 @@ abstract class DebugAsset implements AssetInterface {
 				. \wp_scripts()->registered[ $this->handle() ]->src;
 		}
 
-		/** @var array|\WP_Error $response */
-		$response = wp_remote_get( $url );
-		if ( is_wp_error( $response ) ) {
-			throw new InvalidArgumentException(
-				sprintf(
-					self::M_URL_NOT_ACCESSIBLE,
-					strval( $url )
-				)
-			);
-		}
+		$this->assertUrlIsAccessible( $url );
+		$this->assertAssetIsLoadedFromChild( $url );
 	}
 
 	/**
@@ -110,4 +102,43 @@ abstract class DebugAsset implements AssetInterface {
 	 * @throws ReflectionException
 	 */
 	abstract protected function getAssetInstance( ConfigInterface $config ): void;
+
+	/**
+	 * @param string $url
+	 */
+	private function assertAssetIsLoadedFromChild( string $url ): void {
+		if ( \is_child_theme() ) {
+			if ( \strpos( $url, \wp_scripts()->base_url . '/wp-content/themes/' ) !== false ) {
+				if ( \strpos( $url, \get_stylesheet() ) === false ) {
+					try {
+						throw new \RuntimeException(
+							\sprintf(
+								'Asset "%s" is loaded from parent, see: "%s"',
+								$this->handle(),
+								$url
+							)
+						);
+					} catch (\Exception $e) {
+						echo $e->getMessage();
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param string $url
+	 */
+	private function assertUrlIsAccessible( string $url ): void {
+		/** @var array|\WP_Error $response */
+		$response = wp_remote_get( $url );
+		if ( is_wp_error( $response ) ) {
+			throw new InvalidArgumentException(
+				sprintf(
+					self::M_URL_NOT_ACCESSIBLE,
+					strval( $url )
+				)
+			);
+		}
+	}
 }

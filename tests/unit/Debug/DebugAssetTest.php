@@ -10,7 +10,10 @@ use ItalyStrap\Asset\Debug\DebugAsset;
 use ItalyStrap\Asset\Debug\DebugScript;
 use ItalyStrap\Asset\Debug\DebugStyle;
 use ItalyStrap\Config\ConfigFactory;
+use stdClass;
 use UnitTester;
+use function sprintf;
+use function tad\FunctionMockerLe\undefineAll;
 
 class DebugAssetTest extends Unit {
 
@@ -23,10 +26,11 @@ class DebugAssetTest extends Unit {
 	 * @var bool
 	 */
 	protected $is_wp_error_return_value;
-	protected $fake_asset_url = '';
+	protected $fake_asset_url = '/wp-content/themes/theme-name/fake.asset.url';
+	protected $is_child_theme = false;
+	protected $get_stylesheet = 'theme-name';
 
 	protected function _before() {
-		$this->fake_asset_url = 'fake.asset.url';
 
 		\tad\FunctionMockerLe\define('wp_remote_get', function ( string $url ): array {
 			return [];
@@ -46,7 +50,7 @@ class DebugAssetTest extends Unit {
 		\tad\FunctionMockerLe\define('wp_style_is', $wp_is );
 		\tad\FunctionMockerLe\define('wp_script_is', $wp_is );
 		\tad\FunctionMockerLe\define('wp_scripts', function () {
-			$std_class = new \stdClass();
+			$std_class = new stdClass();
 			$std_class->base_url = '';
 
 			$std_class->src = $this->fake_asset_url;
@@ -56,19 +60,33 @@ class DebugAssetTest extends Unit {
 			];
 			return $std_class;
 		} );
+
+		\tad\FunctionMockerLe\define('is_child_theme', function () {
+			return $this->is_child_theme;
+		} );
+		\tad\FunctionMockerLe\define('get_stylesheet', function () {
+			return $this->get_stylesheet;
+		} );
 	}
 
 	protected function _after() {
+		undefineAll([
+			'wp_style_is',
+			'wp_script_is',
+			'wp_scripts',
+			'is_child_theme',
+			'get_stylesheet',
+		]);
 	}
 
 	public function assetNotAvailableProvider() {
 		return [
 			'css'	=> [
-				'fake.asset.url',
+				$this->fake_asset_url,
 				DebugStyle::class,
 			],
 			'js'	=> [
-				'fake.asset.url',
+				$this->fake_asset_url,
 				DebugScript::class,
 			],
 		];
@@ -89,12 +107,41 @@ class DebugAssetTest extends Unit {
 
 		$this->expectException( InvalidArgumentException::class);
 		$this->expectExceptionMessage(
-			\sprintf(
+			sprintf(
 				DebugAsset::M_URL_NOT_ACCESSIBLE,
 				$url
 			)
 		);
 		$style = new $type( $config );
+	}
+
+	/**
+	 * @test
+	 * @dataProvider assetNotAvailableProvider()
+	 */
+	public function itShouldThrownRunTimeExceptionIfAssetIsLoadedFromParentThemeNotChildThemeFor( $url, $type ) {
+		$this->is_wp_error_return_value = false;
+		$this->is_child_theme = true;
+		$this->get_stylesheet = 'child';
+
+		$config = ConfigFactory::make([
+			Asset::HANDLE	=> 'handle',
+			Asset::URL		=> $url,
+			Asset::SHOULD_LOAD	=> false,
+		]);
+
+		$style = new $type( $config );
+
+		$this->assertStringContainsString(
+			\sprintf(
+				'Asset "%s" is loaded from parent, see: "%s"',
+				'handle',
+				$url
+			),
+			$this->getActualOutput(),
+			''
+		);
+
 	}
 
 	public function assetAvailableProvider() {

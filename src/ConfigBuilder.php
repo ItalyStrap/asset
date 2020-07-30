@@ -217,6 +217,8 @@ class ConfigBuilder {
 		$this->finder[ $extension ]
 			->names( $file_name );
 
+//		return $this->finder[ $extension ]->current();
+
 		/** @var \SplFileInfo $fileInfo */
 		foreach ( $this->finder[ $extension ] as $fileInfo) {
 			return $fileInfo;
