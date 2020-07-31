@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
 
-use ItalyStrap\Event\ParameterKeys;
 use ItalyStrap\Event\SubscriberInterface;
 
 class AssetsSubscriber implements SubscriberInterface {
@@ -28,7 +27,7 @@ class AssetsSubscriber implements SubscriberInterface {
 		return [
 			AssetManager::EVENT_NAME	=> [
 //				ParameterKeys::CALLBACK => [ $this->manager, 'register' ]
-				ParameterKeys::CALLBACK => 'execute'
+				static::CALLBACK => 'execute'
 			],
 		];
 	}

@@ -6,7 +6,6 @@ namespace ItalyStrap\Asset\Adapters;
 use Inpsyde\Assets\Asset;
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\LoaderInterface;
-use ItalyStrap\Event\ParameterKeys;
 use ItalyStrap\Event\SubscriberInterface;
 
 class InpsydeAssetsSubscriber implements SubscriberInterface {
@@ -39,7 +38,7 @@ class InpsydeAssetsSubscriber implements SubscriberInterface {
 	public function getSubscribedEvents(): array {
 		return [
 			AssetManager::ACTION_SETUP	=> [
-				ParameterKeys::CALLBACK	=> 'loadAssets',
+				static::CALLBACK	=> 'loadAssets',
 			],
 		];
 	}
