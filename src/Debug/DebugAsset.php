@@ -15,7 +15,7 @@ use function wp_remote_get;
 
 abstract class DebugAsset implements AssetInterface {
 
-	public const M_URL_NOT_ACCESSIBLE = 'The url "%s" is not accessible';
+	public const M_URL_NOT_ACCESSIBLE = 'The url "%s" is not accessible, reason: %s';
 
 	/**
 	 * @var AssetInterface
@@ -136,7 +136,8 @@ abstract class DebugAsset implements AssetInterface {
 			throw new InvalidArgumentException(
 				sprintf(
 					self::M_URL_NOT_ACCESSIBLE,
-					strval( $url )
+					strval( $url ),
+					$response->get_error_message()
 				)
 			);
 		}

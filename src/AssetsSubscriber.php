@@ -23,12 +23,10 @@ class AssetsSubscriber implements SubscriberInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getSubscribedEvents(): array {
-		return [
-			AssetManager::EVENT_NAME	=> [
+	public function getSubscribedEvents(): iterable {
+		yield AssetManager::EVENT_NAME	=> [
 //				ParameterKeys::CALLBACK => [ $this->manager, 'register' ]
-				static::CALLBACK => 'execute'
-			],
+			static::CALLBACK => 'execute'
 		];
 	}
 
