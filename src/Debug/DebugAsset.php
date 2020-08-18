@@ -131,12 +131,12 @@ abstract class DebugAsset implements AssetInterface {
 	 */
 	private function assertUrlIsAccessible( string $url ): void {
 
-		\add_filter('https_ssl_verify', function ( bool $should_filter ): bool {
-			return false;
-		} );
+//		\add_filter('https_ssl_verify', function ( bool $should_filter ): bool {
+//			return false;
+//		} );
 
 		/** @var array|\WP_Error $response */
-		$response = wp_remote_get( $url );
+		$response = wp_remote_get( $url, ['sslverify' => false] );
 		if ( is_wp_error( $response ) ) {
 			throw new InvalidArgumentException(
 				sprintf(
