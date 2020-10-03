@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Version;
 
-class EmptyVersion implements VersionInterface {
+final class EmptyVersion implements VersionInterface {
 
 	/**
 	 * @inheritDoc

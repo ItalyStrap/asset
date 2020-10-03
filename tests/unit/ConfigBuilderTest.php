@@ -125,7 +125,7 @@ class ConfigBuilderTest extends Unit {
 		$this->expectExceptionMessage( 'A finder for css extension is not registered' );
 
 		/** @var ConfigInterface $config */
-		foreach ($sut->parsedConfig() as $config) {
+		foreach ($sut->parseConfig() as $config) {
 		}
 	}
 
@@ -163,7 +163,7 @@ class ConfigBuilderTest extends Unit {
 		$sut->withType(Style::EXTENSION, Style::class);
 
 		/** @var ConfigInterface $config_obj */
-		foreach ($sut->parsedConfig() as $config_obj) {
+		foreach ($sut->parseConfig() as $config_obj) {
 			$this->assertStringContainsString(
 				'//test-with-extension.css',
 				$config_obj->get( Asset::URL ),
@@ -200,7 +200,7 @@ class ConfigBuilderTest extends Unit {
 		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
 
 		/** @var ConfigInterface $config_obj */
-		foreach ($sut->parsedConfig() as $config_obj) {
+		foreach ($sut->parseConfig() as $config_obj) {
 			$this->assertStringContainsString(
 				'/tests/_data/fixtures/parent/css/style.css',
 				$config_obj->get( Asset::URL ),
@@ -219,11 +219,27 @@ class ConfigBuilderTest extends Unit {
 				Asset::HANDLE => 'test'
 			]
 		] );
-
+//
 		$this->expectException( \InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'File name or url must not be empty' );
+		$this->expectExceptionMessage( 'File name or url must not be empty for "test"' );
 
-		foreach ($sut->parsedConfig() as $items) {
+		foreach ($sut->parseConfig() as $items) {
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldNotThrownInvalidArgumentExceptionIfConfigHasDeregisterKey() {
+		$sut = $this->getInstance();
+		$sut->addConfig( [
+			[
+				Asset::HANDLE => 'test',
+				'deregister'	=> true,
+			]
+		] );
+
+		foreach ($sut->parseConfig() as $items) {
 		}
 	}
 
@@ -243,7 +259,7 @@ class ConfigBuilderTest extends Unit {
 		$sut->withType( Style::EXTENSION, Style::class );
 
 		/** @var ConfigInterface $config */
-		foreach ($sut->parsedConfig() as $config) {
+		foreach ($sut->parseConfig() as $config) {
 			$this->assertSame( 42, $config->get( Asset::VERSION ), '' );
 		}
 	}
@@ -276,7 +292,7 @@ class ConfigBuilderTest extends Unit {
 		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
 
 		/** @var ConfigInterface $config */
-		foreach ($sut->parsedConfig() as $config) {
+		foreach ($sut->parseConfig() as $config) {
 			$this->assertSame(
 				\strval( $file_info->getMTime() ),
 				$config->get( Asset::VERSION ),
@@ -319,7 +335,7 @@ class ConfigBuilderTest extends Unit {
 
 		$called = 0;
 		/** @var ConfigInterface $config */
-		foreach ($sut->parsedConfig() as $config) {
+		foreach ($sut->parseConfig() as $config) {
 			$this->assertSame('55', $config->get( Asset::VERSION ), '');
 			$called++;
 		}
@@ -341,7 +357,7 @@ class ConfigBuilderTest extends Unit {
 		] );
 
 		$is_called = 0;
-		foreach ($sut->parsedConfig() as $items) {
+		foreach ($sut->parseConfig() as $items) {
 			$this->assertSame( '', $items[ ConfigBuilder::FILE_NAME ], '' );
 			$this->assertSame( true, $items[ Asset::SHOULD_LOAD ], '' );
 			$this->assertSame( [], $items[ Asset::DEPENDENCIES ], '' );
@@ -365,7 +381,7 @@ class ConfigBuilderTest extends Unit {
 		$sut->addConfig( require codecept_data_dir( '/fixtures/_config/scripts.php' ) );
 
 		$is_called = 0;
-		foreach ($sut->parsedConfig() as $items) {
+		foreach ($sut->parseConfig() as $items) {
 			$this->assertArrayHasKey( 'handle', $items, '' );
 			$this->assertArrayHasKey( 'url', $items, '' );
 			$this->assertArrayHasKey( 'type', $items, '' );
@@ -392,7 +408,7 @@ class ConfigBuilderTest extends Unit {
 		$this->expectException( \InvalidArgumentException::class );
 		$this->expectExceptionMessage( 'File extension is missing for //test-with-no-extension' );
 
-		foreach ($sut->parsedConfig() as $items) {
+		foreach ($sut->parseConfig() as $items) {
 		}
 	}
 
@@ -411,7 +427,7 @@ class ConfigBuilderTest extends Unit {
 		$this->expectException( \RuntimeException::class );
 		$this->expectExceptionMessage( 'test extension is not registered' );
 
-		foreach ($sut->parsedConfig() as $items) {
+		foreach ($sut->parseConfig() as $items) {
 		}
 	}
 
@@ -443,7 +459,7 @@ class ConfigBuilderTest extends Unit {
 		$this->expectException( \RuntimeException::class );
 		$this->expectExceptionMessage( 'no-style.css file not found' );
 
-		foreach ($sut->parsedConfig() as $items) {
+		foreach ($sut->parseConfig() as $items) {
 		}
 	}
 
@@ -474,7 +490,7 @@ class ConfigBuilderTest extends Unit {
 		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
 
 		$sut->addConfig( $config );
-		$parsedConfig = $sut->parsedConfig();
+		$parsedConfig = $sut->parseConfig();
 
 		$is_called = 0;
 		foreach ($parsedConfig as $items) {

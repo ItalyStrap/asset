@@ -6,7 +6,7 @@ namespace ItalyStrap\Asset\Debug;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Config\ConfigInterface;
 
-class DebugScript extends DebugAsset {
+final class DebugScript extends DebugAsset {
 
 	/**
 	 * @param ConfigInterface $config

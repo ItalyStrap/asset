@@ -7,7 +7,7 @@ use ItalyStrap\Asset\AssetFactory;
 use ItalyStrap\Asset\AssetInterface;
 use ItalyStrap\Config\ConfigInterface;
 
-class GeneratorLoader {
+final class GeneratorLoader {
 
 	/**
 	 * @param iterable $configs

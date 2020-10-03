@@ -26,16 +26,17 @@ class DebugAssetTest extends Unit {
 	 * @var bool
 	 */
 	protected $is_wp_error_return_value;
+	protected $wp_remote_get_return_value;
 	protected $fake_asset_url = '/wp-content/themes/theme-name/fake.asset.url';
 	protected $is_child_theme = false;
 	protected $get_stylesheet = 'theme-name';
 
 	protected function _before() {
 
-		\tad\FunctionMockerLe\define('wp_remote_get', function ( string $url ): array {
-			return [];
+		\tad\FunctionMockerLe\define('wp_remote_get', function ( string $url ) {
+			return $this->wp_remote_get_return_value;
 		});
-		\tad\FunctionMockerLe\define('is_wp_error', function ( array $error ): bool {
+		\tad\FunctionMockerLe\define('is_wp_error', function ( $error ): bool {
 			return $this->is_wp_error_return_value;
 		});
 
@@ -95,13 +96,20 @@ class DebugAssetTest extends Unit {
 	/**
 	 * @test
 	 * @dataProvider assetNotAvailableProvider()
+	 * @param string $url
+	 * @param string $type
 	 */
-	public function itShouldThrownInvalidArgumentExceptionIfGetRemoteAssetIsNotAvailableFor( $url, $type ) {
+	public function itShouldThrownInvalidArgumentExceptionIfGetRemoteAssetIsNotAvailableFor( string $url, string $type ) {
 		$this->is_wp_error_return_value = true;
+		$this->wp_remote_get_return_value = new class {
+			function get_error_message () {
+				return 'Some error message from Remote Request';
+			}
+		};
 
 		$config = ConfigFactory::make([
-			Asset::HANDLE	=> 'handle',
-			Asset::URL		=> $url,
+			Asset::HANDLE		=> 'handle',
+			Asset::URL			=> $url,
 			Asset::SHOULD_LOAD	=> false,
 		]);
 
@@ -109,7 +117,8 @@ class DebugAssetTest extends Unit {
 		$this->expectExceptionMessage(
 			sprintf(
 				DebugAsset::M_URL_NOT_ACCESSIBLE,
-				$url
+				$url,
+				'Some error message from Remote Request'
 			)
 		);
 		$style = new $type( $config );

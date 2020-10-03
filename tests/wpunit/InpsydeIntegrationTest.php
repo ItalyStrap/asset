@@ -53,7 +53,7 @@ class InpsydeIntegrationTest extends \Codeception\TestCase\WPTestCase {
 		$config_builder->addConfig( require codecept_data_dir('/fixtures/_config/scripts.php') );
 
 		$loader = new InpsydeGeneratorLoader();
-		$assets = $loader->load( $config_builder->parsedConfig() );
+		$assets = $loader->load( $config_builder->parseConfig() );
 
 		$assets_mamager = new AssetManager();
 

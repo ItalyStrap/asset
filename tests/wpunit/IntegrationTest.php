@@ -104,7 +104,7 @@ class IntegrationTest extends \Codeception\TestCase\WPTestCase {
 
 		$config_builder->addConfig( $config );
 
-		$assets = ( new GeneratorLoader() )->load( $config_builder->parsedConfig() );
+		$assets = ( new GeneratorLoader() )->load( $config_builder->parseConfig() );
 
 		$assets_manager = new AssetManager();
 		$assets_manager->withAssets(...$assets);

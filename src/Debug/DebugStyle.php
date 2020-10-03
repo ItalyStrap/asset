@@ -9,7 +9,7 @@ use ItalyStrap\Asset\Style;
 use ItalyStrap\Config\Config;
 use ItalyStrap\Config\ConfigInterface;
 
-class DebugStyle extends DebugAsset {
+final class DebugStyle extends DebugAsset {
 
 	/**
 	 * @param ConfigInterface $config

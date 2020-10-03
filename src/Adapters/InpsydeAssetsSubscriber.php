@@ -8,7 +8,7 @@ use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\LoaderInterface;
 use ItalyStrap\Event\SubscriberInterface;
 
-class InpsydeAssetsSubscriber implements SubscriberInterface {
+final class InpsydeAssetsSubscriber implements SubscriberInterface {
 
 	const CALLBACK_METHOD_NAME = 'loadAssets';
 

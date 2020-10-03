@@ -5,7 +5,7 @@ namespace ItalyStrap\Asset;
 
 use ItalyStrap\Event\SubscriberInterface;
 
-class AssetsSubscriber implements SubscriberInterface {
+final class AssetsSubscriber implements SubscriberInterface {
 
 	/**
 	 * @var AssetManager
@@ -25,7 +25,6 @@ class AssetsSubscriber implements SubscriberInterface {
 	 */
 	public function getSubscribedEvents(): iterable {
 		yield AssetManager::EVENT_NAME	=> [
-//				ParameterKeys::CALLBACK => [ $this->manager, 'register' ]
 			static::CALLBACK => 'execute'
 		];
 	}

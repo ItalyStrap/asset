@@ -107,20 +107,22 @@ abstract class DebugAsset implements AssetInterface {
 	 * @param string $url
 	 */
 	private function assertAssetIsLoadedFromChild( string $url ): void {
-		if ( \is_child_theme() ) {
-			if ( \strpos( $url, \wp_scripts()->base_url . '/wp-content/themes/' ) !== false ) {
-				if ( \strpos( $url, \get_stylesheet() ) === false ) {
-					try {
-						throw new \RuntimeException(
-							\sprintf(
-								'Asset "%s" is loaded from parent, see: "%s"',
-								$this->handle(),
-								$url
-							)
-						);
-					} catch (\Exception $e) {
-						echo $e->getMessage();
-					}
+		if ( ! \is_child_theme() ) {
+			return;
+		}
+
+		if ( \strpos( $url, \wp_scripts()->base_url . '/wp-content/themes/' ) !== false ) {
+			if ( \strpos( $url, 'themes/' . \get_stylesheet() ) === false ) {
+				try {
+					throw new \RuntimeException(
+						\sprintf(
+							'Asset "%s" is loaded from parent, see: "%s"',
+							$this->handle(),
+							$url
+						)
+					);
+				} catch (\Exception $e) {
+					echo $e->getMessage();
 				}
 			}
 		}

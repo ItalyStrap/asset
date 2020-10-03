@@ -10,7 +10,7 @@ use Inpsyde\Assets\Loader\LoaderInterface;
 use ItalyStrap\Config\ConfigInterface;
 use function array_map;
 
-class InpsydeGeneratorLoader implements LoaderInterface {
+final class InpsydeGeneratorLoader implements LoaderInterface {
 
 	/**
 	 * @inheritDoc
