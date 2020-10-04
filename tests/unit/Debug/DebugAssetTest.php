@@ -41,11 +41,7 @@ class DebugAssetTest extends Unit {
 		});
 
 		$wp_is = function ( string $handle, $list = '' ): bool {
-			if ( 'registered' === $list ) {
-				return true;
-			}
-
-			return false;
+			return 'registered' === $list;
 		};
 
 		\tad\FunctionMockerLe\define('wp_style_is', $wp_is );

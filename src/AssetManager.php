@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
 
-final class AssetManager {
+class AssetManager {
 
 	public const EVENT_NAME = 'wp_enqueue_scripts';
 
