@@ -144,7 +144,7 @@ final class ConfigBuilder {
 			$config['dependencies'] = $config[ Asset::DEPENDENCIES ];
 			$config['inFooter'] = $config[ Asset::IN_FOOTER ];
 
-			yield ConfigFactory::make($config);
+			yield (new ConfigFactory)->make($config);
 		}
 	}
 
