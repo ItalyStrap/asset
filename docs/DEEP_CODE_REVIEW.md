@@ -101,7 +101,7 @@ The root `README.md` is currently too short to help new contributors understand 
 ## Medium-priority improvements
 
 - Replace `get_class($finder)` with `$finder::class` in `src/ConfigBuilder.php`.
-- Audit exception messages and naming for grammar/consistency, for example `"as already been registered"`.
+- Audit exception messages and naming for grammar/consistency, for example `"has already been registered"`.
 - Review whether `AssetFactory` should validate class names before instantiation to produce clearer errors.
 - Add more targeted tests around invalid configuration shapes and missing file resolution paths.
 - Remove stale code and examples from `tests/_temp/` if they are no longer used.
