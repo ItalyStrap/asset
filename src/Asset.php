@@ -102,7 +102,7 @@ abstract class Asset implements AssetInterface {
 			return true;
 		}
 
-		return (bool) call_user_func( $to_load );
+		return (bool) $to_load();
 	}
 
 	/**

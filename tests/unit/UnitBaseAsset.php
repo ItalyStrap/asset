@@ -242,4 +242,20 @@ abstract class UnitBaseAsset extends Unit {
 		});
 		$this->assertFalse( $sut->shouldEnqueue(), 'Should enqueue the asset' );
 	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldInvokeCallableLoadConditionOnce() {
+		$sut = $this->getInstance();
+		$called = 0;
+
+		$this->config->get(Asset::SHOULD_LOAD)->willReturn(function () use ( &$called ) {
+			$called++;
+			return true;
+		});
+
+		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+		$this->assertSame( 1, $called, 'Callable load condition should be invoked once' );
+	}
 }
