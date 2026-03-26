@@ -15,7 +15,7 @@ This repository already has a useful separation between asset registration (`src
 
 **Why this matters**
 
-The current development dependencies are pinned to versions that do not install on PHP 8.3, and Composer blocks at least one package set because of security advisories. This makes the repository hard to validate on a modern runtime.
+The current development dependencies are pinned to versions that do not install on PHP 8.3. In the current dependency set, a Composer install also rejects the `lucatume/wp-browser` chain because the allowed `symfony/process` versions are flagged by security advisories. This makes the repository hard to validate on a modern runtime.
 
 **Evidence**
 
