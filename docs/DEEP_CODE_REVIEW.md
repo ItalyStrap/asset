@@ -111,6 +111,9 @@ The root `README.md` is currently too short to help new contributors understand 
 - Replaced the legacy `call_user_func()` usage in `src/Asset.php` with direct callable invocation.
 - Added a focused unit test to confirm the load-condition callable is invoked exactly once.
 - Fixed the broken Composer support URLs.
+- Restored a real Composer `test` entry point and normalized Composer script paths to use forward slashes.
+- Added an internal parsed-asset value object plus earlier config validation for missing handles.
+- Improved `AssetFactory` validation so invalid class names fail before instantiation and added focused edge-case coverage.
 - Added this review document and linked it from the README so future contributors can find the recommendations in-repo.
 
 ## Suggested follow-up plan

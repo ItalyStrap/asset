@@ -78,11 +78,11 @@ class ConfigBuilderTest extends Unit {
 		$sut->withType( Script::EXTENSION, Script::class );
 
 		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'css as already been registered' );
+		$this->expectExceptionMessage( 'css has already been registered' );
 		$sut->withType( Style::EXTENSION, Style::class );
 
 		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'js as already been registered' );
+		$this->expectExceptionMessage( 'js has already been registered' );
 		$sut->withType( Script::EXTENSION, Script::class );
 	}
 
@@ -95,11 +95,11 @@ class ConfigBuilderTest extends Unit {
 		$sut->withFinderForType( Script::EXTENSION, $this->getFinder() );
 
 		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( get_class( $this->getFinder() ) . ' for css as already been registered' );
+		$this->expectExceptionMessage( $this->getFinder()::class . ' for css has already been registered' );
 		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
 
 		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( get_class( $this->getFinder() ) . ' for js as already been registered' );
+		$this->expectExceptionMessage( $this->getFinder()::class . ' for js has already been registered' );
 		$sut->withFinderForType( Script::EXTENSION, $this->getFinder() );
 	}
 
@@ -224,6 +224,24 @@ class ConfigBuilderTest extends Unit {
 		$this->expectExceptionMessage( 'File name or url must not be empty for "test"' );
 
 		foreach ($sut->parseConfig() as $items) {
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldThrownInvalidArgumentExceptionIfHandleIsMissing() {
+		$sut = $this->getInstance();
+		$sut->addConfig( [
+			[
+				Asset::URL => '//test.css',
+			]
+		] );
+
+		$this->expectException( \InvalidArgumentException::class );
+		$this->expectExceptionMessage( 'A unique "handle" ID is required for the //test.css' );
+
+		foreach ( $sut->parseConfig() as $items ) {
 		}
 	}
 
@@ -460,6 +478,34 @@ class ConfigBuilderTest extends Unit {
 		$this->expectExceptionMessage( 'no-style.css file not found' );
 
 		foreach ($sut->parseConfig() as $items) {
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function itShouldThrownRuntimeExceptionIfFallbackFilesDoNotExists() {
+		$this->finder->getIterator()->willReturn( new \ArrayIterator(
+			[
+			]
+		) );
+		$this->finder->names( [ 'no-style.css', 'no-style.min.css' ] )->will( function () {
+		} )->shouldBeCalled( 1 );
+
+		$sut = $this->getInstance();
+		$sut->withType( Style::EXTENSION, Style::class );
+		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
+		$sut->addConfig( [
+			[
+				Asset::HANDLE				=> 'test',
+				ConfigBuilder::FILE_NAME	=> [ 'no-style.css', 'no-style.min.css' ],
+			]
+		] );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessage( 'no-style.css, no-style.min.css file not found' );
+
+		foreach ( $sut->parseConfig() as $items ) {
 		}
 	}
 

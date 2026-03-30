@@ -102,11 +102,7 @@ abstract class Asset implements AssetInterface {
 			return true;
 		}
 
-		if ( $to_load instanceof \Closure ) {
-			return (bool) $to_load();
-		}
-
-		return (bool) \call_user_func( $to_load );
+		return (bool) $to_load();
 	}
 
 	/**
