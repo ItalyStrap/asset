@@ -230,7 +230,7 @@ class ConfigBuilderTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function itShouldThrownInvalidArgumentExceptionIfHandleIsMissing() {
+	public function itShouldThrowInvalidArgumentExceptionIfHandleIsMissing() {
 		$sut = $this->getInstance();
 		$sut->addConfig( [
 			[
@@ -484,7 +484,7 @@ class ConfigBuilderTest extends Unit {
 	/**
 	 * @test
 	 */
-	public function itShouldThrownRuntimeExceptionIfFallbackFilesDoNotExists() {
+	public function itShouldThrowRuntimeExceptionIfFallbackFilesDoNotExist() {
 		$this->finder->getIterator()->willReturn( new \ArrayIterator(
 			[
 			]

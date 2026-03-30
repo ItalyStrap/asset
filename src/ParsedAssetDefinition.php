@@ -51,6 +51,7 @@ final class ParsedAssetDefinition {
 			Asset::DEPENDENCIES,
 			Asset::IN_FOOTER,
 			Asset::TYPE,
+			// Downstream consumers still read these normalized aliases from the parsed config.
 			'enqueue',
 			'dependencies',
 			'inFooter',
