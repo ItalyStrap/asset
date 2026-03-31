@@ -73,7 +73,7 @@ final class ConfigBuilder {
 	public function withType( string $key, string $class ): void {
 		if ( array_key_exists( $key, $this->types ) ) {
 			throw new RuntimeException( sprintf(
-				'%s as already been registered',
+				'%s has already been registered',
 				$key
 			));
 		}
@@ -88,8 +88,8 @@ final class ConfigBuilder {
 	public function withFinderForType( string $key, FinderInterface $finder ): void {
 		if ( array_key_exists( $key, $this->finder ) ) {
 			throw new RuntimeException( sprintf(
-				'%s for %s as already been registered',
-				get_class($finder),
+				'%s for %s has already been registered',
+				$finder::class,
 				$key
 			));
 		}
@@ -133,6 +133,8 @@ final class ConfigBuilder {
 				continue;
 			}
 
+			$this->assertHasHandle( $config );
+
 			if ( 'comment-reply' === $config[ Asset::HANDLE ] ) {
 				$config[ Asset::URL ] = '//comment-reply.js';
 			}
@@ -144,8 +146,30 @@ final class ConfigBuilder {
 			$config['dependencies'] = $config[ Asset::DEPENDENCIES ];
 			$config['inFooter'] = $config[ Asset::IN_FOOTER ];
 
-			yield (new ConfigFactory)->make($config);
+			yield (new ConfigFactory)->make(
+				ParsedAssetDefinition::fromArray( $config )->toArray()
+			);
 		}
+	}
+
+	/**
+	 * @param array $config
+	 */
+	private function assertHasHandle( array $config ): void {
+		if ( array_key_exists( Asset::HANDLE, $config ) ) {
+			return;
+		}
+
+		$target = $config[ Asset::URL ];
+
+		if ( empty( $target ) ) {
+			$target = implode( ', ', (array) $config[ self::FILE_NAME ] );
+		}
+
+		throw new InvalidArgumentException( sprintf(
+			'A unique "handle" ID is required for the %s',
+			$target
+		) );
 	}
 
 	/**
