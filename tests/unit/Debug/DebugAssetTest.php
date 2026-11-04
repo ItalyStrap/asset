@@ -161,12 +161,12 @@ class DebugAssetTest extends Unit
         return [
             'css'   => [
                 'http://wordpress'
-                . '/wp-content/plugins/asset/tests/_data/fixtures/parent/css/style.css',
+                . '/tests/_data/fixtures/parent/css/style.css',
                 DebugStyle::class,
             ],
             'js'    => [
                 'http://wordpress'
-                . '/wp-content/plugins/asset/tests/_data/fixtures/parent/js/script.js',
+                . '/tests/_data/fixtures/parent/js/script.js',
                 DebugScript::class,
             ],
         ];

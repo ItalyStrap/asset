@@ -55,7 +55,7 @@ class ConfigBuilderTest extends Unit
     {
         $sut = new ConfigBuilder(
             'http://wordpress',
-            $_SERVER[ 'WP_ROOT_FOLDER' ]
+            \rtrim(\codecept_root_dir(), '/')
         );
         $this->assertInstanceOf(ConfigBuilder::class, $sut, '');
         return $sut;
@@ -576,7 +576,7 @@ class ConfigBuilderTest extends Unit
             $this->assertArrayHasKey('version', $items, '');
 
             $this->assertSame(
-                'http://moduli.test/wp-content/plugins/asset/tests/_data/fixtures/parent/css/style.css',
+                'http://moduli.test/tests/_data/fixtures/parent/css/style.css',
                 $items[ 'url' ],
                 ''
             );

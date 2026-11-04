@@ -112,31 +112,31 @@ class FileTest extends Unit
     {
         return [
             'Without Slash' => [
-                $_SERVER['WP_ROOT_FOLDER'],
+                \rtrim(\codecept_root_dir(), '/'),
                 'http://wordpress',
             ],
             'Test2' => [
-                $_SERVER['WP_ROOT_FOLDER'] . '/',
+                \rtrim(\codecept_root_dir(), '/') . '/',
                 'http://wordpress',
             ],
             'Test3' => [
-                $_SERVER['WP_ROOT_FOLDER'],
+                \rtrim(\codecept_root_dir(), '/'),
                 'http://wordpress' . '/',
             ],
             'Test4' => [
-                $_SERVER['WP_ROOT_FOLDER'] . '\\',
+                \rtrim(\codecept_root_dir(), '/') . '\\',
                 'http://wordpress',
             ],
             'Test5' => [
-                $_SERVER['WP_ROOT_FOLDER'],
+                \rtrim(\codecept_root_dir(), '/'),
                 'http://wordpress' . '\\',
             ],
             'Test6' => [
-                $_SERVER['WP_ROOT_FOLDER'] . '/',
+                \rtrim(\codecept_root_dir(), '/') . '/',
                 'http://wordpress' . '\\',
             ],
             'Test7' => [
-                $_SERVER['WP_ROOT_FOLDER'] . '\\',
+                \rtrim(\codecept_root_dir(), '/') . '\\',
                 'http://wordpress' . '/',
             ],
         ];
@@ -154,7 +154,7 @@ class FileTest extends Unit
             \codecept_data_dir('fixtures/parent/css') . '\style.css'
         );
 
-        $expected = \rtrim($base_url, '\/') . '/wp-content/plugins/asset/tests/_data/fixtures/parent/css/style.css';
+        $expected = \rtrim($base_url, '\/') . '/tests/_data/fixtures/parent/css/style.css';
         $sut = $this->getInstance();
         $this->assertEquals($expected, $sut->url(), '');
     }

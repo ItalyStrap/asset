@@ -77,7 +77,7 @@ class IntegrationTest extends Unit
             new \SplFileInfo($this->finder->reveal()->find(array_reverse($files_to_search), $extension)),
             new EmptyVersion(),
             'http://wordpress',
-            $_SERVER['WP_ROOT_FOLDER']
+            \rtrim(\codecept_root_dir(), '/')
         );
 
         $style = new Style($file, ( new ConfigFactory() )->make($config));

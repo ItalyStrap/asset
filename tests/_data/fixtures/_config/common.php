@@ -3,8 +3,8 @@
 $define_constants = [
 	'TEMPLATEURL'				=> 'http://wordpress',
 	'STYLESHEETURL'				=> 'http://wordpress',
-	'PARENTPATH'				=> $_SERVER['WP_ROOT_FOLDER'],
-	'CHILDPATH'					=> $_SERVER['WP_ROOT_FOLDER'],
+	'PARENTPATH'				=> \rtrim(\codecept_root_dir(), '/'),
+	'CHILDPATH'					=> \rtrim(\codecept_root_dir(), '/'),
 	'CURRENT_TEMPLATE_SLUG'		=> 'index',
 ];
 
