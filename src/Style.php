@@ -11,14 +11,17 @@ use InvalidArgumentException;
  */
 final readonly class Style
 {
+    /** @var non-empty-string|null */
+    private ?string $source;
+
     /**
-     * @param non-empty-string|null $source The URL, null for a style with only the inline styles.
+     * @param string|null $source The URL, null for a style with only the inline styles, not empty.
      * @param list<string> $inlineStyles
      * @param array<'alt'|'path'|'rtl'|'suffix'|'title', string|bool> $data The extra data of the style, like rtl.
      */
     public function __construct(
         private Handle $handle,
-        private ?string $source,
+        ?string $source,
         private Dependencies $dependencies = new Dependencies(),
         private Version $version = new CoreVersion(),
         private string $media = 'all',
@@ -26,7 +29,7 @@ final readonly class Style
         private array $data = [],
         private Condition $condition = new Always(),
     ) {
-        $this->assertNotEmpty($source, 'source');
+        $this->source = $this->checked($source);
         $this->assertNotEmpty($media, 'media');
         foreach ($inlineStyles as $inlineStyle) {
             $this->assertNotEmpty(\trim($inlineStyle), 'inline style');
@@ -82,7 +85,22 @@ final readonly class Style
         return $this->condition;
     }
 
-    private function assertNotEmpty(?string $value, string $name): void
+    /**
+     * @return non-empty-string|null
+     */
+    private function checked(?string $source): ?string
+    {
+        if ($source !== '') {
+            return $source;
+        }
+
+        throw new InvalidArgumentException(\sprintf(
+            'The source of the style "%s" must not be empty, use null for only the inline styles',
+            $this->handle->value()
+        ));
+    }
+
+    private function assertNotEmpty(string $value, string $name): void
     {
         if ($value !== '') {
             return;

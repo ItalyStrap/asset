@@ -11,14 +11,17 @@ use InvalidArgumentException;
  */
 final readonly class Script
 {
+    /** @var non-empty-string|null */
+    private ?string $source;
+
     /**
-     * @param non-empty-string|null $source The URL, null for a handle that only groups its dependencies.
+     * @param string|null $source The URL, null for a handle that only groups its dependencies, not empty.
      * @param list<InlineScript> $inlineScripts
      * @param array<non-empty-string, string|bool> $data The extra data of the script, like a consent category.
      */
     public function __construct(
         private Handle $handle,
-        private ?string $source,
+        ?string $source,
         private Dependencies $dependencies = new Dependencies(),
         private Version $version = new CoreVersion(),
         private ScriptLoading $loading = new ScriptLoading(),
@@ -27,7 +30,7 @@ final readonly class Script
         private ?Translations $translations = null,
         private Condition $condition = new Always(),
     ) {
-        $this->assertSource($source);
+        $this->source = $this->checked($source);
     }
 
     public function handle(): Handle
@@ -85,12 +88,14 @@ final readonly class Script
     }
 
     /**
-     * The type is not checked at runtime, an empty URL would print a script without source.
+     * An empty URL would print a script without source.
+     *
+     * @return non-empty-string|null
      */
-    private function assertSource(?string $source): void
+    private function checked(?string $source): ?string
     {
         if ($source !== '') {
-            return;
+            return $source;
         }
 
         throw new InvalidArgumentException(\sprintf(
