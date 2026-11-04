@@ -8,6 +8,7 @@ use Codeception\Test\Unit;
 use InvalidArgumentException;
 use ItalyStrap\Asset\Domain\Translations;
 use PHPUnit\Framework\Attributes\Test;
+use SplFileInfo;
 
 final class TranslationsTest extends Unit
 {
@@ -23,7 +24,9 @@ final class TranslationsTest extends Unit
     #[Test]
     public function itHasThePath(): void
     {
-        $this->assertSame('/languages', (new Translations('my-domain', '/languages'))->path());
+        $translations = new Translations('my-domain', new SplFileInfo('/plugin/languages'));
+
+        $this->assertSame('/plugin/languages', $translations->path());
     }
 
     #[Test]

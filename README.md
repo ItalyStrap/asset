@@ -1,6 +1,6 @@
 # ItalyStrap Asset
 
-Handle the CSS and JS register and enqueue for WordPress.
+Handle the CSS and JS register and enqueue.
 
 Version 0.0.1-alpha, the API is being redesigned around value objects, see the [open issues](https://github.com/ItalyStrap/asset/issues).
 
@@ -10,7 +10,7 @@ Version 0.0.1-alpha, the API is being redesigned around value objects, see the [
 
 ## Usage
 
-Each script and style is an immutable value object in `ItalyStrap\Asset\Domain`, checked when it is built. The WordPress layer that registers them comes with [#5](https://github.com/ItalyStrap/asset/issues/5).
+Each script and style is an immutable value object in `ItalyStrap\Asset\Domain`, checked when it is built. The layer that registers them comes with [#5](https://github.com/ItalyStrap/asset/issues/5).
 
 ```php
 use ItalyStrap\Asset\Domain\Dependencies;
@@ -26,8 +26,11 @@ use ItalyStrap\Asset\Domain\Translations;
 use ItalyStrap\Asset\Domain\When;
 use ItalyStrap\Asset\Infrastructure\BuildMetadataFile;
 
-// The dependencies and the version written by @wordpress/scripts in build/index.asset.php
-$metadata = (new BuildMetadataFile(__DIR__ . '/build/index.js'))->read();
+// A path or a file of the Finder
+$built = new SplFileInfo(__DIR__ . '/build/index.js');
+
+// The dependencies and the version written by the build in build/index.asset.php
+$metadata = (new BuildMetadataFile($built))->read();
 
 $script = new Script(
     handle: new Handle('my-plugin'),
@@ -36,7 +39,7 @@ $script = new Script(
     version: $metadata->version(),
     loading: new ScriptLoading(inFooter: true, strategy: Strategy::Defer),
     inlineScripts: [new InlineScript('window.myPlugin = {};', Position::Before)],
-    translations: new Translations('my-plugin', __DIR__ . '/languages'),
+    translations: new Translations('my-plugin', new SplFileInfo(__DIR__ . '/languages')),
     condition: new When(is_singular(...)),
 );
 
@@ -54,7 +57,7 @@ $colors = new Style(new Handle('my-colors'), null, inlineStyles: ['.my-banner{co
 
 | Version | The `ver` in the URL |
 | --- | --- |
-| `WordPressVersion`, the default | The version of WordPress |
+| `CoreVersion`, the default | The version of the core |
 | `NoVersion` | None, for external URLs |
 | `FixedVersion('1.2.3')` | The given string |
 
@@ -70,11 +73,11 @@ make install   # Install the dependencies and build the Codeception actors
 make cs        # PHP CodeSniffer, PSR-12 and PHPCompatibility
 make stan      # PHPStan at level max
 make rector    # Rector dry run, PHP 8.2 and code quality sets, make rector-fix applies it
-make unit      # The unit suite, WordPress is not loaded
-make integration # The integration suite, WPLoader loads WordPress
+make unit      # The unit suite, the core is not loaded
+make integration # The integration suite, the core is loaded
 make infection # Mutation tests on the unit suite, with a minimum MSI
 make qa        # All the checks above
 make down      # Stop and remove the containers
 ```
 
-The PHP and WordPress versions are in `.docker/test.env`.
+The PHP and core versions are in `.docker/test.env`.

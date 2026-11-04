@@ -34,7 +34,7 @@ final class ConditionTest extends Unit
     #[Test]
     public function whenAcceptsAnArrayCallable(): void
     {
-        $this->assertFalse((new When([$this, 'deniesTheConsent']))->isSatisfied());
+        $this->assertFalse((new When($this->deniesTheConsent(...)))->isSatisfied());
     }
 
     #[Test]

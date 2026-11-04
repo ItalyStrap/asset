@@ -8,18 +8,18 @@ use Codeception\Test\Unit;
 use InvalidArgumentException;
 use ItalyStrap\Asset\Domain\FixedVersion;
 use ItalyStrap\Asset\Domain\NoVersion;
-use ItalyStrap\Asset\Domain\WordPressVersion;
+use ItalyStrap\Asset\Domain\CoreVersion;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
- * WordPress reads false as its own version and null as no version in the URL.
+ * The register functions read false as the core version and null as no version in the URL.
  */
 final class VersionTest extends Unit
 {
     #[Test]
-    public function theWordPressVersionIsFalse(): void
+    public function theCoreVersionIsFalse(): void
     {
-        $this->assertFalse((new WordPressVersion())->value());
+        $this->assertFalse((new CoreVersion())->value());
     }
 
     #[Test]

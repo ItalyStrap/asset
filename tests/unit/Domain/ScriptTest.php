@@ -17,20 +17,21 @@ use ItalyStrap\Asset\Domain\ScriptLoading;
 use ItalyStrap\Asset\Domain\Strategy;
 use ItalyStrap\Asset\Domain\Translations;
 use ItalyStrap\Asset\Domain\When;
-use ItalyStrap\Asset\Domain\WordPressVersion;
+use ItalyStrap\Asset\Domain\CoreVersion;
 use PHPUnit\Framework\Attributes\Test;
+use SplFileInfo;
 
 final class ScriptTest extends Unit
 {
     #[Test]
-    public function itHasTheWordPressDefaults(): void
+    public function itHasTheDefaults(): void
     {
         $script = new Script(new Handle('my-script'), 'https://example.com/my-script.js');
 
         $this->assertSame('my-script', $script->handle()->value());
         $this->assertSame('https://example.com/my-script.js', $script->source());
         $this->assertSame([], $script->dependencies()->toArray());
-        $this->assertInstanceOf(WordPressVersion::class, $script->version());
+        $this->assertInstanceOf(CoreVersion::class, $script->version());
         $this->assertSame(['in_footer' => false], $script->loading()->toArray());
         $this->assertSame([], $script->inlineScripts());
         $this->assertSame([], $script->data());
@@ -42,7 +43,7 @@ final class ScriptTest extends Unit
     public function itHasAllTheParts(): void
     {
         $inline = new InlineScript('window.myData = {};', Position::Before);
-        $translations = new Translations('my-domain', '/languages');
+        $translations = new Translations('my-domain', new SplFileInfo('/languages'));
         $condition = new When(static fn (): bool => false);
 
         $script = new Script(

@@ -7,7 +7,7 @@ namespace ItalyStrap\Asset\Domain;
 use InvalidArgumentException;
 
 /**
- * The unique name of a script or a style in WordPress.
+ * The unique name of a script or a style.
  */
 final readonly class Handle
 {

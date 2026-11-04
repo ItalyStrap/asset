@@ -7,7 +7,7 @@ namespace ItalyStrap\Asset\Domain;
 use InvalidArgumentException;
 
 /**
- * The code WordPress prints next to a script, like the data the script reads.
+ * The code printed next to a script, like the data the script reads.
  */
 final readonly class InlineScript
 {

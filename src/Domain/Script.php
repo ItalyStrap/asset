@@ -7,20 +7,20 @@ namespace ItalyStrap\Asset\Domain;
 use InvalidArgumentException;
 
 /**
- * A script to register in WordPress, with everything WordPress prints with it.
+ * A script to register, with everything printed with it.
  */
 final readonly class Script
 {
     /**
      * @param string|null $source The URL, null for a handle that only groups its dependencies.
      * @param list<InlineScript> $inlineScripts
-     * @param array<non-empty-string, string|bool> $data The extra data of wp_script_add_data().
+     * @param array<non-empty-string, string|bool> $data The extra data of the script, like a consent category.
      */
     public function __construct(
         private Handle $handle,
         private ?string $source,
         private Dependencies $dependencies = new Dependencies(),
-        private Version $version = new WordPressVersion(),
+        private Version $version = new CoreVersion(),
         private ScriptLoading $loading = new ScriptLoading(),
         private array $inlineScripts = [],
         private array $data = [],

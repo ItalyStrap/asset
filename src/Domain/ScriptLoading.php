@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset\Domain;
 
 /**
- * Where WordPress prints a script and with which strategy.
+ * Where the script is printed and with which strategy.
  */
 final readonly class ScriptLoading
 {
@@ -16,13 +16,13 @@ final readonly class ScriptLoading
     }
 
     /**
-     * The $args of wp_register_script() and wp_enqueue_script().
+     * The $args of the script register and enqueue functions.
      *
      * @return array{in_footer: bool, strategy?: value-of<Strategy>}
      */
     public function toArray(): array
     {
-        if ($this->strategy === null) {
+        if (!$this->strategy instanceof Strategy) {
             return ['in_footer' => $this->inFooter];
         }
 

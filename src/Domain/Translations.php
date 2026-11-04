@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset\Domain;
 
 use InvalidArgumentException;
+use SplFileInfo;
 
 /**
  * The text domain of the script strings and the folder of its JSON translations.
@@ -12,11 +13,11 @@ use InvalidArgumentException;
 final readonly class Translations
 {
     /**
-     * @param string|null $path The folder of the JSON files, null for the languages folder of WordPress.
+     * @param SplFileInfo|null $folder The folder of the JSON files, null for the languages folder of the core.
      */
     public function __construct(
         private string $domain,
-        private ?string $path = null,
+        private ?SplFileInfo $folder = null,
     ) {
         if ($domain === '') {
             throw new InvalidArgumentException('The text domain must not be empty');
@@ -30,6 +31,6 @@ final readonly class Translations
 
     public function path(): ?string
     {
-        return $this->path;
+        return $this->folder?->getPathname();
     }
 }

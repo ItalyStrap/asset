@@ -8,6 +8,7 @@ use ItalyStrap\Asset\Domain\BuildMetadata;
 use ItalyStrap\Asset\Domain\Dependencies;
 use ItalyStrap\Asset\Domain\FixedVersion;
 use RuntimeException;
+use SplFileInfo;
 
 /**
  * The .asset.php file next to a built file, build/index.js and build/index.css read build/index.asset.php.
@@ -17,14 +18,14 @@ final readonly class BuildMetadataFile
     private string $path;
 
     /**
-     * @param string $builtFile The path of the built script or style.
+     * @param SplFileInfo $builtFile The built script or style, a file of the Finder too.
      */
-    public function __construct(string $builtFile)
+    public function __construct(SplFileInfo $builtFile)
     {
         $this->path = \sprintf(
             '%s/%s.asset.php',
-            \dirname($builtFile),
-            \pathinfo($builtFile, \PATHINFO_FILENAME)
+            $builtFile->getPath(),
+            $builtFile->getBasename('.' . $builtFile->getExtension())
         );
     }
 

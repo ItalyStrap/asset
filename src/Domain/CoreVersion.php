@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset\Domain;
 
 /**
- * The version of WordPress, the default of the WordPress functions.
+ * The version of the core, the default of the register functions.
  */
-final readonly class WordPressVersion implements Version
+final readonly class CoreVersion implements Version
 {
     public function value(): false
     {

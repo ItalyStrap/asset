@@ -7,20 +7,20 @@ namespace ItalyStrap\Asset\Domain;
 use InvalidArgumentException;
 
 /**
- * A style to register in WordPress, with the inline styles WordPress prints after it.
+ * A style to register, with the inline styles printed after it.
  */
 final readonly class Style
 {
     /**
      * @param string|null $source The URL, null for a style with only the inline styles.
      * @param list<string> $inlineStyles
-     * @param array<non-empty-string, string|bool> $data The extra data of wp_style_add_data(), like rtl.
+     * @param array<non-empty-string, string|bool> $data The extra data of the style, like rtl.
      */
     public function __construct(
         private Handle $handle,
         private ?string $source,
         private Dependencies $dependencies = new Dependencies(),
-        private Version $version = new WordPressVersion(),
+        private Version $version = new CoreVersion(),
         private string $media = 'all',
         private array $inlineStyles = [],
         private array $data = [],

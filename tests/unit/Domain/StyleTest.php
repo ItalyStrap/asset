@@ -12,20 +12,20 @@ use ItalyStrap\Asset\Domain\FixedVersion;
 use ItalyStrap\Asset\Domain\Handle;
 use ItalyStrap\Asset\Domain\Style;
 use ItalyStrap\Asset\Domain\When;
-use ItalyStrap\Asset\Domain\WordPressVersion;
+use ItalyStrap\Asset\Domain\CoreVersion;
 use PHPUnit\Framework\Attributes\Test;
 
 final class StyleTest extends Unit
 {
     #[Test]
-    public function itHasTheWordPressDefaults(): void
+    public function itHasTheDefaults(): void
     {
         $style = new Style(new Handle('my-style'), 'https://example.com/my-style.css');
 
         $this->assertSame('my-style', $style->handle()->value());
         $this->assertSame('https://example.com/my-style.css', $style->source());
         $this->assertSame([], $style->dependencies()->toArray());
-        $this->assertInstanceOf(WordPressVersion::class, $style->version());
+        $this->assertInstanceOf(CoreVersion::class, $style->version());
         $this->assertSame('all', $style->media());
         $this->assertSame([], $style->inlineStyles());
         $this->assertSame([], $style->data());
@@ -75,7 +75,7 @@ final class StyleTest extends Unit
     public function itRejectsAnEmptyInlineStyle(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new Style(new Handle('my-style'), null, inlineStyles: ['']);
+        new Style(new Handle('my-style'), null, inlineStyles: ['.a{}', '  ']);
     }
 
     #[Test]
