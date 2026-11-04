@@ -68,7 +68,7 @@ jobs:
           if-no-files-found: ignore
 
   mutation:
-    name: Mutation tests on the Docker environment
+    name: Mutation tests
 
     runs-on: ubuntu-latest
     if: "!github.event.pull_request.draft"
@@ -77,12 +77,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # pcov for the coverage is installed in the WordPress image
-      - name: Start the containers
-        run: make up
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: pcov
 
-      - name: Install dependencies
-        run: make install
+      - uses: ramsey/composer-install@v3
 
+      - name: Build the Codeception actors
+        run: vendor/bin/codecept build
+
+      # The unit suite only, the core adapters in src/Core are tested by the integration suite
       - name: Infection
-        run: make infection
+        run: composer run infection

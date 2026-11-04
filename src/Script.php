@@ -4,86 +4,98 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
 
+use InvalidArgumentException;
+
 /**
- * Child class API for Script
+ * A script to register, with everything printed with it.
  */
-final class Script extends Asset
+final readonly class Script
 {
-    public const EXTENSION      = 'js';
-    public const OBJECT_NAME    = 'object_name';
-    public const PARAMS         = 'params';
-
     /**
-     * @inheritDoc
+     * @param non-empty-string|null $source The URL, null for a handle that only groups its dependencies.
+     * @param list<InlineScript> $inlineScripts
+     * @param array<non-empty-string, string|bool> $data The extra data of the script, like a consent category.
      */
-    public function register(): bool
-    {
-        /** @var bool $registered */
-        $registered = \wp_register_script(
-            $this->handle,
-            $this->config->get(Asset::URL),
-            $this->config->get(Asset::DEPENDENCIES, []),
-            $this->config->get(Asset::VERSION),
-            $this->config->get(Asset::IN_FOOTER, false)
-        );
+    public function __construct(
+        private Handle $handle,
+        private ?string $source,
+        private Dependencies $dependencies = new Dependencies(),
+        private Version $version = new CoreVersion(),
+        private ScriptLoading $loading = new ScriptLoading(),
+        private array $inlineScripts = [],
+        private array $data = [],
+        private ?Translations $translations = null,
+        private Condition $condition = new Always(),
+    ) {
+        $this->assertSource($source);
+    }
 
-        return \boolval($registered);
+    public function handle(): Handle
+    {
+        return $this->handle;
     }
 
     /**
-     * @inheritDoc
+     * @return non-empty-string|null
      */
-    public function enqueue(): void
+    public function source(): ?string
     {
-        \wp_enqueue_script(
-            $this->handle,
-            $this->config->get(Asset::URL),
-            $this->config->get(Asset::DEPENDENCIES, []),
-            $this->config->get(Asset::VERSION),
-            $this->config->get(Asset::IN_FOOTER, false)
-        );
+        return $this->source;
+    }
 
-        $this->shouldLocalize();
+    public function dependencies(): Dependencies
+    {
+        return $this->dependencies;
+    }
+
+    public function version(): Version
+    {
+        return $this->version;
+    }
+
+    public function loading(): ScriptLoading
+    {
+        return $this->loading;
     }
 
     /**
-     * Localize the script
-     *
-     * @link https://developer.wordpress.org/reference/functions/wp_localize_script/
+     * @return list<InlineScript>
      */
-    private function localizeScript(): bool
+    public function inlineScripts(): array
     {
-        /** @var bool $localized */
-        $localized = \wp_localize_script(
-            $this->handle,
-            $this->config->get(Asset::LOCALIZE . '.' . self::OBJECT_NAME),
-            $this->config->get(Asset::LOCALIZE . '.' . self::PARAMS)
-        );
-
-        return \boolval($localized);
+        return $this->inlineScripts;
     }
 
-    private function shouldLocalize(): void
+    /**
+     * @return array<non-empty-string, string|bool>
+     */
+    public function data(): array
     {
-        if ($this->config->has(Asset::LOCALIZE)) {
-            $this->localizeScript();
+        return $this->data;
+    }
+
+    public function translations(): ?Translations
+    {
+        return $this->translations;
+    }
+
+    public function condition(): Condition
+    {
+        return $this->condition;
+    }
+
+    /**
+     * The type is not checked at runtime, an empty URL would print a script without source.
+     */
+    private function assertSource(?string $source): void
+    {
+        if ($source !== '') {
+            return;
         }
-    }
 
-    /**
-     * Localize the script
-     * @TODO Add inline script
-     *
-     * @link https://developer.wordpress.org/reference/functions/wp_localize_script/
-     *
-     * @return null
-     */
-//  protected function addInlineScript( array $config = array() ) {
-//
-//      return \wp_add_inline_script(
-//          $this->handle,
-//          $config['data'],
-//          $config['position']
-//      );
-//  }
+        throw new InvalidArgumentException(\sprintf(
+            'The source of the script "%s" must not be empty, use null for no file',
+            $this->handle->value()
+        ));
+    }
 }
