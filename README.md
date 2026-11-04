@@ -1,8 +1,26 @@
-# asset
-Handle the CSS and JS register and enqueue for WordPress
+# ItalyStrap Asset
 
-version 0.0.1-alpha
+Handle the CSS and JS register and enqueue for WordPress.
 
-## Project review
+Version 0.0.1-alpha, the API is being redesigned around value objects, see the [open issues](https://github.com/ItalyStrap/asset/issues).
 
-A deep review of the current codebase, with prioritized modernization recommendations, is available in [`docs/DEEP_CODE_REVIEW.md`](docs/DEEP_CODE_REVIEW.md).
+## Requirements
+
+* PHP 8.2 or later.
+
+## Development
+
+PHP, Composer and the database run in the Docker containers in `.docker/`, the same environment runs in CI. `make help` lists all the targets.
+
+```bash
+make up        # Start the containers
+make install   # Install the dependencies and build the Codeception actors
+make cs        # PHP CodeSniffer, PSR-12 and PHPCompatibility
+make stan      # PHPStan at level max
+make unit      # The unit suite, WordPress is not loaded
+make integration # The integration suite, WPLoader loads WordPress
+make qa        # All the checks above
+make down      # Stop and remove the containers
+```
+
+The PHP and WordPress versions are in `.docker/test.env`.

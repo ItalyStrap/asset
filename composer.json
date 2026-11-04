@@ -14,70 +14,80 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php" : ">=7.2",
-        "italystrap/config": "^2.0",
+        "php": ">=8.2",
+        "italystrap/config": "^2.11",
         "italystrap/finder": "dev-master",
-        "inpsyde/assets": "^2.2"
+        "inpsyde/assets": "^2.8"
     },
     "require-dev": {
-        "lucatume/wp-browser": "^2.4",
+        "lucatume/wp-browser": "^4.5",
+        "codeception/codeception": "^5.3",
+        "codeception/module-asserts": "^3.0",
         "lucatume/function-mocker-le": "^1.0",
-        "codeception/c3": "2.*",
-        "codeception/module-asserts": "^1.0",
-        "codeception/module-phpbrowser": "^1.0",
-        "codeception/module-webdriver": "^1.0",
-        "codeception/module-db": "^1.0",
-        "codeception/module-filesystem": "^1.0",
-        "codeception/module-cli": "^1.0",
-        "codeception/util-universalframework": "^1.0",
-        "brianium/paratest": "^4.0",
-        "italystrap/debug": "^2.0",
-        "squizlabs/php_codesniffer": "*",
-        "phpcompatibility/php-compatibility": "*",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
-        "phpstan/phpstan": "^0.11.16",
-        "szepeviktor/phpstan-wordpress": "^0.3.0",
-        "vimeo/psalm": "^3.9",
-        "phpbench/phpbench": "@dev",
-        "infection/infection": "^0.15.3",
-        "phpmetrics/phpmetrics": "^2.5",
-        "nunomaduro/phpinsights": "^1.14.0",
-        "dg/bypass-finals": "^1.2",
-        "italystrap/event": "dev-master"
+        "phpspec/prophecy-phpunit": "^2.3",
+        "italystrap/event": "^0.2.2",
+        "squizlabs/php_codesniffer": "^3.13",
+        "phpcompatibility/php-compatibility": "^9.3",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+        "phpstan/phpstan": "^2.3",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "infection/infection": "^0.29",
+        "infection/codeception-adapter": "^0.4.3",
+        "dg/bypass-finals": "^1.9"
     },
     "autoload": {
         "psr-4": {
             "ItalyStrap\\Asset\\": "src/"
         }
     },
-    "scripts": {
-        "test": [
-            "@unit"
-        ],
-        "cs": [
-            "vendor/bin/phpcbf -p --ignore=./tests/_support/* ./src/ ./tests/ && vendor/bin/phpcs -p --ignore=./tests/_support/* ./src/ ./tests/"
-        ],
-        "analyze": [
-            "vendor/bin/phpstan analyze --level=max && vendor/bin/psalm"
-        ],
-        "unit": [
-            "vendor/bin/codecept run unit && vendor/bin/infection --threads=8"
-        ],
-        "bench": [
-            "vendor/bin/phpbench run --report=performance"
-        ],
-        "metrics": [
-            "vendor/bin/phpmetrics --report-html='./tests/_output/report' ./src"
-        ],
-        "insights": [
-            "vendor/bin/phpinsights"
-        ],
-        "clean": [
-            "vendor/bin/codecept clean"
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
         ]
     },
-    "support"    : {
+    "scripts": {
+        "cs": [
+            "@php vendor/bin/phpcs -p"
+        ],
+        "cs:fix": [
+            "@php vendor/bin/phpcbf -p"
+        ],
+        "stan": [
+            "@php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress"
+        ],
+        "stan:baseline": [
+            "@php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress --generate-baseline phpstan-baseline.neon"
+        ],
+        "unit": [
+            "@php vendor/bin/codecept run unit"
+        ],
+        "integration": [
+            "@php vendor/bin/codecept run integration"
+        ],
+        "tests": [
+            "@unit",
+            "@integration"
+        ],
+        "infection": [
+            "@php vendor/bin/codecept run unit",
+            "@php vendor/bin/infection --threads=1"
+        ],
+        "clean": [
+            "@php vendor/bin/codecept clean"
+        ]
+    },
+    "support": {
         "issues": "https://github.com/ItalyStrap/asset/issues",
         "source": "https://github.com/ItalyStrap/asset"
+    },
+    "config": {
+        "sort-packages": false,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "infection/extension-installer": true
+        },
+        "platform": {
+            "php": "8.2.29"
+        }
     }
 }

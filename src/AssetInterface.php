@@ -1,43 +1,44 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
 
-interface AssetInterface {
+interface AssetInterface
+{
+    /**
+     * @return string
+     */
+    public function handle(): string;
 
-	/**
-	 * @return string
-	 */
-	public function handle(): string;
+    /**
+     * @return string
+     */
+    public function location(): string;
 
-	/**
-	 * @return string
-	 */
-	public function location(): string;
+    /**
+     * @return bool
+     */
+    public function isEnqueued(): bool;
 
-	/**
-	 * @return bool
-	 */
-	public function isEnqueued(): bool;
+    /**
+     * @return bool
+     */
+    public function isRegistered(): bool;
 
-	/**
-	 * @return bool
-	 */
-	public function isRegistered(): bool;
+    /**
+     * @return bool
+     */
+    public function shouldEnqueue(): bool;
 
-	/**
-	 * @return bool
-	 */
-	public function shouldEnqueue(): bool;
+    /**
+     * Register the script
+     * @return bool
+     */
+    public function register(): bool;
 
-	/**
-	 * Register the script
-	 * @return bool
-	 */
-	public function register(): bool;
-
-	/**
-	 * Enqueue the script
-	 */
-	public function enqueue(): void;
+    /**
+     * Enqueue the script
+     */
+    public function enqueue(): void;
 }

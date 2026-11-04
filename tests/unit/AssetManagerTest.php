@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
@@ -8,106 +9,116 @@ use ItalyStrap\Asset\AssetInterface;
 use ItalyStrap\Asset\AssetManager;
 use UnitTester;
 
-class AssetManagerTest extends Unit {
+class AssetManagerTest extends Unit
+{
+    use \Prophecy\PhpUnit\ProphecyTrait;
 
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
 
-	/**
-	 * @var \Prophecy\Prophecy\ObjectProphecy
-	 */
-	private $asset;
+    /**
+     * @var UnitTester
+     */
+    protected $tester;
 
-	/**
-	 * @return AssetInterface
-	 */
-	public function getAsset(): AssetInterface {
-		return $this->asset->reveal();
-	}
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
+    private $asset;
+
+    /**
+     * @return AssetInterface
+     */
+    public function getAsset(): AssetInterface
+    {
+        return $this->asset->reveal();
+    }
 
 	// phpcs:ignore
 	protected function _before() {
-		$this->asset = $this->prophesize(AssetInterface::class);
-	}
+        $this->asset = $this->prophesize(AssetInterface::class);
+    }
 
 	// phpcs:ignore
     protected function _after() {
-	}
+    }
 
-	/**
-	 * @return AssetManager
-	 */
-	private function getInstance(): AssetManager {
-		$sut = new AssetManager();
-		$this->assertInstanceOf( AssetManager::class, $sut, '');
-		return $sut;
-	}
+    /**
+     * @return AssetManager
+     */
+    private function getInstance(): AssetManager
+    {
+        $sut = new AssetManager();
+        $this->assertInstanceOf(AssetManager::class, $sut, '');
+        return $sut;
+    }
 
-	/**
-	 * @test
-	 */
-	public function instanceOk() {
-		$sut = $this->getInstance();
-	}
+    /**
+     * @test
+     */
+    public function instanceOk()
+    {
+        $sut = $this->getInstance();
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldAddAssets() {
-		$sut = $this->getInstance();
-		$sut->withAssets(
-			$this->getAsset(),
-			$this->getAsset(),
-			$this->getAsset()
-		);
-	}
+    /**
+     * @test
+     */
+    public function itShouldAddAssets()
+    {
+        $sut = $this->getInstance();
+        $sut->withAssets(
+            $this->getAsset(),
+            $this->getAsset(),
+            $this->getAsset()
+        );
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrownRunTimeExceptionIfNoAssetsAreProvided() {
-		$sut = $this->getInstance();
-		$this->expectException(\RuntimeException::class);
-		$this->expectExceptionMessage('No assets are provided');
-		$sut->setup();
-	}
+    /**
+     * @test
+     */
+    public function itShouldThrownRunTimeExceptionIfNoAssetsAreProvided()
+    {
+        $sut = $this->getInstance();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('No assets are provided');
+        $sut->setup();
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldEnqueueAssets() {
-		$this->asset->shouldEnqueue()->willReturn(true);
-		$this->asset->enqueue()->will(function () {
-		});
-		$this->asset->register()->shouldNotBeCalled();
+    /**
+     * @test
+     */
+    public function itShouldEnqueueAssets()
+    {
+        $this->asset->shouldEnqueue()->willReturn(true);
+        $this->asset->enqueue()->will(function () {
+        });
+        $this->asset->register()->shouldNotBeCalled();
 
-		$sut = $this->getInstance();
-		$sut->withAssets(
-			$this->getAsset(),
-			$this->getAsset(),
-			$this->getAsset()
-		);
+        $sut = $this->getInstance();
+        $sut->withAssets(
+            $this->getAsset(),
+            $this->getAsset(),
+            $this->getAsset()
+        );
 
-		$sut->setup();
-	}
+        $sut->setup();
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldOnlyRegisterAssets() {
-		$this->asset->shouldEnqueue()->willReturn(false);
-		$this->asset->enqueue()->shouldNotBeCalled();
-		$this->asset->register()->shouldBeCalled();
+    /**
+     * @test
+     */
+    public function itShouldOnlyRegisterAssets()
+    {
+        $this->asset->shouldEnqueue()->willReturn(false);
+        $this->asset->enqueue()->shouldNotBeCalled();
+        $this->asset->register()->shouldBeCalled();
 
-		$sut = $this->getInstance();
-		$sut->withAssets(
-			$this->getAsset(),
-			$this->getAsset(),
-			$this->getAsset()
-		);
+        $sut = $this->getInstance();
+        $sut->withAssets(
+            $this->getAsset(),
+            $this->getAsset(),
+            $this->getAsset()
+        );
 
-		$sut->setup();
-	}
+        $sut->setup();
+    }
 }

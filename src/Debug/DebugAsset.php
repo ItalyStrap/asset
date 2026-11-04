@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Debug;
@@ -8,145 +9,156 @@ use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\AssetInterface;
 use ItalyStrap\Config\ConfigInterface;
 use ReflectionException;
+
 use function is_wp_error;
 use function sprintf;
 use function strval;
 use function wp_remote_get;
 
-abstract class DebugAsset implements AssetInterface {
+abstract class DebugAsset implements AssetInterface
+{
+    public const M_URL_NOT_ACCESSIBLE = 'The url "%s" is not accessible, reason: %s';
 
-	public const M_URL_NOT_ACCESSIBLE = 'The url "%s" is not accessible, reason: %s';
-
-	/**
-	 * @var AssetInterface
-	 * @psalm-suppress PropertyNotSetInConstructor
-	 *
-	 */
-	protected $asset;
+    /**
+     * @var AssetInterface
+     * @psalm-suppress PropertyNotSetInConstructor
+     *
+     */
+    protected $asset;
 
 
-	/**
-	 * DebugStyle constructor.
-	 * @param ConfigInterface $config
-	 */
-	public function __construct( ConfigInterface $config ) {
+    /**
+     * DebugStyle constructor.
+     * @param ConfigInterface $config
+     */
+    public function __construct(ConfigInterface $config)
+    {
 
-		$this->getAssetInstance( $config );
+        $this->getAssetInstance($config);
 
-		$url = $config->get( Asset::URL );
+        $url = $config->get(Asset::URL);
 
-		if (
-			$this->isRegistered()
-			&& ! $this->isEnqueued()
-		) {
-			$url =
-				\wp_scripts()->base_url
-				. \wp_scripts()->registered[ $this->handle() ]->src;
-		}
+        if (
+            $this->isRegistered()
+            && ! $this->isEnqueued()
+        ) {
+            $url =
+                \wp_scripts()->base_url
+                . \wp_scripts()->registered[ $this->handle() ]->src;
+        }
 
-		$this->assertUrlIsAccessible( $url );
-		$this->assertAssetIsLoadedFromChild( $url );
-	}
+        $this->assertUrlIsAccessible($url);
+        $this->assertAssetIsLoadedFromChild($url);
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function handle(): string {
-		return $this->asset->handle();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function handle(): string
+    {
+        return $this->asset->handle();
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function location(): string {
-		return $this->asset->location();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function location(): string
+    {
+        return $this->asset->location();
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function isEnqueued(): bool {
-		return $this->asset->isEnqueued();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function isEnqueued(): bool
+    {
+        return $this->asset->isEnqueued();
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function isRegistered(): bool {
-		return $this->asset->isRegistered();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function isRegistered(): bool
+    {
+        return $this->asset->isRegistered();
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function shouldEnqueue(): bool {
-		return $this->asset->shouldEnqueue();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function shouldEnqueue(): bool
+    {
+        return $this->asset->shouldEnqueue();
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function register(): bool {
-		return $this->asset->register();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function register(): bool
+    {
+        return $this->asset->register();
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function enqueue(): void {
-		$this->asset->enqueue();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function enqueue(): void
+    {
+        $this->asset->enqueue();
+    }
 
-	/**
-	 * @param ConfigInterface $config
-	 * @throws ReflectionException
-	 */
-	abstract protected function getAssetInstance( ConfigInterface $config ): void;
+    /**
+     * @param ConfigInterface $config
+     * @throws ReflectionException
+     */
+    abstract protected function getAssetInstance(ConfigInterface $config): void;
 
-	/**
-	 * @param string $url
-	 */
-	private function assertAssetIsLoadedFromChild( string $url ): void {
-		if ( ! \is_child_theme() ) {
-			return;
-		}
+    /**
+     * @param string $url
+     */
+    private function assertAssetIsLoadedFromChild(string $url): void
+    {
+        if (! \is_child_theme()) {
+            return;
+        }
 
-		if ( \strpos( $url, \wp_scripts()->base_url . '/wp-content/themes/' ) !== false ) {
-			if ( \strpos( $url, 'themes/' . \get_stylesheet() ) === false ) {
-				try {
-					throw new \RuntimeException(
-						\sprintf(
-							'Asset "%s" is loaded from parent, see: "%s"',
-							$this->handle(),
-							$url
-						)
-					);
-				} catch (\Exception $e) {
-					echo $e->getMessage();
-				}
-			}
-		}
-	}
+        if (\strpos($url, \wp_scripts()->base_url . '/wp-content/themes/') !== false) {
+            if (\strpos($url, 'themes/' . \get_stylesheet()) === false) {
+                try {
+                    throw new \RuntimeException(
+                        \sprintf(
+                            'Asset "%s" is loaded from parent, see: "%s"',
+                            $this->handle(),
+                            $url
+                        )
+                    );
+                } catch (\Exception $e) {
+                    echo $e->getMessage();
+                }
+            }
+        }
+    }
 
-	/**
-	 * @param string $url
-	 */
-	private function assertUrlIsAccessible( string $url ): void {
+    /**
+     * @param string $url
+     */
+    private function assertUrlIsAccessible(string $url): void
+    {
 
-//		\add_filter('https_ssl_verify', function ( bool $should_filter ): bool {
-//			return false;
-//		} );
+//      \add_filter('https_ssl_verify', function ( bool $should_filter ): bool {
+//          return false;
+//      } );
 
-		/** @var array|\WP_Error $response */
-		$response = wp_remote_get( $url, ['sslverify' => false] );
-		if ( is_wp_error( $response ) ) {
-			throw new InvalidArgumentException(
-				sprintf(
-					self::M_URL_NOT_ACCESSIBLE,
-					strval( $url ),
-					$response->get_error_message()
-				)
-			);
-		}
-	}
+        /** @var array|\WP_Error $response */
+        $response = wp_remote_get($url, ['sslverify' => false]);
+        if (is_wp_error($response)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    self::M_URL_NOT_ACCESSIBLE,
+                    strval($url),
+                    $response->get_error_message()
+                )
+            );
+        }
+    }
 }

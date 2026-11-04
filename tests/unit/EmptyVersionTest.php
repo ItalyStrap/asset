@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
@@ -8,43 +9,46 @@ use ItalyStrap\Asset\Version\EmptyVersion;
 use ItalyStrap\Asset\Version\VersionInterface;
 use UnitTester;
 
-class EmptyVersionTest extends Unit {
-
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
+class EmptyVersionTest extends Unit
+{
+    /**
+     * @var UnitTester
+     */
+    protected $tester;
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _before() {
-	}
+    }
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _after() {
-	}
+    }
 
-	/**
-	 * @return EmptyVersion
-	 */
-	private function getInstance() {
-		$sut = new EmptyVersion();
-		$this->assertInstanceOf( VersionInterface::class, $sut, '' );
-		$this->assertInstanceOf( EmptyVersion::class, $sut, '' );
-		return $sut;
-	}
+    /**
+     * @return EmptyVersion
+     */
+    private function getInstance()
+    {
+        $sut = new EmptyVersion();
+        $this->assertInstanceOf(VersionInterface::class, $sut, '');
+        $this->assertInstanceOf(EmptyVersion::class, $sut, '');
+        return $sut;
+    }
 
-	/**
-	 * @test
-	 */
-	public function instanceOk() {
-		$sut = $this->getInstance();
-	}
+    /**
+     * @test
+     */
+    public function instanceOk()
+    {
+        $sut = $this->getInstance();
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldReturnEmptyVersion() {
-		$sut = $this->getInstance();
-		$this->assertEmpty( $sut->version( new \SplFileInfo(''), [] ), '' );
-	}
+    /**
+     * @test
+     */
+    public function itShouldReturnEmptyVersion()
+    {
+        $sut = $this->getInstance();
+        $this->assertEmpty($sut->version(new \SplFileInfo(''), []), '');
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
@@ -14,271 +15,289 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionException;
 use UnitTester;
+
 use function sprintf;
 use function tad\FunctionMockerLe\undefineAll;
 
-abstract class UnitBaseAsset extends Unit {
+abstract class UnitBaseAsset extends Unit
+{
+    use \Prophecy\PhpUnit\ProphecyTrait;
 
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
 
-	protected $type;
-	protected $in_footer_or_media;
+    /**
+     * @var UnitTester
+     */
+    protected $tester;
 
-	/**
-	 * @var ObjectProphecy
-	 */
-	protected $config;
+    protected $type;
+    protected $in_footer_or_media;
 
-	/**
-	 * @return ConfigInterface
-	 */
-	public function getConfig(): ConfigInterface {
-		return $this->config->reveal();
-	}
+    /**
+     * @var ObjectProphecy
+     */
+    protected $config;
 
-	/**
-	 * @return Asset
-	 * @throws ReflectionException
-	 */
-	abstract protected function getInstance();
+    /**
+     * @return ConfigInterface
+     */
+    public function getConfig(): ConfigInterface
+    {
+        return $this->config->reveal();
+    }
+
+    /**
+     * @return Asset
+     * @throws ReflectionException
+     */
+    abstract protected function getInstance();
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _before() {
-		$this->config = $this->prophesize( ConfigInterface::class );
+        $this->config = $this->prophesize(ConfigInterface::class);
 
-		$this->config->has('handle')->willReturn(true);
-		$this->config->get('handle')->willReturn('handle');
-	}
+        $this->config->has('handle')->willReturn(true);
+        $this->config->get('handle')->willReturn('handle');
+    }
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _after() {
-		undefineAll([
-			'wp_script_is',
-			'wp_style_is',
-			'wp_register_script',
-			'wp_register_style',
-			'wp_enqueue_script',
-			'wp_enqueue_style',
-			'wp_localize_script',
-		]);
-	}
+        undefineAll([
+            'wp_script_is',
+            'wp_style_is',
+            'wp_register_script',
+            'wp_register_style',
+            'wp_enqueue_script',
+            'wp_enqueue_style',
+            'wp_localize_script',
+        ]);
+    }
 
-	/**
-	 * @test
-	 */
-	public function instanceOk() {
-		$sut = $this->getInstance();
-		$this->assertInstanceOf( Asset::class, $sut, '' );
-		return $sut;
-	}
+    /**
+     * @test
+     */
+    public function instanceOk()
+    {
+        $sut = $this->getInstance();
+        $this->assertInstanceOf(Asset::class, $sut, '');
+        return $sut;
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrownInvalidArgumentExceptionIfHandleIsNotDefined() {
-		$this->config->has('handle')->willReturn(false);
-		$this->config->get('url')->willReturn('file-name.' . $this->type);
+    /**
+     * @test
+     */
+    public function itShouldThrownInvalidArgumentExceptionIfHandleIsNotDefined()
+    {
+        $this->config->has('handle')->willReturn(false);
+        $this->config->get('url')->willReturn('file-name.' . $this->type);
 
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage(
-			\sprintf(
-				'A unique "handle" ID is required for the file-name.%s',
-				$this->type
-			)
-		);
-		$this->getInstance();
-	}
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            \sprintf(
+                'A unique "handle" ID is required for the file-name.%s',
+                $this->type
+            )
+        );
+        $this->getInstance();
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldHaveDefaultLocation() {
+    /**
+     * @test
+     */
+    public function itShouldHaveDefaultLocation()
+    {
 
-		$this->config->get(Asset::LOCATION, Argument::type('string'))->willReturn('wp_enqueue_scripts');
+        $this->config->get(Asset::LOCATION, Argument::type('string'))->willReturn('wp_enqueue_scripts');
 
-		$sut = $this->getInstance();
-		$this->assertSame( 'wp_enqueue_scripts', $sut->location(), '' );
-	}
+        $sut = $this->getInstance();
+        $this->assertSame('wp_enqueue_scripts', $sut->location(), '');
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldBeRegistered() {
+    /**
+     * @test
+     */
+    public function itShouldBeRegistered()
+    {
 
-		$func_name = sprintf(
-			'wp_%s_is',
-			$this->type
-		);
+        $func_name = sprintf(
+            'wp_%s_is',
+            $this->type
+        );
 
-		$called = 0;
-		\tad\FunctionMockerLe\define( $func_name, function (
-			$handle,
-			$list = 'enqueued'
-		) use ( &$called ) {
-			$called++;
-			return true;
-		} );
+        $called = 0;
+        \tad\FunctionMockerLe\define($func_name, function (
+            $handle,
+            $list = 'enqueued'
+        ) use (&$called) {
+            $called++;
+            return true;
+        });
 
-		$sut = $this->getInstance();
+        $sut = $this->getInstance();
 
-		$this->assertTrue( $sut->isRegistered(), '' );
-		$this->assertEquals(1, $called, "{$func_name} is not called");
-	}
+        $this->assertTrue($sut->isRegistered(), '');
+        $this->assertEquals(1, $called, "{$func_name} is not called");
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldBeEnqueued() {
+    /**
+     * @test
+     */
+    public function itShouldBeEnqueued()
+    {
 
-		$func_name = sprintf(
-			'wp_%s_is',
-			$this->type
-		);
+        $func_name = sprintf(
+            'wp_%s_is',
+            $this->type
+        );
 
-		$called = 0;
-		\tad\FunctionMockerLe\define( $func_name, function (
-			$handle,
-			$list = 'enqueued'
-		) use ( &$called ) {
-			$called++;
-			return true;
-		} );
+        $called = 0;
+        \tad\FunctionMockerLe\define($func_name, function (
+            $handle,
+            $list = 'enqueued'
+        ) use (&$called) {
+            $called++;
+            return true;
+        });
 
-		$sut = $this->getInstance();
+        $sut = $this->getInstance();
 
-		$this->assertTrue( $sut->isEnqueued(), '' );
-		$this->assertEquals(1, $called, '');
-	}
+        $this->assertTrue($sut->isEnqueued(), '');
+        $this->assertEquals(1, $called, '');
+    }
 
-	private function commonRegisterEnqueue( string $func_name_pattern ): void {
-		$this->config->has( Asset::LOCALIZE )->willReturn(false);
+    private function commonRegisterEnqueue(string $func_name_pattern): void
+    {
+        $this->config->has(Asset::LOCALIZE)->willReturn(false);
 
-		$this->config->get( Asset::URL )->willReturn( 'url' );
-		$this->config->get( Asset::VERSION )->willReturn( '42' );
+        $this->config->get(Asset::URL)->willReturn('url');
+        $this->config->get(Asset::VERSION)->willReturn('42');
 
-		/**
-		 * Only for Script
-		 */
-		$this->config->get( Asset::DEPENDENCIES, [] )->willReturn( [] );
-		$this->config->get( Asset::IN_FOOTER, false )->willReturn( true );
+        /**
+         * Only for Script
+         */
+        $this->config->get(Asset::DEPENDENCIES, [])->willReturn([]);
+        $this->config->get(Asset::IN_FOOTER, false)->willReturn(true);
 
-		/**
-		 * Only for Style
-		 */
-		$this->config->get( Asset::MEDIA, 'all' )->willReturn( 'all' );
+        /**
+         * Only for Style
+         */
+        $this->config->get(Asset::MEDIA, 'all')->willReturn('all');
 
-		$func_name = sprintf(
-			$func_name_pattern,
-			$this->type
-		);
+        $func_name = sprintf(
+            $func_name_pattern,
+            $this->type
+        );
 
-		\tad\FunctionMockerLe\define( $func_name, function (
-			string $handle,
-			string $src,
-			array $deps = [],
-			$ver = false,
-			$in_footer_or_media = false
+        \tad\FunctionMockerLe\define($func_name, function (
+            string $handle,
+            string $src,
+            array $deps = [],
+            $ver = false,
+            $in_footer_or_media = false
 ) {
-			Assert::assertStringContainsString( 'handle', $handle, '' );
-			Assert::assertStringContainsString( 'url', $src, '' );
-			Assert::assertIsArray( $deps, '' );
-			Assert::assertStringContainsString( '42', (string)$ver, '' );
-			Assert::assertEquals( $this->in_footer_or_media, $in_footer_or_media, '' );
-			return true;
-		} );
-	}
+            Assert::assertStringContainsString('handle', $handle, '');
+            Assert::assertStringContainsString('url', $src, '');
+            Assert::assertIsArray($deps, '');
+            Assert::assertStringContainsString('42', (string)$ver, '');
+            Assert::assertEquals($this->in_footer_or_media, $in_footer_or_media, '');
+            return true;
+        });
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldRegister() {
-		$this->commonRegisterEnqueue('wp_register_%s');
-		$sut = $this->getInstance();
-		$result = $sut->register();
-		$this->assertTrue($result, '');
-	}
+    /**
+     * @test
+     */
+    public function itShouldRegister()
+    {
+        $this->commonRegisterEnqueue('wp_register_%s');
+        $sut = $this->getInstance();
+        $result = $sut->register();
+        $this->assertTrue($result, '');
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldEnqueue() {
-		$this->commonRegisterEnqueue('wp_enqueue_%s');
-		$sut = $this->getInstance();
-		$sut->enqueue();
-	}
+    /**
+     * @test
+     */
+    public function itShouldEnqueue()
+    {
+        $this->commonRegisterEnqueue('wp_enqueue_%s');
+        $sut = $this->getInstance();
+        $sut->enqueue();
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldLoad() {
-		$sut = $this->getInstance();
+    /**
+     * @test
+     */
+    public function itShouldLoad()
+    {
+        $sut = $this->getInstance();
 
-		$this->config->get(Asset::SHOULD_LOAD)->willReturn(true);
-		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(true);
+        $this->assertTrue($sut->shouldEnqueue(), 'Should enqueue the asset');
 
-		$this->config->get(Asset::SHOULD_LOAD)->willReturn([]);
-		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn([]);
+        $this->assertTrue($sut->shouldEnqueue(), 'Should enqueue the asset');
 
-		$this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
-			return true;
-		});
-		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
-	}
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
+            return true;
+        });
+        $this->assertTrue($sut->shouldEnqueue(), 'Should enqueue the asset');
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldNotLoad() {
-		$sut = $this->getInstance();
+    /**
+     * @test
+     */
+    public function itShouldNotLoad()
+    {
+        $sut = $this->getInstance();
 
-		$this->config->get(Asset::SHOULD_LOAD)->willReturn(false);
-		$this->assertFalse( $sut->shouldEnqueue(), 'Should enqueue the asset' );
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(false);
+        $this->assertFalse($sut->shouldEnqueue(), 'Should enqueue the asset');
 
-		$this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
-			return false;
-		});
-		$this->assertFalse( $sut->shouldEnqueue(), 'Should enqueue the asset' );
-	}
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
+            return false;
+        });
+        $this->assertFalse($sut->shouldEnqueue(), 'Should enqueue the asset');
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldInvokeCallableLoadConditionOnce() {
-		$sut = $this->getInstance();
-		$called = 0;
+    /**
+     * @test
+     */
+    public function itShouldInvokeCallableLoadConditionOnce()
+    {
+        $sut = $this->getInstance();
+        $called = 0;
 
-		$this->config->get(Asset::SHOULD_LOAD)->willReturn(function () use ( &$called ) {
-			$called++;
-			return true;
-		});
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(function () use (&$called) {
+            $called++;
+            return true;
+        });
 
-		$this->assertTrue( $sut->shouldEnqueue(), 'Should enqueue the asset' );
-		$this->assertSame( 1, $called, 'Callable load condition should be invoked once' );
-	}
+        $this->assertTrue($sut->shouldEnqueue(), 'Should enqueue the asset');
+        $this->assertSame(1, $called, 'Callable load condition should be invoked once');
+    }
 
-	/**
-	 * Helper method used as an array callable load condition.
-	 *
-	 * @return bool
-	 */
-	private function alwaysTrueLoadCondition(): bool {
-		return true;
-	}
+    /**
+     * Helper method used as an array callable load condition.
+     *
+     * @return bool
+     */
+    private function alwaysTrueLoadCondition(): bool
+    {
+        return true;
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldLoadWithArrayCallable() {
-		$sut = $this->getInstance();
+    /**
+     * @test
+     */
+    public function itShouldLoadWithArrayCallable()
+    {
+        $sut = $this->getInstance();
 
-		$this->config->get(Asset::SHOULD_LOAD)->willReturn( [ $this, 'alwaysTrueLoadCondition' ] );
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn([ $this, 'alwaysTrueLoadCondition' ]);
 
-		$this->assertTrue(
-			$sut->shouldEnqueue(),
-			'Should enqueue the asset when load condition is an array callable'
-		);
-	}
+        $this->assertTrue(
+            $sut->shouldEnqueue(),
+            'Should enqueue the asset when load condition is an array callable'
+        );
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
@@ -11,55 +12,59 @@ use ItalyStrap\Asset\Style;
 use ItalyStrap\Config\ConfigFactory;
 use UnitTester;
 
-class LoaderTest extends Unit {
-
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
+class LoaderTest extends Unit
+{
+    /**
+     * @var UnitTester
+     */
+    protected $tester;
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _before() {
-	}
+    }
 
 	// phpcs:ignore -- Method from Codeception
 	protected function _after() {
-	}
+    }
 
-	private function getInstance(): GeneratorLoader {
-		$sut = new GeneratorLoader();
-//		$this->assertInstanceOf(\ItalyStrap\Asset\LoaderInterface::class, $sut, '');
-		$this->assertInstanceOf( GeneratorLoader::class, $sut, '');
-		return $sut;
-	}
+    private function getInstance(): GeneratorLoader
+    {
+        $sut = new GeneratorLoader();
+//      $this->assertInstanceOf(\ItalyStrap\Asset\LoaderInterface::class, $sut, '');
+        $this->assertInstanceOf(GeneratorLoader::class, $sut, '');
+        return $sut;
+    }
 
-	/**
-	 * @test
-	 */
-	public function instanceOk() {
-		$sut = $this->getInstance();
-	}
+    /**
+     * @test
+     */
+    public function instanceOk()
+    {
+        $sut = $this->getInstance();
+    }
 
-	function getConfig() {
-		yield ConfigFactory::make([
-			Asset::HANDLE	=> 'handle',
-			'type'			=> Style::class,
-		]);
-	}
+    public function getConfig()
+    {
+        yield ( new ConfigFactory() )->make([
+            Asset::HANDLE   => 'handle',
+            'type'          => Style::class,
+        ]);
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldLoad() {
-		$sut = $this->getInstance();
-		$assets = $sut->load( $this->getConfig() );
+    /**
+     * @test
+     */
+    public function itShouldLoad()
+    {
+        $sut = $this->getInstance();
+        $assets = $sut->load($this->getConfig());
 
-		$should_load = 0;
-		foreach ( $assets as $asset ) {
-			$this->assertInstanceOf( AssetInterface::class, $asset, '' );
-			$should_load++;
-		}
+        $should_load = 0;
+        foreach ($assets as $asset) {
+            $this->assertInstanceOf(AssetInterface::class, $asset, '');
+            $should_load++;
+        }
 
-		$this->assertTrue(\boolval( $should_load ), '$assets is empty');
-	}
+        $this->assertTrue(\boolval($should_load), '$assets is empty');
+    }
 }
