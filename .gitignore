@@ -1,10 +1,6 @@
 /vendor/
-
-/_others/
-
-*.local
+composer.lock
 codeception.yml
-*.lock
-/src/Finder/
+*.local
 *.phar
-infection.json.dist
+.phpcs-cache

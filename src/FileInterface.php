@@ -2,15 +2,15 @@
 
 namespace ItalyStrap\Asset;
 
-interface FileInterface {
+interface FileInterface
+{
+    /**
+     * @return mixed
+     */
+    public function version();
 
-	/**
-	 * @return mixed
-	 */
-	public function version();
-
-	/**
-	 * @return string
-	 */
-	public function url(): string;
+    /**
+     * @return string
+     */
+    public function url(): string;
 }

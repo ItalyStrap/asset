@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
@@ -13,117 +14,130 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use UnitTester;
 
-class AssetsSubscriberInpsydeAdapterTest extends Unit {
+class AssetsSubscriberInpsydeAdapterTest extends Unit
+{
+    use \Prophecy\PhpUnit\ProphecyTrait;
 
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
 
-	/**
-	 * @var ObjectProphecy
-	 */
-	private $asset_manager;
+    /**
+     * @var UnitTester
+     */
+    protected $tester;
 
-	/**
-	 * @var ObjectProphecy
-	 */
-	private $asset_loader;
+    /**
+     * @var ObjectProphecy
+     */
+    private $asset_manager;
 
-	/**
-	 * @var ObjectProphecy
-	 */
-	private $asset_asset;
+    /**
+     * @var ObjectProphecy
+     */
+    private $asset_loader;
 
-	/**
-	 * @return Asset
-	 */
-	public function getAssetAsset(): Asset {
-		return $this->asset_asset->reveal();
-	}
+    /**
+     * @var ObjectProphecy
+     */
+    private $asset_asset;
 
-	/**
-	 * @return LoaderInterface
-	 */
-	public function getAssetLoader(): LoaderInterface {
-		return $this->asset_loader->reveal();
-	}
+    /**
+     * @return Asset
+     */
+    public function getAssetAsset(): Asset
+    {
+        return $this->asset_asset->reveal();
+    }
 
-	/**
-	 * @return AssetManager
-	 */
-	public function getAssetManager(): AssetManager {
-		return $this->asset_manager->reveal();
-	}
+    /**
+     * @return LoaderInterface
+     */
+    public function getAssetLoader(): LoaderInterface
+    {
+        return $this->asset_loader->reveal();
+    }
 
-	protected function _before() {
-		$this->asset_loader = $this->prophesize( LoaderInterface::class );
-		$this->asset_asset = $this->prophesize( Asset::class );
+    /**
+     * @return AssetManager
+     */
+    public function getAssetManager(): AssetManager
+    {
+        return $this->asset_manager->reveal();
+    }
 
-		/**
-		 * https://tomasvotruba.com/blog/2019/03/28/how-to-mock-final-classes-in-phpunit/
-		 */
-		BypassFinals::enable();
-		$this->asset_manager = $this->prophesize( AssetManager::class );
-	}
+    protected function _before()
+    {
+        $this->asset_loader = $this->prophesize(LoaderInterface::class);
+        $this->asset_asset = $this->prophesize(Asset::class);
 
-	protected function _after() {
-	}
+        /**
+         * https://tomasvotruba.com/blog/2019/03/28/how-to-mock-final-classes-in-phpunit/
+         */
+        BypassFinals::allowPaths(['*/vendor/inpsyde/*']);
+        BypassFinals::enable(bypassReadOnly: false);
+        $this->asset_manager = $this->prophesize(AssetManager::class);
+    }
 
-	/**
-	 * @return InpsydeAssetsSubscriber
-	 */
-	private function getAssetsSubscriberInpsydeAdapter(): InpsydeAssetsSubscriber {
-		$sut = new InpsydeAssetsSubscriber( $this->getAssetLoader(), [] );
-		$this->assertInstanceOf( InpsydeAssetsSubscriber::class, $sut, '' );
-		return $sut;
-	}
+    protected function _after()
+    {
+    }
 
-	/**
-	 * @test
-	 */
-	public function instanceOk() {
-		$sut = $this->getAssetsSubscriberInpsydeAdapter();
-	}
+    /**
+     * @return InpsydeAssetsSubscriber
+     */
+    private function getAssetsSubscriberInpsydeAdapter(): InpsydeAssetsSubscriber
+    {
+        $sut = new InpsydeAssetsSubscriber($this->getAssetLoader(), []);
+        $this->assertInstanceOf(InpsydeAssetsSubscriber::class, $sut, '');
+        return $sut;
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldHaveEventFromGetSubscribedEvents() {
-		$sut = $this->getAssetsSubscriberInpsydeAdapter();
-		$array = $sut->getSubscribedEvents();
+    /**
+     * @test
+     */
+    public function instanceOk()
+    {
+        $sut = $this->getAssetsSubscriberInpsydeAdapter();
+    }
 
-		$this->assertArrayHasKey( AssetManager::ACTION_SETUP, $array, '');
-		foreach ( $array as $item ) {
-			$this->assertTrue(
-				\in_array( InpsydeAssetsSubscriber::CALLBACK_METHOD_NAME, $item, true ),
-				''
-			);
-		}
-	}
+    /**
+     * @test
+     */
+    public function itShouldHaveEventFromGetSubscribedEvents()
+    {
+        $sut = $this->getAssetsSubscriberInpsydeAdapter();
+        $array = $sut->getSubscribedEvents();
 
-	/**
-	 * @test
-	 */
-	public function itShouldHaveEventFromGetSubscribedEventsfd() {
-		$return_value = [
-			$this->getAssetAsset(),
-			$this->getAssetAsset(),
-		];
+        $this->assertArrayHasKey(AssetManager::ACTION_SETUP, $array, '');
+        foreach ($array as $item) {
+            $this->assertTrue(
+                \in_array(InpsydeAssetsSubscriber::CALLBACK_METHOD_NAME, $item, true),
+                ''
+            );
+        }
+    }
 
-		$this->asset_loader
-			->load(Argument::any())
-			->willReturn( $return_value )
-			->shouldBeCalled(1);
+    /**
+     * @test
+     */
+    public function itShouldHaveEventFromGetSubscribedEventsfd()
+    {
+        $return_value = [
+            $this->getAssetAsset(),
+            $this->getAssetAsset(),
+        ];
 
-		$obj = $this;
-		$this->asset_manager->register( ...$return_value )->will(
-			function () use ( $obj ): AssetManager {
-				return $obj->getAssetManager();
-			}
-		)->shouldBeCalled(1);
+        $this->asset_loader
+            ->load(Argument::any())
+            ->willReturn($return_value)
+            ->shouldBeCalled(1);
 
-		$sut = $this->getAssetsSubscriberInpsydeAdapter();
-		$sut->loadAssets( $this->getAssetManager() );
-	}
+        $obj = $this;
+        $this->asset_manager->register(...$return_value)->will(
+            function () use ($obj): AssetManager {
+                return $obj->getAssetManager();
+            }
+        )->shouldBeCalled(1);
+
+        $sut = $this->getAssetsSubscriberInpsydeAdapter();
+        $sut->loadAssets($this->getAssetManager());
+    }
 }

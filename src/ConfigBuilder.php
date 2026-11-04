@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Asset;
@@ -9,6 +10,7 @@ use ItalyStrap\Config\ConfigFactory;
 use ItalyStrap\Finder\FinderInterface;
 use RuntimeException;
 use SplFileInfo;
+
 use function array_key_exists;
 use function array_merge;
 use function array_replace;
@@ -19,303 +21,317 @@ use function str_replace;
 use function strpos;
 use function strval;
 
-final class ConfigBuilder {
+final class ConfigBuilder
+{
+    public const FILE_NAME = 'file_name';
 
-	public const FILE_NAME = 'file_name';
+    /**
+     * @var array
+     */
+    private $config = [];
 
-	/**
-	 * @var array
-	 */
-	private $config = [];
+    /**
+     * @var array<string>
+     */
+    private $types = [];
 
-	/**
-	 * @var array<string>
-	 */
-	private $types = [];
+    /**
+     * @var FinderInterface[]
+     */
+    private $finder = [];
 
-	/**
-	 * @var FinderInterface[]
-	 */
-	private $finder = [];
+    /**
+     * @var ?VersionInterface
+     */
+    private $version;
 
-	/**
-	 * @var ?VersionInterface
-	 */
-	private $version;
+    /**
+     * @var string
+     */
+    private $base_url;
 
-	/**
-	 * @var string
-	 */
-	private $base_url;
+    /**
+     * @var string
+     */
+    private $base_path;
 
-	/**
-	 * @var string
-	 */
-	private $base_path;
+    /**
+     * ConfigBuilder constructor.
+     * @param string $base_url
+     * @param string $base_path
+     */
+    public function __construct(
+        string $base_url,
+        string $base_path
+    ) {
+        $this->base_url = $base_url;
+        $this->base_path = $base_path;
+    }
 
-	/**
-	 * ConfigBuilder constructor.
-	 * @param string $base_url
-	 * @param string $base_path
-	 */
-	public function __construct(
-		string $base_url,
-		string $base_path
-	) {
-		$this->base_url = $base_url;
-		$this->base_path = $base_path;
-	}
+    /**
+     * @param string $key
+     * @param string $class
+     */
+    public function withType(string $key, string $class): void
+    {
+        if (array_key_exists($key, $this->types)) {
+            throw new RuntimeException(sprintf(
+                '%s has already been registered',
+                $key
+            ));
+        }
 
-	/**
-	 * @param string $key
-	 * @param string $class
-	 */
-	public function withType( string $key, string $class ): void {
-		if ( array_key_exists( $key, $this->types ) ) {
-			throw new RuntimeException( sprintf(
-				'%s has already been registered',
-				$key
-			));
-		}
+        $this->types[ $key ] = $class;
+    }
 
-		$this->types[ $key ] = $class;
-	}
+    /**
+     * @param string $key
+     * @param FinderInterface $finder
+     */
+    public function withFinderForType(string $key, FinderInterface $finder): void
+    {
+        if (array_key_exists($key, $this->finder)) {
+            throw new RuntimeException(sprintf(
+                '%s for %s has already been registered',
+                $finder::class,
+                $key
+            ));
+        }
 
-	/**
-	 * @param string $key
-	 * @param FinderInterface $finder
-	 */
-	public function withFinderForType( string $key, FinderInterface $finder ): void {
-		if ( array_key_exists( $key, $this->finder ) ) {
-			throw new RuntimeException( sprintf(
-				'%s for %s has already been registered',
-				$finder::class,
-				$key
-			));
-		}
+        $this->finder[ $key ] = $finder;
+    }
 
-		$this->finder[ $key ] = $finder;
-	}
+    public function withVersion(VersionInterface $version): void
+    {
+        $this->version = $version;
+    }
 
-	public function withVersion( VersionInterface $version ): void {
-		$this->version = $version;
-	}
+    /**
+     * @param array ...$configs
+     */
+    public function addConfig(array $configs): void
+    {
+        $this->config = array_merge($this->config, $configs);
+    }
 
-	/**
-	 * @param array ...$configs
-	 */
-	public function addConfig( array $configs ): void {
-		$this->config = array_merge( $this->config, $configs );
-	}
+    /**
+     * @return iterable
+     */
+    public function parseConfig(): iterable
+    {
 
-	/**
-	 * @return iterable
-	 */
-	public function parseConfig(): iterable {
+        $default = [
+            'file'                  => '',
+            self::FILE_NAME         => '',
+            Asset::URL              => '',
+            Asset::VERSION          => null,
+            Asset::SHOULD_LOAD      => true,
+            Asset::DEPENDENCIES     => [],
+            Asset::IN_FOOTER        => true,
+        ];
 
-		$default = [
-			'file'					=> '',
-			self::FILE_NAME			=> '',
-			Asset::URL				=> '',
-			Asset::VERSION			=> null,
-			Asset::SHOULD_LOAD		=> true,
-			Asset::DEPENDENCIES		=> [],
-			Asset::IN_FOOTER		=> true,
-		];
+        foreach ($this->config as $config) {
+            $config = array_replace($default, $config);
 
-		foreach ( $this->config as $config ) {
-			$config = array_replace($default, $config);
+            /**
+             * Avoid old deregister functionality
+             */
+            if (array_key_exists('deregister', $config)) {
+                continue;
+            }
 
-			/**
-			 * Avoid old deregister functionality
-			 */
-			if ( array_key_exists( 'deregister', $config ) ){
-				continue;
-			}
+            $this->assertHasHandle($config);
 
-			$this->assertHasHandle( $config );
+            if ('comment-reply' === $config[ Asset::HANDLE ]) {
+                $config[ Asset::URL ] = '//comment-reply.js';
+            }
 
-			if ( 'comment-reply' === $config[ Asset::HANDLE ] ) {
-				$config[ Asset::URL ] = '//comment-reply.js';
-			}
+            $config = $this->generateFileUrl($config);
 
-			$config = $this->generateFileUrl( $config );
+            $config['type'] = $this->getType($config[ Asset::URL ], $config[ Asset::HANDLE ]);
+            $config['enqueue'] = $config[ Asset::SHOULD_LOAD ];
+            $config['dependencies'] = $config[ Asset::DEPENDENCIES ];
+            $config['inFooter'] = $config[ Asset::IN_FOOTER ];
 
-			$config['type'] = $this->getType( $config[ Asset::URL ], $config[ Asset::HANDLE ] );
-			$config['enqueue'] = $config[ Asset::SHOULD_LOAD ];
-			$config['dependencies'] = $config[ Asset::DEPENDENCIES ];
-			$config['inFooter'] = $config[ Asset::IN_FOOTER ];
+            yield (new ConfigFactory())->make(
+                ParsedAssetDefinition::fromArray($config)->toArray()
+            );
+        }
+    }
 
-			yield (new ConfigFactory)->make(
-				ParsedAssetDefinition::fromArray( $config )->toArray()
-			);
-		}
-	}
+    /**
+     * @param array $config
+     */
+    private function assertHasHandle(array $config): void
+    {
+        if (array_key_exists(Asset::HANDLE, $config)) {
+            return;
+        }
 
-	/**
-	 * @param array $config
-	 */
-	private function assertHasHandle( array $config ): void {
-		if ( array_key_exists( Asset::HANDLE, $config ) ) {
-			return;
-		}
+        $target = $config[ Asset::URL ];
 
-		$target = $config[ Asset::URL ];
+        if (empty($target)) {
+            $target = implode(', ', (array) $config[ self::FILE_NAME ]);
+        }
 
-		if ( empty( $target ) ) {
-			$target = implode( ', ', (array) $config[ self::FILE_NAME ] );
-		}
+        throw new InvalidArgumentException(sprintf(
+            'A unique "handle" ID is required for the %s',
+            $target
+        ));
+    }
 
-		throw new InvalidArgumentException( sprintf(
-			'A unique "handle" ID is required for the %s',
-			$target
-		) );
-	}
+    /**
+     * @param $config
+     * @return mixed
+     */
+    private function generateFileUrl(array $config)
+    {
 
-	/**
-	 * @param $config
-	 * @return mixed
-	 */
-	private function generateFileUrl( array $config ) {
+        /**
+         * In case the url is relative
+         */
+        if (strpos($config[ Asset::URL ], '//') !== false) {
+            return $config;
+        }
 
-		/**
-		 * In case the url is relative
-		 */
-		if ( strpos( $config[ Asset::URL ], '//' ) !== false ) {
-			return $config;
-		}
+        /**
+         * Back compat with old key
+         */
+        if (strpos($config[ 'file' ], '//') !== false) {
+            $config[ Asset::URL ] = $config[ 'file' ];
+            return $config;
+        }
 
-		/**
-		 * Back compat with old key
-		 */
-		if ( strpos( $config[ 'file' ], '//' ) !== false ) {
-			$config[ Asset::URL ] = $config[ 'file' ];
-			return $config;
-		}
+        $fileInfo = $this->getFileInfo($config[ self::FILE_NAME ], $config[ Asset::HANDLE ]);
 
-		$fileInfo = $this->getFileInfo( $config[ self::FILE_NAME ], $config[ Asset::HANDLE ] );
+        $config[ Asset::URL ] = $this->url($fileInfo);
+        $config[ Asset::VERSION ] = $this->version($fileInfo, $config);
 
-		$config[ Asset::URL ] = $this->url( $fileInfo );
-		$config[ Asset::VERSION ] = $this->version( $fileInfo, $config );
+        return $config;
+    }
 
-		return $config;
-	}
+    private function version(SplFileInfo $fileInfo, array $config): string
+    {
+        if (! $this->version) {
+            return strval($fileInfo->getMTime());
+        }
 
-	private function version( SplFileInfo $fileInfo, array $config ): string {
-		if ( ! $this->version ) {
-			return strval( $fileInfo->getMTime() );
-		}
+        return strval($this->version->version($fileInfo, $config));
+    }
 
-		return strval( $this->version->version( $fileInfo, $config ) );
-	}
+    /**
+     * @return string
+     */
+    private function url(SplFileInfo $fileInfo): string
+    {
+        return $this->generateUrl($fileInfo);
+    }
 
-	/**
-	 * @return string
-	 */
-	private function url( SplFileInfo $fileInfo ): string {
-		return $this->generateUrl( $fileInfo );
-	}
+    /**
+     * @return string
+     */
+    private function normalizePath(string $path): string
+    {
+        return str_replace('\\', '/', $path);
+    }
 
-	/**
-	 * @return string
-	 */
-	private function normalizePath( string $path ): string {
-		return str_replace( '\\', '/', $path );
-	}
+    /**
+     * @param SplFileInfo $fileInfo
+     * @return string
+     */
+    private function generateUrl(SplFileInfo $fileInfo): string
+    {
+        return str_replace(
+            $this->normalizePath($this->base_path),
+            $this->base_url,
+            $this->normalizePath(strval($fileInfo->getRealPath()))
+        );
+    }
 
-	/**
-	 * @param SplFileInfo $fileInfo
-	 * @return string
-	 */
-	private function generateUrl( SplFileInfo $fileInfo ): string {
-		return str_replace(
-			$this->normalizePath( $this->base_path ),
-			$this->base_url,
-			$this->normalizePath( strval( $fileInfo->getRealPath() ) )
-		);
-	}
+    /**
+     * @param string[] $file_name
+     * @param $handle
+     * @return SplFileInfo
+     */
+    private function getFileInfo($file_name, $handle): SplFileInfo
+    {
+        $file_name = (array) $file_name;
+        $extension = '';
 
-	/**
-	 * @param string[] $file_name
-	 * @param $handle
-	 * @return SplFileInfo
-	 */
-	private function getFileInfo( $file_name, $handle ): SplFileInfo {
-		$file_name = (array) $file_name;
-		$extension = '';
+        foreach ($file_name as $name) {
+            $extension = $this->fileExtension($name, $handle);
+            break;
+        }
 
-		foreach ( $file_name as $name ) {
-			$extension = $this->fileExtension( $name, $handle );
-			break;
-		}
+        if (! array_key_exists($extension, $this->finder)) {
+            throw new RuntimeException(
+                sprintf(
+                    'A finder for %s extension is not registered',
+                    $extension
+                )
+            );
+        }
 
-		if ( ! array_key_exists( $extension, $this->finder ) ) {
-			throw new RuntimeException(
-				sprintf(
-					'A finder for %s extension is not registered',
-					$extension
-				)
-			);
-		}
+        $this->finder[ $extension ]
+            ->names($file_name);
 
-		$this->finder[ $extension ]
-			->names( $file_name );
+//      return $this->finder[ $extension ]->current();
 
-//		return $this->finder[ $extension ]->current();
+        /** @var SplFileInfo $fileInfo */
+        foreach ($this->finder[ $extension ] as $fileInfo) {
+            return $fileInfo;
+        }
 
-		/** @var SplFileInfo $fileInfo */
-		foreach ( $this->finder[ $extension ] as $fileInfo) {
-			return $fileInfo;
-		}
+        throw new RuntimeException(sprintf(
+            '%s file not found',
+            implode(', ', $file_name)
+        ));
+    }
 
-		throw new RuntimeException( sprintf(
-			'%s file not found',
-			implode(', ', $file_name)
-		) );
-	}
+    /**
+     * @param string $url
+     * @return string
+     */
+    private function getType(string $url, string $handle): string
+    {
+        $extension = $this->fileExtension($url, $handle);
 
-	/**
-	 * @param string $url
-	 * @return string
-	 */
-	private function getType( string $url, string $handle ): string {
-		$extension = $this->fileExtension( $url, $handle );
+        if (! array_key_exists($extension, $this->types)) {
+            throw new RuntimeException(
+                sprintf(
+                    '%s extension is not registered',
+                    $extension
+                )
+            );
+        }
 
-		if ( ! array_key_exists( $extension, $this->types ) ) {
-			throw new RuntimeException(
-				sprintf(
-					'%s extension is not registered',
-					$extension
-				)
-			);
-		}
+        return $this->types[ $extension ];
+    }
 
-		return $this->types[ $extension ];
-	}
+    /**
+     * https://paulund.co.uk/get-the-file-extension-in-php
+     * @param string $file_name_or_url
+     * @param string $handle
+     * @return string
+     */
+    private function fileExtension(string $file_name_or_url, string $handle): string
+    {
+        if (empty($file_name_or_url)) {
+            throw new InvalidArgumentException(\sprintf(
+                'File name or url must not be empty for "%s"',
+                $handle
+            ));
+        }
 
-	/**
-	 * https://paulund.co.uk/get-the-file-extension-in-php
-	 * @param string $file_name_or_url
-	 * @param string $handle
-	 * @return string
-	 */
-	private function fileExtension( string $file_name_or_url, string $handle ): string {
-		if ( empty( $file_name_or_url ) ) {
-			throw new InvalidArgumentException( \sprintf(
-				'File name or url must not be empty for "%s"',
-				$handle
-			) );
-		}
+        $array = explode(".", $file_name_or_url);
 
-		$array = explode( ".", $file_name_or_url );
+        if (count($array) <= 1) {
+            throw new InvalidArgumentException(sprintf(
+                'File extension is missing for %s',
+                $file_name_or_url
+            ));
+        }
 
-		if ( count( $array ) <= 1 ) {
-			throw new InvalidArgumentException( sprintf(
-				'File extension is missing for %s',
-				$file_name_or_url
-			));
-		}
-
-		return strval( end( $array ) );
-	}
+        return strval(end($array));
+    }
 }

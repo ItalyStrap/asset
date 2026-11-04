@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
@@ -17,544 +18,574 @@ use ItalyStrap\Finder\FinderInterface;
 use Prophecy\Argument;
 use UnitTester;
 
-class ConfigBuilderTest extends Unit {
+class ConfigBuilderTest extends Unit
+{
+    use \Prophecy\PhpUnit\ProphecyTrait;
 
 
-	/**
-	 * @var UnitTester
-	 */
-	protected $tester;
 
-	/**
-	 * @var \Prophecy\Prophecy\ObjectProphecy
-	 */
-	private $finder;
+    /**
+     * @var UnitTester
+     */
+    protected $tester;
 
-	/**
-	 * @return FinderInterface
-	 */
-	public function getFinder(): FinderInterface {
-		return $this->finder->reveal();
-	}
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
+    private $finder;
 
-	protected function _before() {
-		$this->finder = $this->prophesize( FinderInterface::class );
-	}
+    /**
+     * @return FinderInterface
+     */
+    public function getFinder(): FinderInterface
+    {
+        return $this->finder->reveal();
+    }
 
-	protected function _after() {
-	}
+    protected function _before()
+    {
+        $this->finder = $this->prophesize(FinderInterface::class);
+    }
 
-	private function getInstance(): ConfigBuilder {
-		$sut = new ConfigBuilder(
-			$_SERVER[ 'TEST_SITE_WP_URL' ],
-			$_SERVER[ 'WP_ROOT_FOLDER' ]
-		);
-		$this->assertInstanceOf( ConfigBuilder::class, $sut, '' );
-		return $sut;
-	}
+    protected function _after()
+    {
+    }
 
-	/**
-	 * @test
-	 */
-	public function instanceOk() {
-		$sut = $this->getInstance();
-	}
+    private function getInstance(): ConfigBuilder
+    {
+        $sut = new ConfigBuilder(
+            'http://wordpress',
+            \rtrim(\codecept_root_dir(), '/')
+        );
+        $this->assertInstanceOf(ConfigBuilder::class, $sut, '');
+        return $sut;
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldAddConfig() {
-		$sut = $this->getInstance();
-		$sut->addConfig( require codecept_data_dir( '/fixtures/_config/styles.php' ) );
-		$sut->addConfig( require codecept_data_dir( '/fixtures/_config/scripts.php' ) );
-	}
+    /**
+     * @test
+     */
+    public function instanceOk()
+    {
+        $sut = $this->getInstance();
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrownRunTimeExceptionIfTypeIsAlreadyRegistered() {
-		$sut = $this->getInstance();
-		$sut->withType( Style::EXTENSION, Style::class );
-		$sut->withType( Script::EXTENSION, Script::class );
+    /**
+     * @test
+     */
+    public function itShouldAddConfig()
+    {
+        $sut = $this->getInstance();
+        $sut->addConfig(require codecept_data_dir('/fixtures/_config/styles.php'));
+        $sut->addConfig(require codecept_data_dir('/fixtures/_config/scripts.php'));
+    }
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'css has already been registered' );
-		$sut->withType( Style::EXTENSION, Style::class );
+    /**
+     * @test
+     */
+    public function itShouldThrownRunTimeExceptionIfTypeIsAlreadyRegistered()
+    {
+        $sut = $this->getInstance();
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withType(Script::EXTENSION, Script::class);
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'js has already been registered' );
-		$sut->withType( Script::EXTENSION, Script::class );
-	}
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('css has already been registered');
+        $sut->withType(Style::EXTENSION, Style::class);
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrownRunTimeExceptionIfFinderForTypeIsAlreadyRegistered() {
-		$sut = $this->getInstance();
-		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
-		$sut->withFinderForType( Script::EXTENSION, $this->getFinder() );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('js has already been registered');
+        $sut->withType(Script::EXTENSION, Script::class);
+    }
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( $this->getFinder()::class . ' for css has already been registered' );
-		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
+    /**
+     * @test
+     */
+    public function itShouldThrownRunTimeExceptionIfFinderForTypeIsAlreadyRegistered()
+    {
+        $sut = $this->getInstance();
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
+        $sut->withFinderForType(Script::EXTENSION, $this->getFinder());
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( $this->getFinder()::class . ' for js has already been registered' );
-		$sut->withFinderForType( Script::EXTENSION, $this->getFinder() );
-	}
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage($this->getFinder()::class . ' for css has already been registered');
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrownRunTimeExceptionIfFinderForTypeIsNotRegistered() {
-		$this->finder->names( Argument::exact('style.css') )->will( function () {
-		} )->shouldNotBeCalled();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage($this->getFinder()::class . ' for js has already been registered');
+        $sut->withFinderForType(Script::EXTENSION, $this->getFinder());
+    }
 
-		$sut = $this->getInstance();
+    /**
+     * @test
+     */
+    public function itShouldThrownRunTimeExceptionIfFinderForTypeIsNotRegistered()
+    {
+        $this->finder->names(Argument::exact('style.css'))->will(function () {
+        })->shouldNotBeCalled();
 
-		$sut->addConfig( [
-			[
-				Asset::HANDLE				=> 'test',
-				ConfigBuilder::FILE_NAME	=> 'style.css',
-			]
-		] );
+        $sut = $this->getInstance();
 
-		$sut->withType(Style::EXTENSION, Style::class);
+        $sut->addConfig([
+            [
+                Asset::HANDLE               => 'test',
+                ConfigBuilder::FILE_NAME    => 'style.css',
+            ]
+        ]);
 
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'A finder for css extension is not registered' );
+        $sut->withType(Style::EXTENSION, Style::class);
 
-		/** @var ConfigInterface $config */
-		foreach ($sut->parseConfig() as $config) {
-		}
-	}
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A finder for css extension is not registered');
 
-	public function urlConfigProvider() {
+        /** @var ConfigInterface $config */
+        foreach ($sut->parseConfig() as $config) {
+        }
+    }
 
-		yield 'slashes'	=> [
-			[
-				Asset::HANDLE	=> 'test',
-				Asset::URL		=> '//test-with-extension.css',
-			]
-		];
+    public static function urlConfigProvider()
+    {
 
-		yield 'back compat with file key'	=> [
-			[
-				Asset::HANDLE	=> 'test',
-				'file'			=> '//test-with-extension.css',
-			]
-		];
-	}
+        yield 'slashes' => [
+            [
+                Asset::HANDLE   => 'test',
+                Asset::URL      => '//test-with-extension.css',
+            ]
+        ];
 
-	/**
-	 * @test
-	 * @group url
-	 * @dataProvider urlConfigProvider()
-	 */
-	public function itShouldGenerateUrlFromProvider( $config_from_provider ) {
-		$this->finder->names( Argument::exact('//test-with-extension.css') )->will( function () {
-		} )->shouldNotBeCalled();
+        yield 'back compat with file key'   => [
+            [
+                Asset::HANDLE   => 'test',
+                'file'          => '//test-with-extension.css',
+            ]
+        ];
+    }
 
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			$config_from_provider
-		] );
+    /**
+     * @test
+     * @group url
+     * @dataProvider urlConfigProvider
+     */
+    public function itShouldGenerateUrlFromProvider($config_from_provider)
+    {
+        $this->finder->names(Argument::exact('//test-with-extension.css'))->will(function () {
+        })->shouldNotBeCalled();
 
-		$sut->withType(Style::EXTENSION, Style::class);
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            $config_from_provider
+        ]);
 
-		/** @var ConfigInterface $config_obj */
-		foreach ($sut->parseConfig() as $config_obj) {
-			$this->assertStringContainsString(
-				'//test-with-extension.css',
-				$config_obj->get( Asset::URL ),
-				''
-			);
-		}
-	}
+        $sut->withType(Style::EXTENSION, Style::class);
 
-	/**
-	 * @test
-	 * @group url
-	 */
-	public function itShouldGenerateUrlFromFileName() {
-		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
-		$this->assertFileExists( $style_css, '');
-		$this->finder->getIterator()->willReturn( new \ArrayIterator(
-			[
-				new \SplFileInfo( $style_css )
-			]
-		) );
-		$this->finder->names( ['style.css'] )->will( function () {
-		} )->shouldBeCalled( 1 );
+        /** @var ConfigInterface $config_obj */
+        foreach ($sut->parseConfig() as $config_obj) {
+            $this->assertStringContainsString(
+                '//test-with-extension.css',
+                $config_obj->get(Asset::URL),
+                ''
+            );
+        }
+    }
+
+    /**
+     * @test
+     * @group url
+     */
+    public function itShouldGenerateUrlFromFileName()
+    {
+        $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
+        $this->assertFileExists($style_css, '');
+        $this->finder->getIterator()->willReturn(new \ArrayIterator(
+            [
+                new \SplFileInfo($style_css)
+            ]
+        ));
+        $this->finder->names(['style.css'])->will(function () {
+        })->shouldBeCalled(1);
 
 
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::HANDLE				=> 'test',
-				ConfigBuilder::FILE_NAME	=> 'style.css',
-			]
-		] );
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::HANDLE               => 'test',
+                ConfigBuilder::FILE_NAME    => 'style.css',
+            ]
+        ]);
 
-		$sut->withType(Style::EXTENSION, Style::class);
-		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
 
-		/** @var ConfigInterface $config_obj */
-		foreach ($sut->parseConfig() as $config_obj) {
-			$this->assertStringContainsString(
-				'/tests/_data/fixtures/parent/css/style.css',
-				$config_obj->get( Asset::URL ),
-				''
-			);
-		}
-	}
+        /** @var ConfigInterface $config_obj */
+        foreach ($sut->parseConfig() as $config_obj) {
+            $this->assertStringContainsString(
+                '/tests/_data/fixtures/parent/css/style.css',
+                $config_obj->get(Asset::URL),
+                ''
+            );
+        }
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrownInvalidArgumentExceptionIfUrlIsEmpty() {
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::HANDLE => 'test'
-			]
-		] );
+    /**
+     * @test
+     */
+    public function itShouldThrownInvalidArgumentExceptionIfUrlIsEmpty()
+    {
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::HANDLE => 'test'
+            ]
+        ]);
 //
-		$this->expectException( \InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'File name or url must not be empty for "test"' );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('File name or url must not be empty for "test"');
 
-		foreach ($sut->parseConfig() as $items) {
-		}
-	}
+        foreach ($sut->parseConfig() as $items) {
+        }
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrowInvalidArgumentExceptionIfHandleIsMissing() {
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::URL => '//test.css',
-			]
-		] );
+    /**
+     * @test
+     */
+    public function itShouldThrowInvalidArgumentExceptionIfHandleIsMissing()
+    {
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::URL => '//test.css',
+            ]
+        ]);
 
-		$this->expectException( \InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'A unique "handle" ID is required for the //test.css' );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A unique "handle" ID is required for the //test.css');
 
-		foreach ( $sut->parseConfig() as $items ) {
-		}
-	}
+        foreach ($sut->parseConfig() as $items) {
+        }
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldNotThrownInvalidArgumentExceptionIfConfigHasDeregisterKey() {
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::HANDLE => 'test',
-				'deregister'	=> true,
-			]
-		] );
+    /**
+     * @test
+     */
+    public function itShouldNotThrownInvalidArgumentExceptionIfConfigHasDeregisterKey()
+    {
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::HANDLE => 'test',
+                'deregister'    => true,
+            ]
+        ]);
 
-		foreach ($sut->parseConfig() as $items) {
-		}
-	}
+        foreach ($sut->parseConfig() as $items) {
+        }
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldHaveVersionFromConfig() {
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::HANDLE	=> 'test',
-				Asset::URL	 	=> '//test.css',
-				Asset::VERSION	=> 42,
-			]
-		] );
+    /**
+     * @test
+     */
+    public function itShouldHaveVersionFromConfig()
+    {
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::HANDLE   => 'test',
+                Asset::URL      => '//test.css',
+                Asset::VERSION  => 42,
+            ]
+        ]);
 
-		$sut->withType( Style::EXTENSION, Style::class );
+        $sut->withType(Style::EXTENSION, Style::class);
 
-		/** @var ConfigInterface $config */
-		foreach ($sut->parseConfig() as $config) {
-			$this->assertSame( 42, $config->get( Asset::VERSION ), '' );
-		}
-	}
+        /** @var ConfigInterface $config */
+        foreach ($sut->parseConfig() as $config) {
+            $this->assertSame(42, $config->get(Asset::VERSION), '');
+        }
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldHaveVersionFromFileInfo() {
-		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
-		$this->assertFileExists( $style_css, '');
-		$file_info = new \SplFileInfo( $style_css );
-		$this->finder->getIterator()->willReturn( new \ArrayIterator(
-			[
-				$file_info
-			]
-		) );
-		$this->finder->names( ['style.css'] )->will( function () {
-		} )->shouldBeCalled( 1 );
+    /**
+     * @test
+     */
+    public function itShouldHaveVersionFromFileInfo()
+    {
+        $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
+        $this->assertFileExists($style_css, '');
+        $file_info = new \SplFileInfo($style_css);
+        $this->finder->getIterator()->willReturn(new \ArrayIterator(
+            [
+                $file_info
+            ]
+        ));
+        $this->finder->names(['style.css'])->will(function () {
+        })->shouldBeCalled(1);
 
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::HANDLE	=> 'test',
-				ConfigBuilder::FILE_NAME	=> 'style.css',
-				Asset::VERSION	=> 42, // This will not be used
-			]
-		] );
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::HANDLE   => 'test',
+                ConfigBuilder::FILE_NAME    => 'style.css',
+                Asset::VERSION  => 42, // This will not be used
+            ]
+        ]);
 
-		$sut->withType( Style::EXTENSION, Style::class );
-		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
 
-		/** @var ConfigInterface $config */
-		foreach ($sut->parseConfig() as $config) {
-			$this->assertSame(
-				\strval( $file_info->getMTime() ),
-				$config->get( Asset::VERSION ),
-				''
-			);
-			$this->assertNotSame(42, $config->get( Asset::VERSION ), '');
-		}
-	}
+        /** @var ConfigInterface $config */
+        foreach ($sut->parseConfig() as $config) {
+            $this->assertSame(
+                \strval($file_info->getMTime()),
+                $config->get(Asset::VERSION),
+                ''
+            );
+            $this->assertNotSame(42, $config->get(Asset::VERSION), '');
+        }
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldHaveCustomVersion() {
-		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
-		$this->assertFileExists( $style_css, '');
-		$file_info = new \SplFileInfo( $style_css );
-		$this->finder->getIterator()->willReturn( new \ArrayIterator(
-			[
-				$file_info
-			]
-		) );
-		$this->finder->names( ['style.css'] )->will( function () {
-		} )->shouldBeCalled( 1 );
+    /**
+     * @test
+     */
+    public function itShouldHaveCustomVersion()
+    {
+        $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
+        $this->assertFileExists($style_css, '');
+        $file_info = new \SplFileInfo($style_css);
+        $this->finder->getIterator()->willReturn(new \ArrayIterator(
+            [
+                $file_info
+            ]
+        ));
+        $this->finder->names(['style.css'])->will(function () {
+        })->shouldBeCalled(1);
 
-		$sut = $this->getInstance();
-		$config_ = [
-			Asset::HANDLE	=> 'test',
-			ConfigBuilder::FILE_NAME	=> 'style.css',
-//			Asset::VERSION	=> 42, // This will not be used
-		];
-		$sut->addConfig( [
-			$config_
-		] );
+        $sut = $this->getInstance();
+        $config_ = [
+            Asset::HANDLE   => 'test',
+            ConfigBuilder::FILE_NAME    => 'style.css',
+//          Asset::VERSION  => 42, // This will not be used
+        ];
+        $sut->addConfig([
+            $config_
+        ]);
 
-		$sut->withType( Style::EXTENSION, Style::class );
-		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
-		$version = $this->prophesize( VersionInterface::class );
-		$version->version(Argument::any(), Argument::type('array'))->willReturn('55')->shouldBeCalled(1);
-		$sut->withVersion( $version->reveal() );
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
+        $version = $this->prophesize(VersionInterface::class);
+        $version->version(Argument::any(), Argument::type('array'))->willReturn('55')->shouldBeCalled(1);
+        $sut->withVersion($version->reveal());
 
-		$called = 0;
-		/** @var ConfigInterface $config */
-		foreach ($sut->parseConfig() as $config) {
-			$this->assertSame('55', $config->get( Asset::VERSION ), '');
-			$called++;
-		}
-		$this->assertTrue( \boolval( $called ) );
-	}
+        $called = 0;
+        /** @var ConfigInterface $config */
+        foreach ($sut->parseConfig() as $config) {
+            $this->assertSame('55', $config->get(Asset::VERSION), '');
+            $called++;
+        }
+        $this->assertTrue(\boolval($called));
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldGetParsedConfigWithDefaultValues() {
-		$sut = $this->getInstance();
-		$sut->withType( 'css', Style::class );
+    /**
+     * @test
+     */
+    public function itShouldGetParsedConfigWithDefaultValues()
+    {
+        $sut = $this->getInstance();
+        $sut->withType('css', Style::class);
 
-		$sut->addConfig( [
-			[
-				Asset::HANDLE => 'handle',
-				Asset::URL => '//url.css',
-			]
-		] );
+        $sut->addConfig([
+            [
+                Asset::HANDLE => 'handle',
+                Asset::URL => '//url.css',
+            ]
+        ]);
 
-		$is_called = 0;
-		foreach ($sut->parseConfig() as $items) {
-			$this->assertSame( '', $items[ ConfigBuilder::FILE_NAME ], '' );
-			$this->assertSame( true, $items[ Asset::SHOULD_LOAD ], '' );
-			$this->assertSame( [], $items[ Asset::DEPENDENCIES ], '' );
-			$this->assertSame( true, $items[ Asset::IN_FOOTER ], '' );
-			$this->assertSame( null, $items[ Asset::VERSION ], '' );
+        $is_called = 0;
+        foreach ($sut->parseConfig() as $items) {
+            $this->assertSame('', $items[ ConfigBuilder::FILE_NAME ], '');
+            $this->assertSame(true, $items[ Asset::SHOULD_LOAD ], '');
+            $this->assertSame([], $items[ Asset::DEPENDENCIES ], '');
+            $this->assertSame(true, $items[ Asset::IN_FOOTER ], '');
+            $this->assertSame(null, $items[ Asset::VERSION ], '');
 
-			$is_called ++;
-		}
+            $is_called++;
+        }
 
-		$this->assertTrue( \boolval( $is_called ), '$configs is empty' );
-	}
+        $this->assertTrue(\boolval($is_called), '$configs is empty');
+    }
 
-	/**
-	 * @test
-	 */
-	public function itShouldGetParsedConfigFromOldConfiguration() {
-		$sut = $this->getInstance();
-		$sut->withType( Style::EXTENSION, Style::class );
-		$sut->withType( Script::EXTENSION, Script::class );
-		$sut->addConfig( require codecept_data_dir( '/fixtures/_config/styles.php' ) );
-		$sut->addConfig( require codecept_data_dir( '/fixtures/_config/scripts.php' ) );
+    /**
+     * @test
+     */
+    public function itShouldGetParsedConfigFromOldConfiguration()
+    {
+        require_once codecept_data_dir('/fixtures/_config/common.php');
 
-		$is_called = 0;
-		foreach ($sut->parseConfig() as $items) {
-			$this->assertArrayHasKey( 'handle', $items, '' );
-			$this->assertArrayHasKey( 'url', $items, '' );
-			$this->assertArrayHasKey( 'type', $items, '' );
-			$is_called ++;
-		}
+        $sut = $this->getInstance();
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withType(Script::EXTENSION, Script::class);
+        $sut->addConfig(require codecept_data_dir('/fixtures/_config/styles.php'));
+        $sut->addConfig(require codecept_data_dir('/fixtures/_config/scripts.php'));
 
-		$this->assertTrue( \boolval( $is_called ), '$configs is empty' );
-	}
+        $is_called = 0;
+        foreach ($sut->parseConfig() as $items) {
+            $this->assertArrayHasKey('handle', $items, '');
+            $this->assertArrayHasKey('url', $items, '');
+            $this->assertArrayHasKey('type', $items, '');
+            $is_called++;
+        }
 
-	/**
-	 * @test
-	 */
-	public function itShouldThrownInvalidArgumentExceptionIfExtensionIsMissing() {
+        $this->assertTrue(\boolval($is_called), '$configs is empty');
+    }
 
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::HANDLE => 'test',
-				Asset::URL => '//test-with-no-extension',
-			]
-		] );
+    /**
+     * @test
+     */
+    public function itShouldThrownInvalidArgumentExceptionIfExtensionIsMissing()
+    {
 
-
-		$this->expectException( \InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'File extension is missing for //test-with-no-extension' );
-
-		foreach ($sut->parseConfig() as $items) {
-		}
-	}
-
-	/**
-	 * @test
-	 */
-	public function itShouldThrownRuntimeExceptionIfExtensionIsNotRegistered() {
-		$sut = $this->getInstance();
-		$sut->addConfig( [
-			[
-				Asset::HANDLE => 'test',
-				Asset::URL => '//test-with-extension.test',
-			]
-		] );
-
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'test extension is not registered' );
-
-		foreach ($sut->parseConfig() as $items) {
-		}
-	}
-
-	/**
-	 * @test
-	 */
-	public function itShouldThrownRuntimeExceptionIfFileDoesNotExists() {
-		$style_css = codecept_data_dir( '/fixtures/parent/css/no-style.css' );
-		$this->assertFileNotExists( $style_css, '');
-
-		$this->finder->getIterator()->willReturn( new \ArrayIterator(
-			[
-			]
-		) );
-		$this->finder->names( ['no-style.css'] )->will( function () {
-		} )->shouldBeCalled( 1 );
-
-		$sut = $this->getInstance();
-		$sut->withType( Style::EXTENSION, Style::class );
-		$sut->withFinderForType(Style::EXTENSION, $this->getFinder());
-
-		$sut->addConfig( [
-			[
-				Asset::HANDLE				=> 'test',
-				ConfigBuilder::FILE_NAME	=> 'no-style.css',
-			]
-		] );
-
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'no-style.css file not found' );
-
-		foreach ($sut->parseConfig() as $items) {
-		}
-	}
-
-	/**
-	 * @test
-	 */
-	public function itShouldThrowRuntimeExceptionIfFallbackFilesDoNotExist() {
-		$this->finder->getIterator()->willReturn( new \ArrayIterator(
-			[
-			]
-		) );
-		$this->finder->names( [ 'no-style.css', 'no-style.min.css' ] )->will( function () {
-		} )->shouldBeCalled( 1 );
-
-		$sut = $this->getInstance();
-		$sut->withType( Style::EXTENSION, Style::class );
-		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
-		$sut->addConfig( [
-			[
-				Asset::HANDLE				=> 'test',
-				ConfigBuilder::FILE_NAME	=> [ 'no-style.css', 'no-style.min.css' ],
-			]
-		] );
-
-		$this->expectException( \RuntimeException::class );
-		$this->expectExceptionMessage( 'no-style.css, no-style.min.css file not found' );
-
-		foreach ( $sut->parseConfig() as $items ) {
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function itShouldIterate() {
-		$config = require codecept_data_dir( '/fixtures/_config/new-assets-config.php' );
-		$style_css = codecept_data_dir( '/fixtures/parent/css/style.css' );
-
-		$this->assertFileExists(
-			codecept_data_dir( '/fixtures/parent/css/style.css' ),
-			''
-		);
-
-		$this->finder->getIterator()->willReturn( new \ArrayIterator(
-			[
-				new \SplFileInfo( $style_css )
-			]
-		) );
-
-		$this->finder->names( $config[ 0 ][ 'file_name' ] )->will( function () {
-		} )->shouldBeCalled( 1 );
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::HANDLE => 'test',
+                Asset::URL => '//test-with-no-extension',
+            ]
+        ]);
 
 
-		$sut = $this->getInstance();
-		$sut->withType( Style::EXTENSION, Style::class );
-		$sut->withFinderForType( Style::EXTENSION, $this->getFinder() );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('File extension is missing for //test-with-no-extension');
 
-		$sut->addConfig( $config );
-		$parsedConfig = $sut->parseConfig();
+        foreach ($sut->parseConfig() as $items) {
+        }
+    }
 
-		$is_called = 0;
-		foreach ($parsedConfig as $items) {
-//			codecept_debug($items);
-			$this->assertArrayHasKey( 'url', $items, '' );
-			$this->assertArrayHasKey( 'version', $items, '' );
+    /**
+     * @test
+     */
+    public function itShouldThrownRuntimeExceptionIfExtensionIsNotRegistered()
+    {
+        $sut = $this->getInstance();
+        $sut->addConfig([
+            [
+                Asset::HANDLE => 'test',
+                Asset::URL => '//test-with-extension.test',
+            ]
+        ]);
 
-			$this->assertSame(
-				'http://moduli.test/wp-content/plugins/asset/tests/_data/fixtures/parent/css/style.css',
-				$items[ 'url' ],
-				''
-			);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('test extension is not registered');
 
-			$this->assertSame( \strval( \filemtime( $style_css ) ), $items[ 'version' ], '' );
+        foreach ($sut->parseConfig() as $items) {
+        }
+    }
 
-			$is_called ++;
-		}
+    /**
+     * @test
+     */
+    public function itShouldThrownRuntimeExceptionIfFileDoesNotExists()
+    {
+        $style_css = codecept_data_dir('/fixtures/parent/css/no-style.css');
+        $this->assertFileNotExists($style_css, '');
 
-		$this->assertTrue( \boolval( $is_called ), '$configs is empty' );
-	}
+        $this->finder->getIterator()->willReturn(new \ArrayIterator(
+            [
+            ]
+        ));
+        $this->finder->names(['no-style.css'])->will(function () {
+        })->shouldBeCalled(1);
+
+        $sut = $this->getInstance();
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
+
+        $sut->addConfig([
+            [
+                Asset::HANDLE               => 'test',
+                ConfigBuilder::FILE_NAME    => 'no-style.css',
+            ]
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('no-style.css file not found');
+
+        foreach ($sut->parseConfig() as $items) {
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldThrowRuntimeExceptionIfFallbackFilesDoNotExist()
+    {
+        $this->finder->getIterator()->willReturn(new \ArrayIterator(
+            [
+            ]
+        ));
+        $this->finder->names([ 'no-style.css', 'no-style.min.css' ])->will(function () {
+        })->shouldBeCalled(1);
+
+        $sut = $this->getInstance();
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
+        $sut->addConfig([
+            [
+                Asset::HANDLE               => 'test',
+                ConfigBuilder::FILE_NAME    => [ 'no-style.css', 'no-style.min.css' ],
+            ]
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('no-style.css, no-style.min.css file not found');
+
+        foreach ($sut->parseConfig() as $items) {
+        }
+    }
+
+    /**
+     *
+     */
+    public function itShouldIterate()
+    {
+        $config = require codecept_data_dir('/fixtures/_config/new-assets-config.php');
+        $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
+
+        $this->assertFileExists(
+            codecept_data_dir('/fixtures/parent/css/style.css'),
+            ''
+        );
+
+        $this->finder->getIterator()->willReturn(new \ArrayIterator(
+            [
+                new \SplFileInfo($style_css)
+            ]
+        ));
+
+        $this->finder->names($config[ 0 ][ 'file_name' ])->will(function () {
+        })->shouldBeCalled(1);
+
+
+        $sut = $this->getInstance();
+        $sut->withType(Style::EXTENSION, Style::class);
+        $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
+
+        $sut->addConfig($config);
+        $parsedConfig = $sut->parseConfig();
+
+        $is_called = 0;
+        foreach ($parsedConfig as $items) {
+//          codecept_debug($items);
+            $this->assertArrayHasKey('url', $items, '');
+            $this->assertArrayHasKey('version', $items, '');
+
+            $this->assertSame(
+                'http://moduli.test/tests/_data/fixtures/parent/css/style.css',
+                $items[ 'url' ],
+                ''
+            );
+
+            $this->assertSame(\strval(\filemtime($style_css)), $items[ 'version' ], '');
+
+            $is_called++;
+        }
+
+        $this->assertTrue(\boolval($is_called), '$configs is empty');
+    }
 }

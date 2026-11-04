@@ -1,10 +1,10 @@
 <?php
 
 $define_constants = [
-	'TEMPLATEURL'				=> $_SERVER['TEST_SITE_WP_URL'],
-	'STYLESHEETURL'				=> $_SERVER['TEST_SITE_WP_URL'],
-	'PARENTPATH'				=> $_SERVER['WP_ROOT_FOLDER'],
-	'CHILDPATH'					=> $_SERVER['WP_ROOT_FOLDER'],
+	'TEMPLATEURL'				=> 'http://wordpress',
+	'STYLESHEETURL'				=> 'http://wordpress',
+	'PARENTPATH'				=> \rtrim(\codecept_root_dir(), '/'),
+	'CHILDPATH'					=> \rtrim(\codecept_root_dir(), '/'),
 	'CURRENT_TEMPLATE_SLUG'		=> 'index',
 ];
 
