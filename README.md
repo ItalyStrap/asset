@@ -2,7 +2,7 @@
 
 Handle the CSS and JS register and enqueue.
 
-Version 0.0.1-alpha, the API is being redesigned around value objects, see the [open issues](https://github.com/ItalyStrap/asset/issues).
+Each script and style is an immutable value object, the [releases](https://github.com/ItalyStrap/asset/releases) follow [semantic versioning](https://semver.org).
 
 ## Requirements
 
@@ -69,21 +69,23 @@ The condition runs when the asset is enqueued, `Always` is the default, with `Wh
 ```php
 use ItalyStrap\Asset\AssetLoader;
 use ItalyStrap\Asset\AssetsSubscriber;
-use ItalyStrap\Asset\Hook;
+use ItalyStrap\Asset\EventName;
 
-add_action(Hook::FRONT_END, static fn () => (new AssetLoader())->load($script, $tag, $colors));
+add_action(EventName::FRONT_END, static fn () => (new AssetLoader())->load($script, $tag, $colors));
 
 // Or with italystrap/event
-$subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $tag], Hook::ADMIN));
+$subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $tag], EventName::ADMIN));
 ```
 
-| Hook | Where |
+| Event name | Where |
 | --- | --- |
-| `Hook::FRONT_END` | The front end |
-| `Hook::ADMIN` | The admin pages |
-| `Hook::EDITOR` | The editor interface |
-| `Hook::BLOCK` | The content of the blocks, front end and editor |
-| `Hook::LOGIN` | The login page |
+| `EventName::FRONT_END` | The front end |
+| `EventName::ADMIN` | The admin pages |
+| `EventName::EDITOR` | The editor interface |
+| `EventName::BLOCK` | The content of the blocks, front end and editor |
+| `EventName::LOGIN` | The login page |
+
+`Hook`, the name of `EventName` before 1.1.0, is deprecated and removed in 2.0.
 
 ### The URL of a file
 

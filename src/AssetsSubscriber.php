@@ -19,7 +19,7 @@ final readonly class AssetsSubscriber implements SubscriberInterface
     public function __construct(
         private AssetLoader $loader,
         private array $assets,
-        private string $hook = Hook::FRONT_END,
+        private string $hook = EventName::FRONT_END,
         private int $priority = 10,
     ) {
     }

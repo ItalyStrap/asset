@@ -7,8 +7,8 @@ namespace ItalyStrap\Asset\Tests\Unit;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\AssetLoader;
 use ItalyStrap\Asset\AssetsSubscriber;
+use ItalyStrap\Asset\EventName;
 use ItalyStrap\Asset\Handle;
-use ItalyStrap\Asset\Hook;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\ScriptLoader;
 use ItalyStrap\Asset\StyleLoader;
@@ -25,25 +25,25 @@ final class AssetsSubscriberTest extends Unit
         $events = \iterator_to_array((new AssetsSubscriber(new AssetLoader(), []))->getSubscribedEvents());
 
         $this->assertSame(
-            [Hook::FRONT_END => [SubscriberInterface::CALLBACK => 'load', SubscriberInterface::PRIORITY => 10]],
+            [EventName::FRONT_END => [SubscriberInterface::CALLBACK => 'load', SubscriberInterface::PRIORITY => 10]],
             $events
         );
     }
 
     #[Test]
-    public function itLoadsOnTheHookWithThePriority(): void
+    public function itLoadsOnTheEventWithThePriority(): void
     {
         $priority = \PHP_INT_MAX - 50;
-        $subscriber = new AssetsSubscriber(new AssetLoader(), [], Hook::LOGIN, $priority);
+        $subscriber = new AssetsSubscriber(new AssetLoader(), [], EventName::LOGIN, $priority);
 
         $this->assertSame(
-            [Hook::LOGIN => [SubscriberInterface::CALLBACK => 'load', SubscriberInterface::PRIORITY => $priority]],
+            [EventName::LOGIN => [SubscriberInterface::CALLBACK => 'load', SubscriberInterface::PRIORITY => $priority]],
             \iterator_to_array($subscriber->getSubscribedEvents())
         );
     }
 
     #[Test]
-    public function itLoadsTheAssetsWhenTheHookRuns(): void
+    public function itLoadsTheAssetsWhenTheEventRuns(): void
     {
         $scripts = new ScriptRegistrySpy();
         $loader = new AssetLoader(new ScriptLoader($scripts), new StyleLoader(new StyleRegistrySpy()));

@@ -6,8 +6,8 @@ namespace ItalyStrap\Asset\Tests\Integration;
 
 use ItalyStrap\Asset\AssetLoader;
 use ItalyStrap\Asset\AssetsSubscriber;
+use ItalyStrap\Asset\EventName;
 use ItalyStrap\Asset\Handle;
-use ItalyStrap\Asset\Hook;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Event\GlobalOrderedListenerProvider;
 use ItalyStrap\Event\SubscriberRegister;
@@ -23,7 +23,7 @@ final class AssetsSubscriberTest extends WPTestCase
     }
 
     #[Test]
-    public function itLoadsTheAssetsOnTheHook(): void
+    public function itLoadsTheAssetsOnTheEvent(): void
     {
         $subscriber = new AssetsSubscriber(
             new AssetLoader(),
@@ -32,7 +32,7 @@ final class AssetsSubscriberTest extends WPTestCase
         );
         (new SubscriberRegister(new GlobalOrderedListenerProvider()))->addSubscriber($subscriber);
 
-        \do_action(Hook::FRONT_END);
+        \do_action(EventName::FRONT_END);
         $this->assertFalse(\wp_script_is('my-script', 'registered'));
 
         // Like the page of admin_enqueue_scripts, the arguments of the hook are not used
