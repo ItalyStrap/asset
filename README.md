@@ -62,7 +62,7 @@ $colors = new Style(new Handle('my-colors'), null, inlineStyles: ['.my-banner{co
 | `NoVersion` | None, for external URLs |
 | `FixedVersion('1.2.3')` | The given string |
 
-The condition runs when the asset is enqueued, `Always` is the default, with `When` the asset is only registered when the callback returns false.
+The condition runs when the asset is enqueued, `Always` is the default, with `When` the asset is only registered when the callback returns false, with `RegisterOnly` it is only registered, for a dependency of other assets.
 
 ### Load the assets
 

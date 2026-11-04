@@ -6,6 +6,7 @@ namespace ItalyStrap\Asset\Tests\Unit;
 
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\Always;
+use ItalyStrap\Asset\RegisterOnly;
 use ItalyStrap\Asset\When;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -15,6 +16,12 @@ final class ConditionTest extends Unit
     public function alwaysIsSatisfied(): void
     {
         $this->assertTrue((new Always())->isSatisfied());
+    }
+
+    #[Test]
+    public function registerOnlyIsNotSatisfied(): void
+    {
+        $this->assertFalse((new RegisterOnly())->isSatisfied());
     }
 
     #[Test]
