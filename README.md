@@ -10,21 +10,22 @@ Version 0.0.1-alpha, the API is being redesigned around value objects, see the [
 
 ## Usage
 
-Each script and style is an immutable value object in `ItalyStrap\Asset\Domain`, checked when it is built. The layer that registers them comes with [#5](https://github.com/ItalyStrap/asset/issues/5).
+Each script and style is an immutable value object, checked when it is built. The loaders register them with all their parts and enqueue them when their condition is satisfied.
 
 ```php
-use ItalyStrap\Asset\Domain\Dependencies;
-use ItalyStrap\Asset\Domain\Handle;
-use ItalyStrap\Asset\Domain\InlineScript;
-use ItalyStrap\Asset\Domain\NoVersion;
-use ItalyStrap\Asset\Domain\Position;
-use ItalyStrap\Asset\Domain\Script;
-use ItalyStrap\Asset\Domain\ScriptLoading;
-use ItalyStrap\Asset\Domain\Strategy;
-use ItalyStrap\Asset\Domain\Style;
-use ItalyStrap\Asset\Domain\Translations;
-use ItalyStrap\Asset\Domain\When;
-use ItalyStrap\Asset\Infrastructure\BuildMetadataFile;
+use ItalyStrap\Asset\Dependencies;
+use ItalyStrap\Asset\Handle;
+use ItalyStrap\Asset\InlineScript;
+use ItalyStrap\Asset\NoVersion;
+use ItalyStrap\Asset\Position;
+use ItalyStrap\Asset\Script;
+use ItalyStrap\Asset\ScriptLoading;
+use ItalyStrap\Asset\Strategy;
+use ItalyStrap\Asset\Style;
+use ItalyStrap\Asset\Translations;
+use ItalyStrap\Asset\When;
+use ItalyStrap\Asset\BuildMetadataFile;
+use ItalyStrap\Asset\Core\PluginFileUrl;
 
 // A path or a file of the Finder
 $built = new SplFileInfo(__DIR__ . '/build/index.js');
@@ -34,7 +35,7 @@ $metadata = (new BuildMetadataFile($built))->read();
 
 $script = new Script(
     handle: new Handle('my-plugin'),
-    source: plugins_url('build/index.js', __FILE__),
+    source: (new PluginFileUrl(new SplFileInfo(__FILE__)))->url($built),
     dependencies: $metadata->dependencies()->with(new Dependencies('my-consent')),
     version: $metadata->version(),
     loading: new ScriptLoading(inFooter: true, strategy: Strategy::Defer),
@@ -63,6 +64,36 @@ $colors = new Style(new Handle('my-colors'), null, inlineStyles: ['.my-banner{co
 
 The condition runs when the asset is enqueued, `Always` is the default, with `When` the asset is only registered when the callback returns false.
 
+### Load the assets
+
+```php
+use ItalyStrap\Asset\AssetLoader;
+use ItalyStrap\Asset\AssetsSubscriber;
+use ItalyStrap\Asset\Hook;
+
+add_action(Hook::FRONT_END, static fn () => (new AssetLoader())->load($script, $tag, $colors));
+
+// Or with italystrap/event
+$subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $tag], Hook::ADMIN));
+```
+
+| Hook | Where |
+| --- | --- |
+| `Hook::FRONT_END` | The front end |
+| `Hook::ADMIN` | The admin pages |
+| `Hook::EDITOR` | The editor interface |
+| `Hook::BLOCK` | The content of the blocks, front end and editor |
+| `Hook::LOGIN` | The login page |
+
+### The URL of a file
+
+`Core\\PluginFileUrl` and `Core\\ThemeFileUrl` build the URL from where the file is on the disk, a path or a file of the Finder. `PluginFileUrl` works when the plugin folder is a symlink, `ThemeFileUrl` looks in the child theme and in its parent.
+
+```php
+$url = (new ThemeFileUrl())->url(new SplFileInfo(get_stylesheet_directory() . '/build/index.css'));
+```
+
+
 ## Development
 
 PHP, Composer and the database run in the Docker containers in `.docker/`, the same environment runs in CI. `make help` lists all the targets.
@@ -75,7 +106,7 @@ make stan      # PHPStan at level max
 make rector    # Rector dry run, PHP 8.2 and code quality sets, make rector-fix applies it
 make unit      # The unit suite, the core is not loaded
 make integration # The integration suite, the core is loaded
-make infection # Mutation tests on the unit suite, with a minimum MSI
+make infection # Mutation tests on the unit suite, 100% MSI, the adapters in src/Core are tested by the integration suite
 make qa        # All the checks above
 make down      # Stop and remove the containers
 ```

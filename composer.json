@@ -1,12 +1,12 @@
 {
     "name": "italystrap/asset",
-    "description": "Handle the CSS and JS register and enqueue for WordPress",
+    "description": "Register and enqueue scripts and styles as value objects",
     "keywords": [
-        "Asset",
+        "asset",
+        "script",
+        "style",
         "register",
-        "enqueue",
-        "WordPress",
-        "localize"
+        "enqueue"
     ],
     "type": "library",
     "license": "MIT",
@@ -20,17 +20,12 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=8.2",
-        "italystrap/config": "^2.11",
-        "italystrap/finder": "dev-master",
-        "inpsyde/assets": "^2.8"
+        "php": ">=8.2"
     },
     "require-dev": {
         "lucatume/wp-browser": "^4.5",
         "codeception/codeception": "^5.3",
         "codeception/module-asserts": "^3.0",
-        "lucatume/function-mocker-le": "^1.0",
-        "phpspec/prophecy-phpunit": "^2.3",
         "italystrap/event": "^0.2.2",
         "squizlabs/php_codesniffer": "^3.13",
         "phpcompatibility/php-compatibility": "^9.3",
@@ -39,8 +34,10 @@
         "szepeviktor/phpstan-wordpress": "^2.0",
         "infection/infection": "^0.29",
         "infection/codeception-adapter": "^0.4.3",
-        "dg/bypass-finals": "^1.9",
         "rector/rector": "^2.2"
+    },
+    "suggest": {
+        "italystrap/event": "Hook the assets with the AssetsSubscriber"
     },
     "autoload": {
         "psr-4": {
@@ -50,6 +47,10 @@
     "autoload-dev": {
         "classmap": [
             "tests/"
+        ],
+        "exclude-from-classmap": [
+            "tests/_output/",
+            "tests/_data/"
         ]
     },
     "scripts": {
@@ -61,9 +62,6 @@
         ],
         "stan": [
             "@php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress"
-        ],
-        "stan:baseline": [
-            "@php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress --generate-baseline phpstan-baseline.neon"
         ],
         "unit": [
             "@php vendor/bin/codecept run unit"
