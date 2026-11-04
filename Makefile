@@ -70,8 +70,16 @@ tests: unit integration ## Run all the suites
 infection: ## Run the mutation tests on the unit suite
 	$(EXEC) composer infection
 
+.PHONY: rector
+rector: ## Show the changes Rector would apply
+	$(EXEC) composer rector
+
+.PHONY: rector-fix
+rector-fix: ## Apply the Rector changes
+	$(EXEC) composer rector:fix
+
 .PHONY: qa
-qa: cs stan tests ## Run the coding standard, the static analysis and all the suites
+qa: cs stan rector tests infection ## Run all the checks
 
 .PHONY: clean
 clean: ## Remove the Codeception output

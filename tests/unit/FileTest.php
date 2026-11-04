@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
-use cli\arguments\Argument;
+use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Version\VersionInterface;
@@ -12,7 +14,7 @@ use SplFileInfo;
 
 class FileTest extends Unit
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
 
     /**
@@ -20,34 +22,19 @@ class FileTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @var SplFileInfo
-     */
-    private $file;
+    private ?\SplFileInfo $file = null;
 
-    /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
-     */
-    private $fakeFile;
+    private ?ObjectProphecy $fakeFile = null;
 
-    private $base_url = '';
-    private $base_path = '';
-    /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
-     */
-    private $version;
+    private string $base_url = '';
+    private string $base_path = '';
+    private ?ObjectProphecy $version = null;
 
-    /**
-     * @return VersionInterface
-     */
     public function getVersion(): VersionInterface
     {
         return $this->version->reveal();
     }
 
-    /**
-     * @return SplFileInfo
-     */
     public function getFakeFile(): SplFileInfo
     {
         return $this->fakeFile->reveal();
@@ -64,10 +51,7 @@ class FileTest extends Unit
 	protected function _after() {
     }
 
-    /**
-     * @return File
-     */
-    public function getInstance()
+    public function getInstance(): File
     {
         $sut = new File($this->getFakeFile(), $this->getVersion(), $this->base_url, $this->base_path);
         $this->assertInstanceOf(File::class, $sut, '');
@@ -77,7 +61,7 @@ class FileTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): File
     {
         return $this->getInstance();
     }
@@ -85,7 +69,7 @@ class FileTest extends Unit
     /**
      * @test
      */
-    public function itShouldReturnTheFileVersionFromGetMTIme()
+    public function itShouldReturnTheFileVersionFromGetMTIme(): void
     {
         $expected = time();
 
@@ -98,17 +82,17 @@ class FileTest extends Unit
     /**
      * @test
      */
-    public function itShouldReturnTheVersionFromMock()
+    public function itShouldReturnTheVersionFromMock(): void
     {
         $expected = '42';
 
-        $this->version->version(\Prophecy\Argument::any(), \Prophecy\Argument::any())->willReturn($expected);
+        $this->version->version(Argument::any(), Argument::any())->willReturn($expected);
 
         $sut = $this->getInstance();
         $this->assertEquals(\strval($expected), $sut->version(), '');
     }
 
-    public static function baseStringProvider()
+    public static function baseStringProvider(): array
     {
         return [
             'Without Slash' => [
@@ -146,7 +130,7 @@ class FileTest extends Unit
      * @test
      * @dataProvider baseStringProvider
      */
-    public function itShouldReturnTheFileUrl($base_path, $base_url)
+    public function itShouldReturnTheFileUrl(string $base_path, string $base_url): void
     {
         $this->base_path = $base_path;
         $this->base_url = $base_url;

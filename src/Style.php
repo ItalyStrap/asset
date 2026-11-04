@@ -13,7 +13,6 @@ final class Style extends Asset
 
     /**
      * Pre register the style
-     * @return bool
      */
     public function register(): bool
     {

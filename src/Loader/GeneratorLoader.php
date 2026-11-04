@@ -11,7 +11,6 @@ use ItalyStrap\Config\ConfigInterface;
 final class GeneratorLoader
 {
     /**
-     * @param iterable $configs
      * @return array<AssetInterface>
      */
     public function load(iterable $configs): iterable

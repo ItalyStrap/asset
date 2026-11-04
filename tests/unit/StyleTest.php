@@ -8,7 +8,7 @@ use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\Style;
 
 // phpcs:disable
-include_once 'UnitBaseAsset.php';
+include_once __DIR__ . '/UnitBaseAsset.php';
 // phpcs:enable
 
 class StyleTest extends UnitBaseAsset
@@ -24,16 +24,15 @@ class StyleTest extends UnitBaseAsset
      * @return Asset
      * @throws \ReflectionException
      */
-    protected function getInstance()
+    protected function getInstance(): Style
     {
-        $sut = new Style($this->getConfig());
-        return $sut;
+        return new Style($this->getConfig());
     }
 
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
         $sut = parent::instanceOk();
         $this->assertInstanceOf(Style::class, $sut, '');

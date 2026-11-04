@@ -14,6 +14,7 @@ use ItalyStrap\Config\ConfigFactory;
 use stdClass;
 use UnitTester;
 
+use function tad\FunctionMockerLe\define;
 use function sprintf;
 use function tad\FunctionMockerLe\undefineAll;
 
@@ -36,20 +37,14 @@ class DebugAssetTest extends Unit
     protected function _before()
     {
 
-        \tad\FunctionMockerLe\define('wp_remote_get', function (string $url) {
-            return $this->wp_remote_get_return_value;
-        });
-        \tad\FunctionMockerLe\define('is_wp_error', function ($error): bool {
-            return $this->is_wp_error_return_value;
-        });
+        define('wp_remote_get', fn(string $url) => $this->wp_remote_get_return_value);
+        define('is_wp_error', fn($error): bool => $this->is_wp_error_return_value);
 
-        $wp_is = function (string $handle, $list = ''): bool {
-            return 'registered' === $list;
-        };
+        $wp_is = (fn(string $handle, $list = ''): bool => 'registered' === $list);
 
-        \tad\FunctionMockerLe\define('wp_style_is', $wp_is);
-        \tad\FunctionMockerLe\define('wp_script_is', $wp_is);
-        \tad\FunctionMockerLe\define('wp_scripts', function () {
+        define('wp_style_is', $wp_is);
+        define('wp_script_is', $wp_is);
+        define('wp_scripts', function (): \stdClass {
             $std_class = new stdClass();
             $std_class->base_url = '';
 
@@ -61,12 +56,8 @@ class DebugAssetTest extends Unit
             return $std_class;
         });
 
-        \tad\FunctionMockerLe\define('is_child_theme', function () {
-            return $this->is_child_theme;
-        });
-        \tad\FunctionMockerLe\define('get_stylesheet', function () {
-            return $this->get_stylesheet;
-        });
+        define('is_child_theme', fn() => $this->is_child_theme);
+        define('get_stylesheet', fn() => $this->get_stylesheet);
     }
 
     protected function _after()
@@ -80,7 +71,7 @@ class DebugAssetTest extends Unit
         ]);
     }
 
-    public static function assetNotAvailableProvider()
+    public static function assetNotAvailableProvider(): array
     {
         return [
             'css'   => [
@@ -97,14 +88,14 @@ class DebugAssetTest extends Unit
     /**
      * @test
      * @dataProvider assetNotAvailableProvider
-     * @param string $url
-     * @param string $type
      */
-    public function itShouldThrownInvalidArgumentExceptionIfGetRemoteAssetIsNotAvailableFor(string $url, string $type)
-    {
+    public function itShouldThrownInvalidArgumentExceptionIfGetRemoteAssetIsNotAvailableFor(
+        string $url,
+        string $type,
+    ): void {
         $this->is_wp_error_return_value = true;
         $this->wp_remote_get_return_value = new class {
-            public function get_error_message() // phpcs:ignore PSR1.Methods.CamelCapsMethodName -- WP_Error API
+            public function get_error_message(): string // phpcs:ignore PSR1.Methods.CamelCapsMethodName -- WP_Error API
             {
                 return 'Some error message from Remote Request';
             }
@@ -124,15 +115,17 @@ class DebugAssetTest extends Unit
                 'Some error message from Remote Request'
             )
         );
-        $style = new $type($config);
+        new $type($config);
     }
 
     /**
      * @test
      * @dataProvider assetNotAvailableProvider
      */
-    public function itShouldThrownRunTimeExceptionIfAssetIsLoadedFromParentThemeNotChildThemeFor($url, $type)
-    {
+    public function itShouldThrownRunTimeExceptionIfAssetIsLoadedFromParentThemeNotChildThemeFor(
+        string $url,
+        string $type,
+    ): void {
         $this->is_wp_error_return_value = false;
         $this->is_child_theme = true;
         $this->get_stylesheet = 'child';
@@ -143,7 +136,7 @@ class DebugAssetTest extends Unit
             Asset::SHOULD_LOAD  => false,
         ]);
 
-        $style = new $type($config);
+        new $type($config);
 
         $this->assertStringContainsString(
             \sprintf(
@@ -156,7 +149,7 @@ class DebugAssetTest extends Unit
         );
     }
 
-    public static function assetAvailableProvider()
+    public static function assetAvailableProvider(): array
     {
         return [
             'css'   => [
@@ -176,7 +169,7 @@ class DebugAssetTest extends Unit
      * @test
      * @dataProvider assetAvailableProvider
      */
-    public function itShouldGetRemoteAssetFor($url, $type)
+    public function itShouldGetRemoteAssetFor(string $url, string $type): void
     {
 
         $this->is_wp_error_return_value = false;
@@ -186,6 +179,6 @@ class DebugAssetTest extends Unit
             Asset::SHOULD_LOAD  => false,
         ]);
 
-        $style = new $type($config);
+        new $type($config);
     }
 }

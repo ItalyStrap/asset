@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Codeception\Test\Unit;
 use DG\BypassFinals;
 use Inpsyde\Assets\Asset;
@@ -16,7 +17,7 @@ use UnitTester;
 
 class AssetsSubscriberInpsydeAdapterTest extends Unit
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
 
     /**
@@ -24,40 +25,22 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @var ObjectProphecy
-     */
-    private $asset_manager;
+    private ?ObjectProphecy $asset_manager = null;
 
-    /**
-     * @var ObjectProphecy
-     */
-    private $asset_loader;
+    private ?ObjectProphecy $asset_loader = null;
 
-    /**
-     * @var ObjectProphecy
-     */
-    private $asset_asset;
+    private ?ObjectProphecy $asset_asset = null;
 
-    /**
-     * @return Asset
-     */
     public function getAssetAsset(): Asset
     {
         return $this->asset_asset->reveal();
     }
 
-    /**
-     * @return LoaderInterface
-     */
     public function getAssetLoader(): LoaderInterface
     {
         return $this->asset_loader->reveal();
     }
 
-    /**
-     * @return AssetManager
-     */
     public function getAssetManager(): AssetManager
     {
         return $this->asset_manager->reveal();
@@ -80,9 +63,6 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit
     {
     }
 
-    /**
-     * @return InpsydeAssetsSubscriber
-     */
     private function getAssetsSubscriberInpsydeAdapter(): InpsydeAssetsSubscriber
     {
         $sut = new InpsydeAssetsSubscriber($this->getAssetLoader(), []);
@@ -93,15 +73,15 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
-        $sut = $this->getAssetsSubscriberInpsydeAdapter();
+        $this->getAssetsSubscriberInpsydeAdapter();
     }
 
     /**
      * @test
      */
-    public function itShouldHaveEventFromGetSubscribedEvents()
+    public function itShouldHaveEventFromGetSubscribedEvents(): void
     {
         $sut = $this->getAssetsSubscriberInpsydeAdapter();
         $array = $sut->getSubscribedEvents();
@@ -118,7 +98,7 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit
     /**
      * @test
      */
-    public function itShouldHaveEventFromGetSubscribedEventsfd()
+    public function itShouldHaveEventFromGetSubscribedEventsfd(): void
     {
         $return_value = [
             $this->getAssetAsset(),
@@ -132,9 +112,7 @@ class AssetsSubscriberInpsydeAdapterTest extends Unit
 
         $obj = $this;
         $this->asset_manager->register(...$return_value)->will(
-            function () use ($obj): AssetManager {
-                return $obj->getAssetManager();
-            }
+            fn(): AssetManager => $obj->getAssetManager()
         )->shouldBeCalled(1);
 
         $sut = $this->getAssetsSubscriberInpsydeAdapter();

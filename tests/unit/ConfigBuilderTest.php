@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
 
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\Asset;
-use ItalyStrap\Asset\AssetInterface;
 use ItalyStrap\Asset\ConfigBuilder;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\Style;
-use ItalyStrap\Asset\Version\EmptyVersion;
 use ItalyStrap\Asset\Version\VersionInterface;
 use ItalyStrap\Config\ConfigInterface;
-use ItalyStrap\Finder\Finder;
 use ItalyStrap\Finder\FinderInterface;
 use Prophecy\Argument;
 use UnitTester;
 
 class ConfigBuilderTest extends Unit
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
 
 
@@ -29,14 +28,8 @@ class ConfigBuilderTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
-     */
-    private $finder;
+    private ?ObjectProphecy $finder = null;
 
-    /**
-     * @return FinderInterface
-     */
     public function getFinder(): FinderInterface
     {
         return $this->finder->reveal();
@@ -64,15 +57,15 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
-        $sut = $this->getInstance();
+        $this->getInstance();
     }
 
     /**
      * @test
      */
-    public function itShouldAddConfig()
+    public function itShouldAddConfig(): void
     {
         $sut = $this->getInstance();
         $sut->addConfig(require codecept_data_dir('/fixtures/_config/styles.php'));
@@ -82,7 +75,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownRunTimeExceptionIfTypeIsAlreadyRegistered()
+    public function itShouldThrownRunTimeExceptionIfTypeIsAlreadyRegistered(): void
     {
         $sut = $this->getInstance();
         $sut->withType(Style::EXTENSION, Style::class);
@@ -100,7 +93,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownRunTimeExceptionIfFinderForTypeIsAlreadyRegistered()
+    public function itShouldThrownRunTimeExceptionIfFinderForTypeIsAlreadyRegistered(): void
     {
         $sut = $this->getInstance();
         $sut->withFinderForType(Style::EXTENSION, $this->getFinder());
@@ -118,9 +111,9 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownRunTimeExceptionIfFinderForTypeIsNotRegistered()
+    public function itShouldThrownRunTimeExceptionIfFinderForTypeIsNotRegistered(): void
     {
-        $this->finder->names(Argument::exact('style.css'))->will(function () {
+        $this->finder->names(Argument::exact('style.css'))->will(function (): void {
         })->shouldNotBeCalled();
 
         $sut = $this->getInstance();
@@ -142,7 +135,7 @@ class ConfigBuilderTest extends Unit
         }
     }
 
-    public static function urlConfigProvider()
+    public static function urlConfigProvider(): \Iterator
     {
 
         yield 'slashes' => [
@@ -165,9 +158,9 @@ class ConfigBuilderTest extends Unit
      * @group url
      * @dataProvider urlConfigProvider
      */
-    public function itShouldGenerateUrlFromProvider($config_from_provider)
+    public function itShouldGenerateUrlFromProvider(array $config_from_provider): void
     {
-        $this->finder->names(Argument::exact('//test-with-extension.css'))->will(function () {
+        $this->finder->names(Argument::exact('//test-with-extension.css'))->will(function (): void {
         })->shouldNotBeCalled();
 
         $sut = $this->getInstance();
@@ -191,7 +184,7 @@ class ConfigBuilderTest extends Unit
      * @test
      * @group url
      */
-    public function itShouldGenerateUrlFromFileName()
+    public function itShouldGenerateUrlFromFileName(): void
     {
         $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
         $this->assertFileExists($style_css, '');
@@ -200,7 +193,7 @@ class ConfigBuilderTest extends Unit
                 new \SplFileInfo($style_css)
             ]
         ));
-        $this->finder->names(['style.css'])->will(function () {
+        $this->finder->names(['style.css'])->will(function (): void {
         })->shouldBeCalled(1);
 
 
@@ -228,7 +221,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownInvalidArgumentExceptionIfUrlIsEmpty()
+    public function itShouldThrownInvalidArgumentExceptionIfUrlIsEmpty(): void
     {
         $sut = $this->getInstance();
         $sut->addConfig([
@@ -247,7 +240,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrowInvalidArgumentExceptionIfHandleIsMissing()
+    public function itShouldThrowInvalidArgumentExceptionIfHandleIsMissing(): void
     {
         $sut = $this->getInstance();
         $sut->addConfig([
@@ -266,7 +259,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldNotThrownInvalidArgumentExceptionIfConfigHasDeregisterKey()
+    public function itShouldNotThrownInvalidArgumentExceptionIfConfigHasDeregisterKey(): void
     {
         $sut = $this->getInstance();
         $sut->addConfig([
@@ -283,7 +276,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldHaveVersionFromConfig()
+    public function itShouldHaveVersionFromConfig(): void
     {
         $sut = $this->getInstance();
         $sut->addConfig([
@@ -305,7 +298,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldHaveVersionFromFileInfo()
+    public function itShouldHaveVersionFromFileInfo(): void
     {
         $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
         $this->assertFileExists($style_css, '');
@@ -315,7 +308,7 @@ class ConfigBuilderTest extends Unit
                 $file_info
             ]
         ));
-        $this->finder->names(['style.css'])->will(function () {
+        $this->finder->names(['style.css'])->will(function (): void {
         })->shouldBeCalled(1);
 
         $sut = $this->getInstance();
@@ -344,7 +337,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldHaveCustomVersion()
+    public function itShouldHaveCustomVersion(): void
     {
         $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
         $this->assertFileExists($style_css, '');
@@ -354,7 +347,7 @@ class ConfigBuilderTest extends Unit
                 $file_info
             ]
         ));
-        $this->finder->names(['style.css'])->will(function () {
+        $this->finder->names(['style.css'])->will(function (): void {
         })->shouldBeCalled(1);
 
         $sut = $this->getInstance();
@@ -385,7 +378,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldGetParsedConfigWithDefaultValues()
+    public function itShouldGetParsedConfigWithDefaultValues(): void
     {
         $sut = $this->getInstance();
         $sut->withType('css', Style::class);
@@ -414,7 +407,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldGetParsedConfigFromOldConfiguration()
+    public function itShouldGetParsedConfigFromOldConfiguration(): void
     {
         require_once codecept_data_dir('/fixtures/_config/common.php');
 
@@ -438,7 +431,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownInvalidArgumentExceptionIfExtensionIsMissing()
+    public function itShouldThrownInvalidArgumentExceptionIfExtensionIsMissing(): void
     {
 
         $sut = $this->getInstance();
@@ -460,7 +453,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownRuntimeExceptionIfExtensionIsNotRegistered()
+    public function itShouldThrownRuntimeExceptionIfExtensionIsNotRegistered(): void
     {
         $sut = $this->getInstance();
         $sut->addConfig([
@@ -480,7 +473,7 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownRuntimeExceptionIfFileDoesNotExists()
+    public function itShouldThrownRuntimeExceptionIfFileDoesNotExists(): void
     {
         $style_css = codecept_data_dir('/fixtures/parent/css/no-style.css');
         $this->assertFileNotExists($style_css, '');
@@ -489,7 +482,7 @@ class ConfigBuilderTest extends Unit
             [
             ]
         ));
-        $this->finder->names(['no-style.css'])->will(function () {
+        $this->finder->names(['no-style.css'])->will(function (): void {
         })->shouldBeCalled(1);
 
         $sut = $this->getInstance();
@@ -513,13 +506,13 @@ class ConfigBuilderTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrowRuntimeExceptionIfFallbackFilesDoNotExist()
+    public function itShouldThrowRuntimeExceptionIfFallbackFilesDoNotExist(): void
     {
         $this->finder->getIterator()->willReturn(new \ArrayIterator(
             [
             ]
         ));
-        $this->finder->names([ 'no-style.css', 'no-style.min.css' ])->will(function () {
+        $this->finder->names([ 'no-style.css', 'no-style.min.css' ])->will(function (): void {
         })->shouldBeCalled(1);
 
         $sut = $this->getInstance();
@@ -542,7 +535,7 @@ class ConfigBuilderTest extends Unit
     /**
      *
      */
-    public function itShouldIterate()
+    public function itShouldIterate(): void
     {
         $config = require codecept_data_dir('/fixtures/_config/new-assets-config.php');
         $style_css = codecept_data_dir('/fixtures/parent/css/style.css');
@@ -558,7 +551,7 @@ class ConfigBuilderTest extends Unit
             ]
         ));
 
-        $this->finder->names($config[ 0 ][ 'file_name' ])->will(function () {
+        $this->finder->names($config[ 0 ][ 'file_name' ])->will(function (): void {
         })->shouldBeCalled(1);
 
 

@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
 
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
+use ItalyStrap\Event\EventDispatcher;
+use ItalyStrap\Event\SubscriberRegister;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\AssetManager;
 use ItalyStrap\Asset\AssetsSubscriber;
 use ItalyStrap\Event\SubscriberInterface;
 use UnitTester;
 
+use function tad\FunctionMockerLe\define;
+
 class AssetSubscriberTest extends Unit
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
 
     /**
      * @var UnitTester
      */
     protected $tester;
-    /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
-     */
-    private $asset_manager;
+    private ?ObjectProphecy $asset_manager = null;
 
-    /**
-     * @return AssetManager
-     */
     public function getAssetManager(): AssetManager
     {
         return $this->asset_manager->reveal();
@@ -41,7 +41,7 @@ class AssetSubscriberTest extends Unit
     {
     }
 
-    private function getInstance()
+    private function getInstance(): AssetsSubscriber
     {
         $sut = new AssetsSubscriber($this->getAssetManager());
         $this->assertInstanceOf(SubscriberInterface::class, $sut, '');
@@ -52,24 +52,24 @@ class AssetSubscriberTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
-        $sut = $this->getInstance();
+        $this->getInstance();
     }
 
     /**
      * @test
      */
-    public function itShouldHaveEventsSubscribed()
+    public function itShouldHaveEventsSubscribed(): void
     {
         $sut = $this->getInstance();
-        $subscriberd_events = $sut->getSubscribedEvents();
+        $sut->getSubscribedEvents();
     }
 
     /**
      * @test
      */
-    public function itShouldExecute()
+    public function itShouldExecute(): void
     {
         $sut = $this->getInstance();
         $sut->execute();
@@ -78,14 +78,12 @@ class AssetSubscriberTest extends Unit
     /**
      * @test
      */
-    public function itShouldNotThrownAnyErrorsWhenSutIsSubscribedOnEvent()
+    public function itShouldNotThrownAnyErrorsWhenSutIsSubscribedOnEvent(): void
     {
-        \tad\FunctionMockerLe\define('add_filter', function () {
-            return true;
-        });
+        define('add_filter', fn(): true => true);
 
-        $event_dispatcher = new \ItalyStrap\Event\EventDispatcher();
-        $event_subscriber = new \ItalyStrap\Event\SubscriberRegister($event_dispatcher);
+        $event_dispatcher = new EventDispatcher();
+        $event_subscriber = new SubscriberRegister($event_dispatcher);
         $sut = $this->getInstance();
 
         $event_subscriber->addSubscriber($sut);

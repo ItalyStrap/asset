@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Codeception\Test\Unit;
 use InvalidArgumentException;
 use ItalyStrap\Asset\Asset;
-use ItalyStrap\Asset\File;
-use ItalyStrap\Asset\FileInterface;
 use ItalyStrap\Config\ConfigInterface;
 use PHPUnit\Framework\Assert;
 use Prophecy\Argument;
@@ -16,12 +15,13 @@ use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionException;
 use UnitTester;
 
+use function tad\FunctionMockerLe\define;
 use function sprintf;
 use function tad\FunctionMockerLe\undefineAll;
 
 abstract class UnitBaseAsset extends Unit
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
 
     /**
@@ -37,9 +37,6 @@ abstract class UnitBaseAsset extends Unit
      */
     protected $config;
 
-    /**
-     * @return ConfigInterface
-     */
     public function getConfig(): ConfigInterface
     {
         return $this->config->reveal();
@@ -85,7 +82,7 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldThrownInvalidArgumentExceptionIfHandleIsNotDefined()
+    public function itShouldThrownInvalidArgumentExceptionIfHandleIsNotDefined(): void
     {
         $this->config->has('handle')->willReturn(false);
         $this->config->get('url')->willReturn('file-name.' . $this->type);
@@ -103,7 +100,7 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldHaveDefaultLocation()
+    public function itShouldHaveDefaultLocation(): void
     {
 
         $this->config->get(Asset::LOCATION, Argument::type('string'))->willReturn('wp_enqueue_scripts');
@@ -115,7 +112,7 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldBeRegistered()
+    public function itShouldBeRegistered(): void
     {
 
         $func_name = sprintf(
@@ -124,10 +121,10 @@ abstract class UnitBaseAsset extends Unit
         );
 
         $called = 0;
-        \tad\FunctionMockerLe\define($func_name, function (
+        define($func_name, function (
             $handle,
             $list = 'enqueued'
-        ) use (&$called) {
+        ) use (&$called): true {
             $called++;
             return true;
         });
@@ -141,7 +138,7 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldBeEnqueued()
+    public function itShouldBeEnqueued(): void
     {
 
         $func_name = sprintf(
@@ -150,10 +147,10 @@ abstract class UnitBaseAsset extends Unit
         );
 
         $called = 0;
-        \tad\FunctionMockerLe\define($func_name, function (
+        define($func_name, function (
             $handle,
             $list = 'enqueued'
-        ) use (&$called) {
+        ) use (&$called): true {
             $called++;
             return true;
         });
@@ -187,13 +184,13 @@ abstract class UnitBaseAsset extends Unit
             $this->type
         );
 
-        \tad\FunctionMockerLe\define($func_name, function (
+        define($func_name, function (
             string $handle,
             string $src,
             array $deps = [],
             $ver = false,
             $in_footer_or_media = false
-) {
+): true {
             Assert::assertStringContainsString('handle', $handle, '');
             Assert::assertStringContainsString('url', $src, '');
             Assert::assertIsArray($deps, '');
@@ -206,7 +203,7 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldRegister()
+    public function itShouldRegister(): void
     {
         $this->commonRegisterEnqueue('wp_register_%s');
         $sut = $this->getInstance();
@@ -217,7 +214,7 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldEnqueue()
+    public function itShouldEnqueue(): void
     {
         $this->commonRegisterEnqueue('wp_enqueue_%s');
         $sut = $this->getInstance();
@@ -227,7 +224,7 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldLoad()
+    public function itShouldLoad(): void
     {
         $sut = $this->getInstance();
 
@@ -237,37 +234,33 @@ abstract class UnitBaseAsset extends Unit
         $this->config->get(Asset::SHOULD_LOAD)->willReturn([]);
         $this->assertTrue($sut->shouldEnqueue(), 'Should enqueue the asset');
 
-        $this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
-            return true;
-        });
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(fn(): true => true);
         $this->assertTrue($sut->shouldEnqueue(), 'Should enqueue the asset');
     }
 
     /**
      * @test
      */
-    public function itShouldNotLoad()
+    public function itShouldNotLoad(): void
     {
         $sut = $this->getInstance();
 
         $this->config->get(Asset::SHOULD_LOAD)->willReturn(false);
         $this->assertFalse($sut->shouldEnqueue(), 'Should enqueue the asset');
 
-        $this->config->get(Asset::SHOULD_LOAD)->willReturn(function () {
-            return false;
-        });
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(fn(): false => false);
         $this->assertFalse($sut->shouldEnqueue(), 'Should enqueue the asset');
     }
 
     /**
      * @test
      */
-    public function itShouldInvokeCallableLoadConditionOnce()
+    public function itShouldInvokeCallableLoadConditionOnce(): void
     {
         $sut = $this->getInstance();
         $called = 0;
 
-        $this->config->get(Asset::SHOULD_LOAD)->willReturn(function () use (&$called) {
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn(function () use (&$called): true {
             $called++;
             return true;
         });
@@ -278,8 +271,6 @@ abstract class UnitBaseAsset extends Unit
 
     /**
      * Helper method used as an array callable load condition.
-     *
-     * @return bool
      */
     private function alwaysTrueLoadCondition(): bool
     {
@@ -289,11 +280,11 @@ abstract class UnitBaseAsset extends Unit
     /**
      * @test
      */
-    public function itShouldLoadWithArrayCallable()
+    public function itShouldLoadWithArrayCallable(): void
     {
         $sut = $this->getInstance();
 
-        $this->config->get(Asset::SHOULD_LOAD)->willReturn([ $this, 'alwaysTrueLoadCondition' ]);
+        $this->config->get(Asset::SHOULD_LOAD)->willReturn($this->alwaysTrueLoadCondition(...));
 
         $this->assertTrue(
             $sut->shouldEnqueue(),

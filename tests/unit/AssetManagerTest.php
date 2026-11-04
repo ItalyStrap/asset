@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
 
+use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\AssetInterface;
 use ItalyStrap\Asset\AssetManager;
@@ -11,7 +13,7 @@ use UnitTester;
 
 class AssetManagerTest extends Unit
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
 
     /**
@@ -19,14 +21,8 @@ class AssetManagerTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @var \Prophecy\Prophecy\ObjectProphecy
-     */
-    private $asset;
+    private ?ObjectProphecy $asset = null;
 
-    /**
-     * @return AssetInterface
-     */
     public function getAsset(): AssetInterface
     {
         return $this->asset->reveal();
@@ -41,9 +37,6 @@ class AssetManagerTest extends Unit
     protected function _after() {
     }
 
-    /**
-     * @return AssetManager
-     */
     private function getInstance(): AssetManager
     {
         $sut = new AssetManager();
@@ -54,15 +47,15 @@ class AssetManagerTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
-        $sut = $this->getInstance();
+        $this->getInstance();
     }
 
     /**
      * @test
      */
-    public function itShouldAddAssets()
+    public function itShouldAddAssets(): void
     {
         $sut = $this->getInstance();
         $sut->withAssets(
@@ -75,7 +68,7 @@ class AssetManagerTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownRunTimeExceptionIfNoAssetsAreProvided()
+    public function itShouldThrownRunTimeExceptionIfNoAssetsAreProvided(): void
     {
         $sut = $this->getInstance();
         $this->expectException(\RuntimeException::class);
@@ -86,10 +79,10 @@ class AssetManagerTest extends Unit
     /**
      * @test
      */
-    public function itShouldEnqueueAssets()
+    public function itShouldEnqueueAssets(): void
     {
         $this->asset->shouldEnqueue()->willReturn(true);
-        $this->asset->enqueue()->will(function () {
+        $this->asset->enqueue()->will(function (): void {
         });
         $this->asset->register()->shouldNotBeCalled();
 
@@ -106,7 +99,7 @@ class AssetManagerTest extends Unit
     /**
      * @test
      */
-    public function itShouldOnlyRegisterAssets()
+    public function itShouldOnlyRegisterAssets(): void
     {
         $this->asset->shouldEnqueue()->willReturn(false);
         $this->asset->enqueue()->shouldNotBeCalled();

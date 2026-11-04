@@ -6,10 +6,11 @@ namespace ItalyStrap\Asset\Test;
 
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\Script;
-use Prophecy\Argument;
+
+use function tad\FunctionMockerLe\define;
 
 // phpcs:disable
-include_once 'UnitBaseAsset.php';
+include_once __DIR__ . '/UnitBaseAsset.php';
 // phpcs:enable
 
 class ScriptTest extends UnitBaseAsset
@@ -25,16 +26,15 @@ class ScriptTest extends UnitBaseAsset
      * @return Asset
      * @throws \ReflectionException
      */
-    protected function getInstance()
+    protected function getInstance(): Script
     {
-        $sut = new Script($this->getConfig());
-        return $sut;
+        return new Script($this->getConfig());
     }
 
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
         $sut = parent::instanceOk();
         $this->assertInstanceOf(Script::class, $sut, '');
@@ -43,16 +43,16 @@ class ScriptTest extends UnitBaseAsset
     /**
      * @test
      */
-    public function itShouldAddLocalizedScript()
+    public function itShouldAddLocalizedScript(): void
     {
 
-        \tad\FunctionMockerLe\define('wp_enqueue_script', function () {
+        define('wp_enqueue_script', function (): void {
         });
 
         $wp_localize_script_called = 0;
-        \tad\FunctionMockerLe\define(
+        define(
             'wp_localize_script',
-            function (string $handle, string $object_name, array $l10n) use (&$wp_localize_script_called) {
+            function (string $handle, string $object_name, array $l10n) use (&$wp_localize_script_called): true {
                 $this->assertStringContainsString('handle', $handle, '');
                 $this->assertStringContainsString('object_name', $object_name, '');
                 $this->assertArrayHasKey('key', $l10n, '');

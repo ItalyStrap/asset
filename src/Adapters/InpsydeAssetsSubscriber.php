@@ -14,24 +14,11 @@ final class InpsydeAssetsSubscriber implements SubscriberInterface
     public const CALLBACK_METHOD_NAME = 'loadAssets';
 
     /**
-     * @var LoaderInterface
-     */
-    private $loader;
-
-    /**
-     * @var mixed
-     */
-    private $resource;
-
-    /**
      * AssetsSubscriberInpsydeAdapter constructor.
-     * @param LoaderInterface $loader
      * @param mixed $resource
      */
-    public function __construct(LoaderInterface $loader, $resource)
+    public function __construct(private readonly LoaderInterface $loader, private $resource)
     {
-        $this->loader = $loader;
-        $this->resource = $resource;
     }
 
     /**
@@ -41,14 +28,11 @@ final class InpsydeAssetsSubscriber implements SubscriberInterface
     {
         return [
             AssetManager::ACTION_SETUP  => [
-                static::CALLBACK    => 'loadAssets',
+                self::CALLBACK    => 'loadAssets',
             ],
         ];
     }
 
-    /**
-     * @param AssetManager $manager
-     */
     public function loadAssets(AssetManager $manager): void
     {
         /**

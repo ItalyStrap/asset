@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
 
+use lucatume\WPBrowser\TestCase\WPTestCase;
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Script;
 use Inpsyde\Assets\Style;
 use ItalyStrap\Asset\Adapters\InpsydeGeneratorLoader;
 use ItalyStrap\Asset\ConfigBuilder;
-use ItalyStrap\Asset\Version\EmptyVersion;
-use ItalyStrap\Config\ConfigInterface;
-use ItalyStrap\Finder\Finder;
 use ItalyStrap\Finder\FinderFactory;
 
-class InpsydeIntegrationTest extends \lucatume\WPBrowser\TestCase\WPTestCase
+class InpsydeIntegrationTest extends WPTestCase
 {
     /**
      * @var \IntegrationTester
@@ -40,7 +38,7 @@ class InpsydeIntegrationTest extends \lucatume\WPBrowser\TestCase\WPTestCase
     /**
      * @test
      */
-    public function integrationWithOldAssetConfig()
+    public function integrationWithOldAssetConfig(): void
     {
 
         $finder = (new FinderFactory())->make();

@@ -24,9 +24,6 @@ class InpsydeGeneratorLoaderTest extends Unit
     {
     }
 
-    /**
-     * @return InpsydeGeneratorLoader
-     */
     private function getInstance(): InpsydeGeneratorLoader
     {
         $sut = new InpsydeGeneratorLoader();
@@ -38,8 +35,8 @@ class InpsydeGeneratorLoaderTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
-        $sut = $this->getInstance();
+        $this->getInstance();
     }
 }

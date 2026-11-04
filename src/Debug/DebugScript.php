@@ -10,7 +10,6 @@ use ItalyStrap\Config\ConfigInterface;
 final class DebugScript extends DebugAsset
 {
     /**
-     * @param ConfigInterface $config
      * @throws \ReflectionException
      */
     protected function getAssetInstance(ConfigInterface $config): void

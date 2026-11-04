@@ -56,7 +56,7 @@ abstract class WPUnitBaseAsset extends WPTestCase
     /**
      * @test
      */
-    public function itShouldHaveAssetEnqueued()
+    public function itShouldHaveAssetEnqueued(): void
     {
         $sut = $this->getInstance();
 
@@ -71,7 +71,7 @@ abstract class WPUnitBaseAsset extends WPTestCase
     /**
      * @test
      */
-    public function itfgnsfgnfsx()
+    public function itfgnsfgnfsx(): void
     {
         wp_enqueue_script(
             'ciao',

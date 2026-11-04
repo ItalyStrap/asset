@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Adapters;
 
-use Inpsyde\Assets\Asset;
 use Inpsyde\Assets\AssetFactory;
 use Inpsyde\Assets\BaseAsset;
 use Inpsyde\Assets\Loader\LoaderInterface;
@@ -31,9 +30,7 @@ final class InpsydeGeneratorLoader implements LoaderInterface
          * @psalm-suppress ArgumentTypeCoercion
          */
         $assets = array_map(
-            static function (BaseAsset $asset): BaseAsset {
-                return $asset->disableAutodiscoverVersion();
-            },
+            static fn(BaseAsset $asset): BaseAsset => $asset->disableAutodiscoverVersion(),
             $assets
         );
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
+use Prophecy\PhpUnit\ProphecyTrait;
+use ItalyStrap\Finder\FinderInterface;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Style;
@@ -13,7 +15,7 @@ use UnitTester;
 
 class IntegrationTest extends Unit
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
 
     /**
@@ -29,7 +31,7 @@ class IntegrationTest extends Unit
         ];
 
 //      $this->finder = new AssetFinder();
-        $this->finder = $this->prophesize(\ItalyStrap\Finder\FinderInterface::class);
+        $this->finder = $this->prophesize(FinderInterface::class);
         $this->finder->in($this->paths)->willReturn($this->finder);
     }
 
@@ -37,7 +39,7 @@ class IntegrationTest extends Unit
 	protected function _after() {
     }
 
-    public static function configProvider()
+    public static function configProvider(): array
     {
         return [
             '01'    => [
@@ -60,7 +62,7 @@ class IntegrationTest extends Unit
     /**
      * @dataProvider configProvider
      */
-    public function integration(array $config)
+    public function integration(array $config): void
     {
         $files_to_search = array_reverse(explode('.', $config['file']));
 //      codecept_debug( $files_to_search  );

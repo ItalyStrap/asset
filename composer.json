@@ -1,7 +1,13 @@
 {
     "name": "italystrap/asset",
     "description": "Handle the CSS and JS register and enqueue for WordPress",
-    "keywords": ["Asset", "register", "enqueue", "WordPress", "localize"],
+    "keywords": [
+        "Asset",
+        "register",
+        "enqueue",
+        "WordPress",
+        "localize"
+    ],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -33,7 +39,8 @@
         "szepeviktor/phpstan-wordpress": "^2.0",
         "infection/infection": "^0.29",
         "infection/codeception-adapter": "^0.4.3",
-        "dg/bypass-finals": "^1.9"
+        "dg/bypass-finals": "^1.9",
+        "rector/rector": "^2.2"
     },
     "autoload": {
         "psr-4": {
@@ -69,11 +76,16 @@
             "@integration"
         ],
         "infection": [
-            "@php vendor/bin/codecept run unit",
-            "@php vendor/bin/infection --threads=1"
+            "@php vendor/bin/infection --threads=max"
         ],
         "clean": [
             "@php vendor/bin/codecept clean"
+        ],
+        "rector": [
+            "@php vendor/bin/rector process --dry-run"
+        ],
+        "rector:fix": [
+            "@php vendor/bin/rector process"
         ]
     },
     "support": {
