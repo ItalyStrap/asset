@@ -50,8 +50,6 @@ final class Script extends Asset
      * Localize the script
      *
      * @link https://developer.wordpress.org/reference/functions/wp_localize_script/
-     *
-     * @return bool
      */
     private function localizeScript(): bool
     {

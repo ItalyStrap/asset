@@ -38,12 +38,12 @@ class LoaderTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
-        $sut = $this->getInstance();
+        $this->getInstance();
     }
 
-    public function getConfig()
+    public function getConfig(): \Generator
     {
         yield ( new ConfigFactory() )->make([
             Asset::HANDLE   => 'handle',
@@ -54,7 +54,7 @@ class LoaderTest extends Unit
     /**
      * @test
      */
-    public function itShouldLoad()
+    public function itShouldLoad(): void
     {
         $sut = $this->getInstance();
         $assets = $sut->load($this->getConfig());

@@ -31,7 +31,7 @@ class AssetFactoryTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
         $asset = ( new AssetFactory() )->make(( new ConfigFactory() )->make([
             'type'  => Style::class,
@@ -45,7 +45,7 @@ class AssetFactoryTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownInvalidArgumentExceptionIfTypeIsNotAssetInterface()
+    public function itShouldThrownInvalidArgumentExceptionIfTypeIsNotAssetInterface(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The class stdClass must implement ItalyStrap\Asset\AssetInterface');
@@ -58,7 +58,7 @@ class AssetFactoryTest extends Unit
     /**
      * @test
      */
-    public function itShouldThrownInvalidArgumentExceptionIfTypeClassDoesNotExist()
+    public function itShouldThrownInvalidArgumentExceptionIfTypeClassDoesNotExist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The class ItalyStrap\\Asset\\MissingAsset does not exist');

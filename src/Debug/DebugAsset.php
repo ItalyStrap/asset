@@ -29,7 +29,6 @@ abstract class DebugAsset implements AssetInterface
 
     /**
      * DebugStyle constructor.
-     * @param ConfigInterface $config
      */
     public function __construct(ConfigInterface $config)
     {
@@ -108,22 +107,18 @@ abstract class DebugAsset implements AssetInterface
     }
 
     /**
-     * @param ConfigInterface $config
      * @throws ReflectionException
      */
     abstract protected function getAssetInstance(ConfigInterface $config): void;
 
-    /**
-     * @param string $url
-     */
     private function assertAssetIsLoadedFromChild(string $url): void
     {
         if (! \is_child_theme()) {
             return;
         }
 
-        if (\strpos($url, \wp_scripts()->base_url . '/wp-content/themes/') !== false) {
-            if (\strpos($url, 'themes/' . \get_stylesheet()) === false) {
+        if (str_contains($url, \wp_scripts()->base_url . '/wp-content/themes/')) {
+            if (!str_contains($url, 'themes/' . \get_stylesheet())) {
                 try {
                     throw new \RuntimeException(
                         \sprintf(
@@ -139,9 +134,6 @@ abstract class DebugAsset implements AssetInterface
         }
     }
 
-    /**
-     * @param string $url
-     */
     private function assertUrlIsAccessible(string $url): void
     {
 

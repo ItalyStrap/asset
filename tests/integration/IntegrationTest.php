@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Tests;
 
+use lucatume\WPBrowser\TestCase\WPTestCase;
+use ItalyStrap\Event\EventDispatcher;
+use ItalyStrap\Event\SubscriberRegister;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\AssetInterface;
 use ItalyStrap\Asset\AssetManager;
@@ -14,14 +17,10 @@ use ItalyStrap\Asset\Debug\DebugStyle;
 use ItalyStrap\Asset\Loader\GeneratorLoader;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\Style;
-use ItalyStrap\Asset\Version\EmptyVersion;
-use ItalyStrap\Config\ConfigFactory;
-use ItalyStrap\Debug\Debug;
-use ItalyStrap\Finder\Finder;
 use ItalyStrap\Finder\FinderFactory;
 use PHPUnit\Framework\Assert;
 
-class IntegrationTest extends \lucatume\WPBrowser\TestCase\WPTestCase
+class IntegrationTest extends WPTestCase
 {
     /**
      * @var \IntegrationTester
@@ -52,10 +51,10 @@ class IntegrationTest extends \lucatume\WPBrowser\TestCase\WPTestCase
     /**
      * @test
      */
-    public function itShouldRunAssets()
+    public function itShouldRunAssets(): void
     {
-        $event_dispatcher = new \ItalyStrap\Event\EventDispatcher();
-        $event_subscriber = new \ItalyStrap\Event\SubscriberRegister($event_dispatcher);
+        $event_dispatcher = new EventDispatcher();
+        $event_subscriber = new SubscriberRegister($event_dispatcher);
 
         $config = [
             [

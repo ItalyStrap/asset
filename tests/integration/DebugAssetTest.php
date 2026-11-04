@@ -14,8 +14,6 @@ use ItalyStrap\Config\ConfigFactory;
 use PHPUnit\Framework\Assert;
 use IntegrationTester;
 
-use function get_class;
-
 class DebugAssetTest extends WPTestCase
 {
     /**
@@ -39,7 +37,7 @@ class DebugAssetTest extends WPTestCase
         parent::tearDown();
     }
 
-    public static function assetNotAvailableProvider()
+    public static function assetNotAvailableProvider(): array
     {
         return [
             'css'   => [
@@ -57,8 +55,10 @@ class DebugAssetTest extends WPTestCase
      * @test
      * @dataProvider assetNotAvailableProvider
      */
-    public function itShouldThrownInvalidArgumentExceptionIfGetRemoteAssetIsNotAvailableFor($url, $type)
-    {
+    public function itShouldThrownInvalidArgumentExceptionIfGetRemoteAssetIsNotAvailableFor(
+        string $url,
+        string $type,
+    ): void {
 
         $config = ( new ConfigFactory() )->make([
             Asset::HANDLE   => 'handle',
@@ -70,7 +70,7 @@ class DebugAssetTest extends WPTestCase
         } catch (Exception $e) {
             Assert::assertStringContainsString(
                 InvalidArgumentException::class,
-                get_class($e),
+                $e::class,
                 ''
             );
             Assert::assertStringContainsString(
@@ -81,7 +81,7 @@ class DebugAssetTest extends WPTestCase
         }
     }
 
-    public static function assetAvailableProvider()
+    public static function assetAvailableProvider(): array
     {
         return [
             'css'   => [
@@ -101,7 +101,7 @@ class DebugAssetTest extends WPTestCase
      * @test
      * @dataProvider assetAvailableProvider
      */
-    public function itShouldGetRemoteAssetFor($url, $type)
+    public function itShouldGetRemoteAssetFor(string $url, string $type): void
     {
 
         $config = ( new ConfigFactory() )->make([
@@ -109,6 +109,6 @@ class DebugAssetTest extends WPTestCase
             Asset::URL      => $url,
         ]);
 
-        $style = new $type($config);
+        new $type($config);
     }
 }

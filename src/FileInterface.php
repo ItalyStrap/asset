@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ItalyStrap\Asset;
 
 interface FileInterface
@@ -9,8 +11,5 @@ interface FileInterface
      */
     public function version();
 
-    /**
-     * @return string
-     */
     public function url(): string;
 }

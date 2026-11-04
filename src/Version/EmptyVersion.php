@@ -9,7 +9,7 @@ final class EmptyVersion implements VersionInterface
     /**
      * @inheritDoc
      */
-    public function version(\SplFileInfo $fileInfo, array $config)
+    public function version(\SplFileInfo $fileInfo, array $config): string
     {
         return '';
     }

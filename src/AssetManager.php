@@ -11,11 +11,8 @@ class AssetManager
     /**
      * @var array Asset
      */
-    private $assets = [];
+    private array $assets = [];
 
-    /**
-     * @param AssetInterface ...$assets
-     */
     public function withAssets(AssetInterface ...$assets): void
     {
         $this->assets = \array_merge($assets, $this->assets);
@@ -23,11 +20,11 @@ class AssetManager
 
     public function setup(): void
     {
-        if (empty($this->assets)) {
+        if ($this->assets === []) {
             throw new \RuntimeException('No assets are provided');
         }
 
-        \array_walk($this->assets, function (AssetInterface $asset) {
+        \array_walk($this->assets, function (AssetInterface $asset): void {
             if ($asset->shouldEnqueue()) {
                 $asset->enqueue();
             } else {

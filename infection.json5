@@ -4,10 +4,14 @@
         "directories": ["src"]
     },
     "logs": {
-        "text": "tests/_output/infection.log"
+        "text": "tests/_output/infection.log",
+        "github": true
     },
     "tmpDir": "tests/_output",
     "timeout": 10,
+    // The floor of the legacy classes, raised when #5 removes them
+    "minMsi": 73,
+    "minCoveredMsi": 77,
     "mutators": {
         "@default": true
     },

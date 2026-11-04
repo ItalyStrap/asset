@@ -17,8 +17,10 @@ make up        # Start the containers
 make install   # Install the dependencies and build the Codeception actors
 make cs        # PHP CodeSniffer, PSR-12 and PHPCompatibility
 make stan      # PHPStan at level max
+make rector    # Rector dry run, PHP 8.2 and code quality sets, make rector-fix applies it
 make unit      # The unit suite, WordPress is not loaded
 make integration # The integration suite, WPLoader loads WordPress
+make infection # Mutation tests on the unit suite, with a minimum MSI
 make qa        # All the checks above
 make down      # Stop and remove the containers
 ```

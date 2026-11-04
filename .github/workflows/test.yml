@@ -66,3 +66,23 @@ jobs:
           name: tests-output
           path: tests/_output
           if-no-files-found: ignore
+
+  mutation:
+    name: Mutation tests on the Docker environment
+
+    runs-on: ubuntu-latest
+    if: "!github.event.pull_request.draft"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # pcov for the coverage is installed in the WordPress image
+      - name: Start the containers
+        run: make up
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Infection
+        run: make infection

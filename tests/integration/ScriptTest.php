@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Test;
 
+use ItalyStrap\Config\ConfigFactory;
 use ItalyStrap\Asset\Asset;
 use ItalyStrap\Asset\File;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\Version\EmptyVersion;
-use ItalyStrap\Finder\Finder;
 
 // phpcs:disable
-include_once 'WPUnitBaseAsset.php';
+include_once __DIR__ . '/WPUnitBaseAsset.php';
 // phpcs:enable
 
 class ScriptTest extends WPUnitBaseAsset
@@ -29,15 +29,7 @@ class ScriptTest extends WPUnitBaseAsset
         // Your set up methods here.
     }
 
-    public function tearDown(): void
-    {
-        // Your tear down methods here.
-
-        // Then...
-        parent::tearDown();
-    }
-
-    protected function getInstance()
+    protected function getInstance(): Script
     {
 
         $file = new File(
@@ -47,14 +39,12 @@ class ScriptTest extends WPUnitBaseAsset
             $_SERVER['WP_ROOT_FOLDER']
         );
 
-        $config = ( new \ItalyStrap\Config\ConfigFactory() )->make([
+        $config = ( new ConfigFactory() )->make([
             Asset::HANDLE   => 'handle',
             Asset::URL      => $file->url(),
             Asset::VERSION  => $file->version(),
         ]);
 
-        $sut = new Script($config);
-
-        return $sut;
+        return new Script($config);
     }
 }

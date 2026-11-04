@@ -11,43 +11,21 @@ use function rtrim;
 use function str_replace;
 use function strval;
 
-final class File implements FileInterface
+final readonly class File implements FileInterface
 {
-    /**
-     * @var SplFileInfo
-     */
-    private $file;
+    private string $base_url;
 
-    /**
-     * @var string
-     */
-    private $base_url;
-
-    /**
-     * @var string
-     */
-    private $base_path;
-
-    /**
-     * @var VersionInterface
-     */
-    private $version;
+    private string $base_path;
 
     /**
      * File constructor.
-     * @param SplFileInfo $splFileInfo
-     * @param Version\VersionInterface $version
-     * @param string $base_url
-     * @param string $base_path
      */
     public function __construct(
-        SplFileInfo $splFileInfo,
-        VersionInterface $version,
+        private SplFileInfo $file,
+        private VersionInterface $version,
         string $base_url,
         string $base_path
     ) {
-        $this->file = $splFileInfo;
-        $this->version = $version;
         $this->base_url = rtrim($base_url, '\/');
         $this->base_path = rtrim($base_path, '\/');
     }
@@ -72,17 +50,11 @@ final class File implements FileInterface
         return $this->generateUrl();
     }
 
-    /**
-     * @return string
-     */
     private function normalizePath(string $path): string
     {
         return str_replace('\\', '/', $path);
     }
 
-    /**
-     * @return string
-     */
     private function generateUrl(): string
     {
         return str_replace(

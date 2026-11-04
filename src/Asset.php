@@ -48,7 +48,6 @@ abstract class Asset implements AssetInterface
 
     /**
      * Asset constructor.
-     * @param ConfigInterface $config
      * @throws ReflectionException
      */
     public function __construct(ConfigInterface $config)
@@ -85,8 +84,6 @@ abstract class Asset implements AssetInterface
 
     /**
      * Loading asset conditionally.
-     *
-     * @return bool
      */
     public function shouldEnqueue(): bool
     {
@@ -133,9 +130,6 @@ abstract class Asset implements AssetInterface
     /**
      * Optional. Status of the script to check. Default 'enqueued'.
      * Accepts 'enqueued', 'registered', 'queue', 'to_do', and 'done'.
-     *
-     * @param string $list
-     * @return bool
      */
     private function is(string $list = 'enqueued'): bool
     {

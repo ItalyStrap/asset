@@ -9,25 +9,12 @@ use InvalidArgumentException;
 use function array_key_exists;
 use function sprintf;
 
-final class ParsedAssetDefinition
+final readonly class ParsedAssetDefinition
 {
-    /**
-     * @var array
-     */
-    private $config;
-
-    /**
-     * @param array $config
-     */
-    private function __construct(array $config)
+    private function __construct(private array $config)
     {
-        $this->config = $config;
     }
 
-    /**
-     * @param array $config
-     * @return self
-     */
     public static function fromArray(array $config): self
     {
         foreach (self::requiredKeys() as $key) {
@@ -63,9 +50,6 @@ final class ParsedAssetDefinition
         ];
     }
 
-    /**
-     * @return array
-     */
     public function toArray(): array
     {
         return $this->config;

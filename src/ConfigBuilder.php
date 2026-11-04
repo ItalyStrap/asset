@@ -18,60 +18,33 @@ use function count;
 use function implode;
 use function sprintf;
 use function str_replace;
-use function strpos;
 use function strval;
 
 final class ConfigBuilder
 {
     public const FILE_NAME = 'file_name';
 
-    /**
-     * @var array
-     */
-    private $config = [];
+    private array $config = [];
 
     /**
      * @var array<string>
      */
-    private $types = [];
+    private array $types = [];
 
     /**
      * @var FinderInterface[]
      */
-    private $finder = [];
+    private array $finder = [];
 
-    /**
-     * @var ?VersionInterface
-     */
-    private $version;
-
-    /**
-     * @var string
-     */
-    private $base_url;
-
-    /**
-     * @var string
-     */
-    private $base_path;
+    private ?VersionInterface $version = null;
 
     /**
      * ConfigBuilder constructor.
-     * @param string $base_url
-     * @param string $base_path
      */
-    public function __construct(
-        string $base_url,
-        string $base_path
-    ) {
-        $this->base_url = $base_url;
-        $this->base_path = $base_path;
+    public function __construct(private readonly string $base_url, private readonly string $base_path)
+    {
     }
 
-    /**
-     * @param string $key
-     * @param string $class
-     */
     public function withType(string $key, string $class): void
     {
         if (array_key_exists($key, $this->types)) {
@@ -84,10 +57,6 @@ final class ConfigBuilder
         $this->types[ $key ] = $class;
     }
 
-    /**
-     * @param string $key
-     * @param FinderInterface $finder
-     */
     public function withFinderForType(string $key, FinderInterface $finder): void
     {
         if (array_key_exists($key, $this->finder)) {
@@ -106,17 +75,11 @@ final class ConfigBuilder
         $this->version = $version;
     }
 
-    /**
-     * @param array ...$configs
-     */
     public function addConfig(array $configs): void
     {
         $this->config = array_merge($this->config, $configs);
     }
 
-    /**
-     * @return iterable
-     */
     public function parseConfig(): iterable
     {
 
@@ -159,9 +122,6 @@ final class ConfigBuilder
         }
     }
 
-    /**
-     * @param array $config
-     */
     private function assertHasHandle(array $config): void
     {
         if (array_key_exists(Asset::HANDLE, $config)) {
@@ -182,22 +142,21 @@ final class ConfigBuilder
 
     /**
      * @param $config
-     * @return mixed
      */
-    private function generateFileUrl(array $config)
+    private function generateFileUrl(array $config): array
     {
 
         /**
          * In case the url is relative
          */
-        if (strpos($config[ Asset::URL ], '//') !== false) {
+        if (str_contains($config[ Asset::URL ], '//')) {
             return $config;
         }
 
         /**
          * Back compat with old key
          */
-        if (strpos($config[ 'file' ], '//') !== false) {
+        if (str_contains($config[ 'file' ], '//')) {
             $config[ Asset::URL ] = $config[ 'file' ];
             return $config;
         }
@@ -212,33 +171,23 @@ final class ConfigBuilder
 
     private function version(SplFileInfo $fileInfo, array $config): string
     {
-        if (! $this->version) {
+        if (!$this->version instanceof VersionInterface) {
             return strval($fileInfo->getMTime());
         }
 
         return strval($this->version->version($fileInfo, $config));
     }
 
-    /**
-     * @return string
-     */
     private function url(SplFileInfo $fileInfo): string
     {
         return $this->generateUrl($fileInfo);
     }
 
-    /**
-     * @return string
-     */
     private function normalizePath(string $path): string
     {
         return str_replace('\\', '/', $path);
     }
 
-    /**
-     * @param SplFileInfo $fileInfo
-     * @return string
-     */
     private function generateUrl(SplFileInfo $fileInfo): string
     {
         return str_replace(
@@ -251,7 +200,6 @@ final class ConfigBuilder
     /**
      * @param string[] $file_name
      * @param $handle
-     * @return SplFileInfo
      */
     private function getFileInfo($file_name, $handle): SplFileInfo
     {
@@ -288,10 +236,6 @@ final class ConfigBuilder
         ));
     }
 
-    /**
-     * @param string $url
-     * @return string
-     */
     private function getType(string $url, string $handle): string
     {
         $extension = $this->fileExtension($url, $handle);
@@ -310,9 +254,6 @@ final class ConfigBuilder
 
     /**
      * https://paulund.co.uk/get-the-file-extension-in-php
-     * @param string $file_name_or_url
-     * @param string $handle
-     * @return string
      */
     private function fileExtension(string $file_name_or_url, string $handle): string
     {

@@ -24,10 +24,7 @@ class EmptyVersionTest extends Unit
 	protected function _after() {
     }
 
-    /**
-     * @return EmptyVersion
-     */
-    private function getInstance()
+    private function getInstance(): EmptyVersion
     {
         $sut = new EmptyVersion();
         $this->assertInstanceOf(VersionInterface::class, $sut, '');
@@ -38,15 +35,15 @@ class EmptyVersionTest extends Unit
     /**
      * @test
      */
-    public function instanceOk()
+    public function instanceOk(): void
     {
-        $sut = $this->getInstance();
+        $this->getInstance();
     }
 
     /**
      * @test
      */
-    public function itShouldReturnEmptyVersion()
+    public function itShouldReturnEmptyVersion(): void
     {
         $sut = $this->getInstance();
         $this->assertEmpty($sut->version(new \SplFileInfo(''), []), '');
