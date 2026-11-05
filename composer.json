@@ -37,7 +37,7 @@
         "rector/rector": "^2.2"
     },
     "suggest": {
-        "italystrap/event": "Hook the assets with the AssetsSubscriber"
+        "italystrap/event": "Load the assets on their event with the AssetsSubscriber"
     },
     "autoload": {
         "psr-4": {

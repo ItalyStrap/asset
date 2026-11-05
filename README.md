@@ -2,17 +2,26 @@
 
 Handle the CSS and JS register and enqueue.
 
-Each script and style is an immutable value object, the [releases](https://github.com/ItalyStrap/asset/releases) follow [semantic versioning](https://semver.org).
+The [releases](https://github.com/ItalyStrap/asset/releases) follow [semantic versioning](https://semver.org).
 
 ## Requirements
 
 * PHP 8.2 or later.
+* [italystrap/event](https://github.com/ItalyStrap/event), only for the `AssetsSubscriber`.
+
+## Installation
+
+```bash
+composer require italystrap/asset
+```
 
 ## Usage
 
 Each script and style is an immutable value object, checked when it is built. The loaders register them with all their parts and enqueue them when their condition is satisfied.
 
 ```php
+use ItalyStrap\Asset\BuildMetadataFile;
+use ItalyStrap\Asset\Core\PluginFileUrl;
 use ItalyStrap\Asset\Dependencies;
 use ItalyStrap\Asset\Handle;
 use ItalyStrap\Asset\InlineScript;
@@ -24,8 +33,6 @@ use ItalyStrap\Asset\Strategy;
 use ItalyStrap\Asset\Style;
 use ItalyStrap\Asset\Translations;
 use ItalyStrap\Asset\When;
-use ItalyStrap\Asset\BuildMetadataFile;
-use ItalyStrap\Asset\Core\PluginFileUrl;
 
 // A path or a file of the Finder
 $built = new SplFileInfo(__DIR__ . '/build/index.js');
@@ -70,11 +77,14 @@ The condition runs when the asset is enqueued, `Always` is the default, with `Wh
 use ItalyStrap\Asset\AssetLoader;
 use ItalyStrap\Asset\AssetsSubscriber;
 use ItalyStrap\Asset\EventName;
+use ItalyStrap\Event\GlobalOrderedListenerProvider;
+use ItalyStrap\Event\SubscriberRegister;
 
 add_action(EventName::FRONT_END, static fn () => (new AssetLoader())->load($script, $tag, $colors));
 
-// Or with italystrap/event
-$subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $tag], EventName::ADMIN));
+// Or with italystrap/event, the priority is optional
+$subscribers = new SubscriberRegister(new GlobalOrderedListenerProvider());
+$subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $tag], EventName::ADMIN, 20));
 ```
 
 | Event name | Where |
@@ -89,12 +99,19 @@ $subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $t
 
 ### The URL of a file
 
-`Core\\PluginFileUrl` and `Core\\ThemeFileUrl` build the URL from where the file is on the disk, a path or a file of the Finder. `PluginFileUrl` works when the plugin folder is a symlink, `ThemeFileUrl` looks in the child theme and in its parent.
+`Core\PluginFileUrl` and `Core\ThemeFileUrl` build the URL from where the file is on the disk, a path or a file of the Finder. `PluginFileUrl` works when the plugin folder is a symlink, `ThemeFileUrl` looks in the child theme and in its parent.
 
 ```php
+use ItalyStrap\Asset\Core\ThemeFileUrl;
+
 $url = (new ThemeFileUrl())->url(new SplFileInfo(get_stylesheet_directory() . '/build/index.css'));
 ```
 
+`FolderUrls` does the same for any folder with its URL, without the core.
+
+### Without the core
+
+`ScriptLoader` and `StyleLoader` call the `ScriptRegistry` and the `StyleRegistry`, `Core\CoreScriptRegistry` and `Core\CoreStyleRegistry` by default. Pass your own registry to test the code that loads the assets without the core.
 
 ## Development
 

@@ -1,4 +1,4 @@
-# The unit suite, WordPress is not loaded, the WordPress functions are mocked.
+# The unit suite, the core is not loaded, the registries are spies.
 actor: UnitTester
 modules:
     enabled:

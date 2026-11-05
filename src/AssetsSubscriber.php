@@ -7,9 +7,9 @@ namespace ItalyStrap\Asset;
 use ItalyStrap\Event\SubscriberInterface;
 
 /**
- * Loads the assets on their hook, it needs italystrap/event.
+ * Loads the assets on their event, it needs italystrap/event.
  *
- * Without italystrap/event, call AssetLoader::load() on the hook.
+ * Without italystrap/event, call AssetLoader::load() on the event.
  */
 final readonly class AssetsSubscriber implements SubscriberInterface
 {
@@ -33,7 +33,7 @@ final readonly class AssetsSubscriber implements SubscriberInterface
     }
 
     /**
-     * The arguments of the hook, like the page of the admin, are not used.
+     * The arguments of the event, like the page of the admin, are not used.
      */
     public function load(): void
     {
