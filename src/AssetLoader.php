@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset;
 
 /**
- * Loads the scripts and the styles, call it on the hook of the assets.
+ * Loads the scripts and the styles, call it on the event of the assets, see EventName.
  */
 final readonly class AssetLoader
 {

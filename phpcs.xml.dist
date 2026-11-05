@@ -20,11 +20,8 @@
         <exclude-pattern>*/tests/_support/*Tester.php</exclude-pattern>
     </rule>
 
-    <!-- Codeception calls _before and _after, function-mocker defines the WordPress functions with define(). -->
+    <!-- Codeception calls _before and _after. -->
     <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
-        <exclude-pattern>*/tests/*</exclude-pattern>
-    </rule>
-    <rule ref="Generic.NamingConventions.UpperCaseConstantName">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
 

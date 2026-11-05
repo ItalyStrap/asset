@@ -27,11 +27,11 @@ down: ## Stop and remove the containers
 	$(COMPOSE) down --volumes
 
 .PHONY: build
-build: ## Rebuild the WordPress image
+build: ## Rebuild the image of the core
 	$(COMPOSE) build wordpress
 
 .PHONY: shell
-shell: ## Open a shell in the WordPress container
+shell: ## Open a shell in the container of the core
 	$(EXEC_TTY) bash
 
 .PHONY: composer
@@ -60,7 +60,7 @@ unit: ## Run the unit suite
 	$(EXEC) vendor/bin/codecept run unit $(ARGS)
 
 .PHONY: integration
-integration: ## Run the integration suite, WordPress loaded
+integration: ## Run the integration suite, the core is loaded
 	$(EXEC) vendor/bin/codecept run integration $(ARGS)
 
 .PHONY: tests

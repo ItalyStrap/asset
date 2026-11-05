@@ -46,11 +46,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Same environment used locally, PHP and WordPress versions come from .docker/test.env
+      # Same environment used locally, PHP and core versions come from .docker/test.env
       - name: Start the containers
         run: make up
 
-      - name: Wait for WordPress
+      - name: Wait for the core
         run: timeout 180 sh -c 'until docker exec italystrap-asset_test test -f /var/www/html/wp-config.php; do sleep 2; done'
 
       - name: Install dependencies

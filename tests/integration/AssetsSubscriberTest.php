@@ -35,7 +35,7 @@ final class AssetsSubscriberTest extends WPTestCase
         \do_action(EventName::FRONT_END);
         $this->assertFalse(\wp_script_is('my-script', 'registered'));
 
-        // Like the page of admin_enqueue_scripts, the arguments of the hook are not used
+        // Like the page of admin_enqueue_scripts, the arguments of the event are not used
         \do_action('my_plugin_assets', 'settings_page_my-plugin');
         $this->assertTrue(\wp_script_is('my-script', 'enqueued'));
     }

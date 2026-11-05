@@ -1,4 +1,4 @@
-# The integration suite, WPLoader loads WordPress from the container.
+# The integration suite, WPLoader loads the core from the container.
 actor: IntegrationTester
 modules:
     enabled:
