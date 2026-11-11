@@ -96,7 +96,7 @@ $subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $t
 | `EventName::BLOCK` | The content of the blocks, front end and editor |
 | `EventName::LOGIN` | The login page |
 
-`Hook`, the name of `EventName` before 1.1.0, is deprecated and removed in 2.0.
+`Hook`, the name of `EventName` before 1.1.0, is removed in 2.0.
 
 ### Print, check and remove the assets
 
