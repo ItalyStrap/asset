@@ -8,6 +8,8 @@ use ItalyStrap\Asset\Core\CoreScriptRegistry;
 
 /**
  * Registers a script with all its parts, then enqueues it when its condition is satisfied.
+ *
+ * Needs WordPress 6.3 or later, for the loading strategy of the scripts.
  */
 final readonly class ScriptLoader
 {
@@ -38,6 +40,55 @@ final readonly class ScriptLoader
 
         $this->translate($handle, $script->translations());
         $this->enqueue($handle, $script->condition());
+    }
+
+    public function is(Handle $handle, AssetStatus $status): bool
+    {
+        return $this->registry->is($handle->value(), $status);
+    }
+
+    /**
+     * Prints the registered handles now, with their dependencies, like a script registered with RegisterOnly
+     * that must run at a given point of the page. A handle not registered is skipped.
+     */
+    public function print(Handle ...$handles): void
+    {
+        foreach ($handles as $handle) {
+            $this->printOne($handle->value());
+        }
+    }
+
+    public function dequeue(Handle $handle): void
+    {
+        $this->registry->dequeue($handle->value());
+    }
+
+    public function deregister(Handle $handle): void
+    {
+        $this->registry->deregister($handle->value());
+    }
+
+    /**
+     * Prints the data in a global object before the script, for the scripts that still read it there.
+     *
+     * @param non-empty-string $objectName
+     * @param array<string, mixed> $data
+     */
+    public function localize(Handle $handle, string $objectName, array $data): void
+    {
+        $this->registry->localize($handle->value(), $objectName, $data);
+    }
+
+    /**
+     * @param non-empty-string $handle
+     */
+    private function printOne(string $handle): void
+    {
+        if (!$this->registry->is($handle, AssetStatus::Registered)) {
+            return;
+        }
+
+        $this->registry->print($handle);
     }
 
     /**

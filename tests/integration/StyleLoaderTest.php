@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Tests\Integration;
 
+use ItalyStrap\Asset\AssetStatus;
 use ItalyStrap\Asset\Dependencies;
 use ItalyStrap\Asset\FixedVersion;
 use ItalyStrap\Asset\Handle;
+use ItalyStrap\Asset\RegisterOnly;
 use ItalyStrap\Asset\Style;
 use ItalyStrap\Asset\StyleLoader;
 use ItalyStrap\Asset\When;
@@ -81,5 +83,35 @@ final class StyleLoaderTest extends WPTestCase
         $this->assertFalse(\wp_styles()->registered['my-colors']->src);
         $this->assertStringContainsString('.a{color:red}', $html);
         $this->assertStringNotContainsString('<link', $html);
+    }
+
+    #[Test]
+    public function itReadsTheStatusAndPrintsARegisteredStyle(): void
+    {
+        $loader = new StyleLoader();
+        $loader->load(new Style(new Handle('my-style'), self::URL, condition: new RegisterOnly()));
+
+        $this->assertTrue($loader->is(new Handle('my-style'), AssetStatus::Registered));
+        $this->assertFalse($loader->is(new Handle('my-style'), AssetStatus::Enqueued));
+
+        \ob_start();
+        $loader->print(new Handle('my-style'), new Handle('missing'));
+        $html = (string) \ob_get_clean();
+
+        $this->assertStringContainsString(self::URL, $html);
+        $this->assertTrue($loader->is(new Handle('my-style'), AssetStatus::Done));
+    }
+
+    #[Test]
+    public function itDequeuesAndDeregistersAStyle(): void
+    {
+        $loader = new StyleLoader();
+        $loader->load(new Style(new Handle('my-style'), self::URL));
+
+        $loader->dequeue(new Handle('my-style'));
+        $this->assertFalse($loader->is(new Handle('my-style'), AssetStatus::Enqueued));
+
+        $loader->deregister(new Handle('my-style'));
+        $this->assertFalse($loader->is(new Handle('my-style'), AssetStatus::Registered));
     }
 }

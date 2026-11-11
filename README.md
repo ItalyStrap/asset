@@ -7,6 +7,7 @@ The [releases](https://github.com/ItalyStrap/asset/releases) follow [semantic ve
 ## Requirements
 
 * PHP 8.2 or later.
+* The WordPress functions each class calls, see the table in [The WordPress functions](#the-wordpress-functions).
 * [italystrap/event](https://github.com/ItalyStrap/event), only for the `AssetsSubscriber`.
 
 ## Installation
@@ -95,7 +96,65 @@ $subscribers->addSubscriber(new AssetsSubscriber(new AssetLoader(), [$script, $t
 | `EventName::BLOCK` | The content of the blocks, front end and editor |
 | `EventName::LOGIN` | The login page |
 
-`Hook`, the name of `EventName` before 1.1.0, is deprecated and removed in 2.0.
+`Hook`, the name of `EventName` before 1.1.0, is removed in 2.0.
+
+### Print, check and remove the assets
+
+`ScriptLoader` and `StyleLoader` also work on the handles already registered, by the plugin or by the others.
+
+```php
+use ItalyStrap\Asset\AssetStatus;
+use ItalyStrap\Asset\Handle;
+use ItalyStrap\Asset\ScriptLoader;
+
+$scripts = new ScriptLoader();
+
+// A script registered with RegisterOnly, printed at the start of the head, before the other scripts.
+add_action('wp_head', static fn () => $scripts->print(new Handle('my-consent')), 2);
+
+$scripts->is(new Handle('my-consent'), AssetStatus::Done);
+$scripts->localize(new Handle('my-plugin'), 'myPlugin', ['restUrl' => rest_url()]);
+$scripts->dequeue(new Handle('other-plugin'));
+$scripts->deregister(new Handle('other-plugin'));
+```
+
+`print()` skips a handle that is not registered, so the caller needs no check. `AssetStatus` has the five statuses of `wp_script_is()` and `wp_style_is()`: `Enqueued`, `Registered`, `Queue`, `ToDo` and `Done`. `StyleLoader` has the same methods, without `localize()`.
+
+### Script modules
+
+A `ScriptModule` is an ES module of the import map, like the view script of a block, loaded by `AssetLoader` with the scripts and the styles.
+
+```php
+use ItalyStrap\Asset\AssetLoader;
+use ItalyStrap\Asset\Dependencies;
+use ItalyStrap\Asset\EventName;
+use ItalyStrap\Asset\Handle;
+use ItalyStrap\Asset\ScriptModule;
+use ItalyStrap\Asset\Translations;
+
+$view = new ScriptModule(
+    id: new Handle('@my-plugin/view'),
+    source: plugins_url('build/view.js', __FILE__),
+    dependencies: new Dependencies('@wordpress/interactivity'),
+    translations: new Translations('my-plugin'),
+);
+
+add_action(EventName::FRONT_END, static fn () => (new AssetLoader())->load($view));
+```
+
+`ScriptModuleLoader` dequeues and deregisters a module by its id.
+
+### The WordPress functions
+
+The package calls the functions of the core without checking them, the code that uses it checks the version of the core when it supports an older one. The docblock of each class says the same.
+
+| Class | Needs |
+| --- | --- |
+| `ScriptLoader` | WordPress 6.3, for the strategy of the scripts |
+| `StyleLoader` | WordPress 3.6 |
+| `AssetLoader` | The versions of the loaders it uses |
+| `ScriptModuleLoader` | WordPress 6.5 |
+| `ScriptModule` with `Translations` | WordPress 7.0, for `wp_set_script_module_translations()` |
 
 ### The URL of a file
 
@@ -111,7 +170,7 @@ $url = (new ThemeFileUrl())->url(new SplFileInfo(get_stylesheet_directory() . '/
 
 ### Without the core
 
-`ScriptLoader` and `StyleLoader` call the `ScriptRegistry` and the `StyleRegistry`, `Core\CoreScriptRegistry` and `Core\CoreStyleRegistry` by default. Pass your own registry to test the code that loads the assets without the core.
+`ScriptLoader`, `StyleLoader` and `ScriptModuleLoader` call the `ScriptRegistry`, the `StyleRegistry` and the `ScriptModuleRegistry`, `Core\CoreScriptRegistry`, `Core\CoreStyleRegistry` and `Core\CoreScriptModuleRegistry` by default. Pass your own registry to test the code that loads the assets without the core.
 
 ## Development
 

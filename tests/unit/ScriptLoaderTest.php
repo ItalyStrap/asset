@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItalyStrap\Asset\Tests\Unit;
 
 use Codeception\Test\Unit;
+use ItalyStrap\Asset\AssetStatus;
 use ItalyStrap\Asset\Dependencies;
 use ItalyStrap\Asset\FixedVersion;
 use ItalyStrap\Asset\Handle;
@@ -94,6 +95,47 @@ final class ScriptLoaderTest extends Unit
         $this->load(new Script(new Handle('my-script'), self::URL, translations: new Translations('my-domain')));
 
         $this->assertSame(['translate', 'my-script', 'my-domain', ''], $this->registry->calls[1]);
+    }
+
+    #[Test]
+    public function itReadsTheStatusOfAHandle(): void
+    {
+        $this->registry->statuses = ['my-script' => [AssetStatus::Registered]];
+        $loader = new ScriptLoader($this->registry);
+
+        $this->assertTrue($loader->is(new Handle('my-script'), AssetStatus::Registered));
+        $this->assertFalse($loader->is(new Handle('my-script'), AssetStatus::Enqueued));
+        $this->assertFalse($loader->is(new Handle('other-script'), AssetStatus::Registered));
+    }
+
+    #[Test]
+    public function itPrintsARegisteredScript(): void
+    {
+        $this->registry->statuses = ['my-script' => [AssetStatus::Registered]];
+
+        (new ScriptLoader($this->registry))->print(new Handle('my-script'), new Handle('other-script'));
+
+        $this->assertSame([
+            ['is', 'my-script', 'registered'],
+            ['print', 'my-script'],
+            ['is', 'other-script', 'registered'],
+        ], $this->registry->calls);
+    }
+
+    #[Test]
+    public function itDequeuesDeregistersAndLocalizesAScript(): void
+    {
+        $loader = new ScriptLoader($this->registry);
+
+        $loader->localize(new Handle('my-script'), 'myScript', ['url' => 'https://example.com']);
+        $loader->dequeue(new Handle('my-script'));
+        $loader->deregister(new Handle('my-script'));
+
+        $this->assertSame([
+            ['localize', 'my-script', 'myScript', ['url' => 'https://example.com']],
+            ['dequeue', 'my-script'],
+            ['deregister', 'my-script'],
+        ], $this->registry->calls);
     }
 
     private function load(Script $script): void

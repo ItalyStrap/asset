@@ -6,6 +6,8 @@ namespace ItalyStrap\Asset;
 
 /**
  * Where the scripts are registered, the core in Core\CoreScriptRegistry.
+ *
+ * Needs WordPress 6.3 or later, for the loading strategy of the scripts.
  */
 interface ScriptRegistry
 {
@@ -45,4 +47,33 @@ interface ScriptRegistry
      * @param non-empty-string $handle
      */
     public function enqueue(string $handle): void;
+
+    /**
+     * @param non-empty-string $handle
+     */
+    public function is(string $handle, AssetStatus $status): bool;
+
+    /**
+     * Prints the handle and its dependencies now.
+     *
+     * @param non-empty-string $handle
+     */
+    public function print(string $handle): void;
+
+    /**
+     * @param non-empty-string $handle
+     */
+    public function dequeue(string $handle): void;
+
+    /**
+     * @param non-empty-string $handle
+     */
+    public function deregister(string $handle): void;
+
+    /**
+     * @param non-empty-string $handle
+     * @param non-empty-string $objectName The global object of the data, like myPlugin.
+     * @param array<string, mixed> $data
+     */
+    public function localize(string $handle, string $objectName, array $data): void;
 }

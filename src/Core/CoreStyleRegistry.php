@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Core;
 
+use ItalyStrap\Asset\AssetStatus;
 use ItalyStrap\Asset\StyleRegistry;
 
 /**
  * The styles of the core, one function for each call, the integration suite tests it.
+ *
+ * Needs WordPress 3.6 or later.
  */
 final readonly class CoreStyleRegistry implements StyleRegistry
 {
@@ -34,5 +37,25 @@ final readonly class CoreStyleRegistry implements StyleRegistry
     public function enqueue(string $handle): void
     {
         \wp_enqueue_style($handle);
+    }
+
+    public function is(string $handle, AssetStatus $status): bool
+    {
+        return \wp_style_is($handle, $status->value);
+    }
+
+    public function print(string $handle): void
+    {
+        \wp_print_styles([$handle]);
+    }
+
+    public function dequeue(string $handle): void
+    {
+        \wp_dequeue_style($handle);
+    }
+
+    public function deregister(string $handle): void
+    {
+        \wp_deregister_style($handle);
     }
 }
