@@ -9,8 +9,11 @@ use ItalyStrap\Asset\AssetLoader;
 use ItalyStrap\Asset\Handle;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\ScriptLoader;
+use ItalyStrap\Asset\ScriptModule;
+use ItalyStrap\Asset\ScriptModuleLoader;
 use ItalyStrap\Asset\Style;
 use ItalyStrap\Asset\StyleLoader;
+use ItalyStrap\Asset\Tests\Unit\Fake\ScriptModuleRegistrySpy;
 use ItalyStrap\Asset\Tests\Unit\Fake\ScriptRegistrySpy;
 use ItalyStrap\Asset\Tests\Unit\Fake\StyleRegistrySpy;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,5 +37,17 @@ final class AssetLoaderTest extends Unit
             ['first-style', 'first-style', 'second-style', 'second-style'],
             \array_column($styles->calls, 1)
         );
+    }
+
+    #[Test]
+    public function itLoadsTheScriptModules(): void
+    {
+        $modules = new ScriptModuleRegistrySpy();
+
+        (new AssetLoader(modules: new ScriptModuleLoader($modules)))->load(
+            new ScriptModule(new Handle('my-module'), 'https://example.com/view.js'),
+        );
+
+        $this->assertSame(['register', 'enqueue'], \array_column($modules->calls, 0));
     }
 }

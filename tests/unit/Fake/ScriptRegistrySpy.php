@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Tests\Unit\Fake;
 
+use ItalyStrap\Asset\AssetStatus;
 use ItalyStrap\Asset\ScriptRegistry;
 
 /**
@@ -13,6 +14,9 @@ final class ScriptRegistrySpy implements ScriptRegistry
 {
     /** @var list<array<int, mixed>> */
     public array $calls = [];
+
+    /** @var array<string, list<AssetStatus>> The statuses of each handle, read by is(). */
+    public array $statuses = [];
 
     public function register(
         string $handle,
@@ -42,5 +46,32 @@ final class ScriptRegistrySpy implements ScriptRegistry
     public function enqueue(string $handle): void
     {
         $this->calls[] = ['enqueue', $handle];
+    }
+
+    public function is(string $handle, AssetStatus $status): bool
+    {
+        $this->calls[] = ['is', $handle, $status->value];
+
+        return \in_array($status, $this->statuses[$handle] ?? [], true);
+    }
+
+    public function print(string $handle): void
+    {
+        $this->calls[] = ['print', $handle];
+    }
+
+    public function dequeue(string $handle): void
+    {
+        $this->calls[] = ['dequeue', $handle];
+    }
+
+    public function deregister(string $handle): void
+    {
+        $this->calls[] = ['deregister', $handle];
+    }
+
+    public function localize(string $handle, string $objectName, array $data): void
+    {
+        $this->calls[] = ['localize', $handle, $objectName, $data];
     }
 }

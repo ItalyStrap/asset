@@ -14,7 +14,7 @@ use ItalyStrap\Event\SubscriberInterface;
 final readonly class AssetsSubscriber implements SubscriberInterface
 {
     /**
-     * @param list<Script|Style> $assets
+     * @param list<Script|Style|ScriptModule> $assets
      */
     public function __construct(
         private AssetLoader $loader,

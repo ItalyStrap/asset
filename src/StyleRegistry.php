@@ -37,4 +37,26 @@ interface StyleRegistry
      * @param non-empty-string $handle
      */
     public function enqueue(string $handle): void;
+
+    /**
+     * @param non-empty-string $handle
+     */
+    public function is(string $handle, AssetStatus $status): bool;
+
+    /**
+     * Prints the handle and its dependencies now.
+     *
+     * @param non-empty-string $handle
+     */
+    public function print(string $handle): void;
+
+    /**
+     * @param non-empty-string $handle
+     */
+    public function dequeue(string $handle): void;
+
+    /**
+     * @param non-empty-string $handle
+     */
+    public function deregister(string $handle): void;
 }

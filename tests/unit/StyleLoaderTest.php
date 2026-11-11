@@ -7,6 +7,7 @@ namespace ItalyStrap\Asset\Tests\Unit;
 use Codeception\Test\Unit;
 use ItalyStrap\Asset\Dependencies;
 use ItalyStrap\Asset\FixedVersion;
+use ItalyStrap\Asset\AssetStatus;
 use ItalyStrap\Asset\Handle;
 use ItalyStrap\Asset\Style;
 use ItalyStrap\Asset\StyleLoader;
@@ -62,6 +63,41 @@ final class StyleLoaderTest extends Unit
         $this->load(new Style(new Handle('my-style'), self::URL, condition: new When(static fn (): bool => false)));
 
         $this->assertSame(['register'], \array_column($this->registry->calls, 0));
+    }
+
+    #[Test]
+    public function itReadsTheStatusOfAHandle(): void
+    {
+        $this->registry->statuses = ['my-style' => [AssetStatus::Registered, AssetStatus::Enqueued]];
+        $loader = new StyleLoader($this->registry);
+
+        $this->assertTrue($loader->is(new Handle('my-style'), AssetStatus::Enqueued));
+        $this->assertFalse($loader->is(new Handle('my-style'), AssetStatus::Done));
+    }
+
+    #[Test]
+    public function itPrintsARegisteredStyle(): void
+    {
+        $this->registry->statuses = ['my-style' => [AssetStatus::Registered]];
+
+        (new StyleLoader($this->registry))->print(new Handle('other-style'), new Handle('my-style'));
+
+        $this->assertSame([
+            ['is', 'other-style', 'registered'],
+            ['is', 'my-style', 'registered'],
+            ['print', 'my-style'],
+        ], $this->registry->calls);
+    }
+
+    #[Test]
+    public function itDequeuesAndDeregistersAStyle(): void
+    {
+        $loader = new StyleLoader($this->registry);
+
+        $loader->dequeue(new Handle('my-style'));
+        $loader->deregister(new Handle('my-style'));
+
+        $this->assertSame([['dequeue', 'my-style'], ['deregister', 'my-style']], $this->registry->calls);
     }
 
     private function load(Style $style): void

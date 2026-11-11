@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace ItalyStrap\Asset\Tests\Integration;
 
+use ItalyStrap\Asset\AssetStatus;
 use ItalyStrap\Asset\Dependencies;
 use ItalyStrap\Asset\FixedVersion;
 use ItalyStrap\Asset\Handle;
 use ItalyStrap\Asset\InlineScript;
 use ItalyStrap\Asset\NoVersion;
 use ItalyStrap\Asset\Position;
+use ItalyStrap\Asset\RegisterOnly;
 use ItalyStrap\Asset\Script;
 use ItalyStrap\Asset\ScriptLoader;
 use ItalyStrap\Asset\ScriptLoading;
@@ -127,6 +129,51 @@ final class ScriptLoaderTest extends WPTestCase
 
         $this->assertFalse(\wp_scripts()->registered['my-group']->src);
         $this->assertTrue(\wp_script_is('my-group', 'enqueued'));
+    }
+
+    #[Test]
+    public function itReadsTheStatusAndPrintsARegisteredScriptOnce(): void
+    {
+        $loader = new ScriptLoader();
+        $loader->load(new Script(new Handle('my-script'), self::URL, condition: new RegisterOnly()));
+
+        $this->assertTrue($loader->is(new Handle('my-script'), AssetStatus::Registered));
+        $this->assertFalse($loader->is(new Handle('my-script'), AssetStatus::Enqueued));
+        $this->assertFalse($loader->is(new Handle('my-script'), AssetStatus::Done));
+
+        $html = $this->printed(static fn () => $loader->print(new Handle('my-script'), new Handle('missing')));
+
+        $this->assertStringContainsString(self::URL, $html);
+        $this->assertTrue($loader->is(new Handle('my-script'), AssetStatus::Done));
+        $this->assertSame('', $this->printed(static fn () => $loader->print(new Handle('my-script'))));
+    }
+
+    #[Test]
+    public function itLocalizesDequeuesAndDeregistersAScript(): void
+    {
+        $loader = new ScriptLoader();
+        $loader->load(new Script(new Handle('my-script'), self::URL));
+
+        $loader->localize(new Handle('my-script'), 'myScript', ['url' => 'https://example.com']);
+        $this->assertStringContainsString(
+            'var myScript = {"url":"https://example.com"};',
+            (string) \wp_scripts()->get_data('my-script', 'data')
+        );
+
+        $loader->dequeue(new Handle('my-script'));
+        $this->assertFalse($loader->is(new Handle('my-script'), AssetStatus::Enqueued));
+        $this->assertTrue($loader->is(new Handle('my-script'), AssetStatus::Registered));
+
+        $loader->deregister(new Handle('my-script'));
+        $this->assertFalse($loader->is(new Handle('my-script'), AssetStatus::Registered));
+    }
+
+    private function printed(callable $print): string
+    {
+        \ob_start();
+        $print();
+
+        return (string) \ob_get_clean();
     }
 
     /**
