@@ -6,6 +6,8 @@ namespace ItalyStrap\Asset;
 
 /**
  * Where the styles are registered, the core in Core\CoreStyleRegistry.
+ *
+ * Needs WordPress 3.6 or later.
  */
 interface StyleRegistry
 {

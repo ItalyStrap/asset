@@ -8,6 +8,8 @@ use InvalidArgumentException;
 
 /**
  * A script module, an ES module loaded with an import map, like the view script of a block.
+ *
+ * Needs WordPress 6.5 or later, the translations need 7.0.
  */
 final readonly class ScriptModule
 {

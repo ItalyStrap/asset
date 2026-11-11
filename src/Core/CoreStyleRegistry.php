@@ -9,6 +9,8 @@ use ItalyStrap\Asset\StyleRegistry;
 
 /**
  * The styles of the core, one function for each call, the integration suite tests it.
+ *
+ * Needs WordPress 3.6 or later.
  */
 final readonly class CoreStyleRegistry implements StyleRegistry
 {

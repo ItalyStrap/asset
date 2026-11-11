@@ -6,6 +6,8 @@ namespace ItalyStrap\Asset;
 
 /**
  * Loads the scripts, the styles and the script modules, call it on the event of the assets, see EventName.
+ *
+ * Needs the WordPress of its loaders: 6.3 for the scripts, 3.6 for the styles, 6.5 for the script modules.
  */
 final readonly class AssetLoader
 {

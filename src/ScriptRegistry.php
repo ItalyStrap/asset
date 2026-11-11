@@ -6,6 +6,8 @@ namespace ItalyStrap\Asset;
 
 /**
  * Where the scripts are registered, the core in Core\CoreScriptRegistry.
+ *
+ * Needs WordPress 6.3 or later, for the loading strategy of the scripts.
  */
 interface ScriptRegistry
 {

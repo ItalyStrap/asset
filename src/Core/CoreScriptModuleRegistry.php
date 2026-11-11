@@ -8,6 +8,8 @@ use ItalyStrap\Asset\ScriptModuleRegistry;
 
 /**
  * The script modules of the core, one function for each call, the integration suite tests it.
+ *
+ * Needs WordPress 6.5 or later, the translations need 7.0.
  */
 final readonly class CoreScriptModuleRegistry implements ScriptModuleRegistry
 {
@@ -16,6 +18,9 @@ final readonly class CoreScriptModuleRegistry implements ScriptModuleRegistry
         \wp_register_script_module($id, $source, $dependencies, $version);
     }
 
+    /**
+     * Needs WordPress 7.0, for wp_set_script_module_translations().
+     */
     public function translate(string $id, string $domain, string $path): void
     {
         \wp_set_script_module_translations($id, $domain, $path);

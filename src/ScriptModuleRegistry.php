@@ -6,6 +6,8 @@ namespace ItalyStrap\Asset;
 
 /**
  * Where the script modules are registered, the core in Core\CoreScriptModuleRegistry.
+ *
+ * Needs WordPress 6.5 or later, the translations need 7.0.
  */
 interface ScriptModuleRegistry
 {

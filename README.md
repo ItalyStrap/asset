@@ -146,11 +146,13 @@ add_action(EventName::FRONT_END, static fn () => (new AssetLoader())->load($view
 
 ### The WordPress functions
 
-The package calls the functions of the core without checking them, the code that uses it checks the version of the core when it supports an older one.
+The package calls the functions of the core without checking them, the code that uses it checks the version of the core when it supports an older one. The docblock of each class says the same.
 
 | Class | Needs |
 | --- | --- |
-| `ScriptLoader`, `StyleLoader` | WordPress 6.3, for the strategy of the scripts |
+| `ScriptLoader` | WordPress 6.3, for the strategy of the scripts |
+| `StyleLoader` | WordPress 3.6 |
+| `AssetLoader` | The versions of the loaders it uses |
 | `ScriptModuleLoader` | WordPress 6.5 |
 | `ScriptModule` with `Translations` | WordPress 7.0, for `wp_set_script_module_translations()` |
 

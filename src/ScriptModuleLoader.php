@@ -8,6 +8,8 @@ use ItalyStrap\Asset\Core\CoreScriptModuleRegistry;
 
 /**
  * Registers a script module with its translations, then enqueues it when its condition is satisfied.
+ *
+ * Needs WordPress 6.5 or later, the translations need 7.0.
  */
 final readonly class ScriptModuleLoader
 {

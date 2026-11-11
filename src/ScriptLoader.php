@@ -8,6 +8,8 @@ use ItalyStrap\Asset\Core\CoreScriptRegistry;
 
 /**
  * Registers a script with all its parts, then enqueues it when its condition is satisfied.
+ *
+ * Needs WordPress 6.3 or later, for the loading strategy of the scripts.
  */
 final readonly class ScriptLoader
 {

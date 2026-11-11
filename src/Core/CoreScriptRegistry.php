@@ -9,6 +9,8 @@ use ItalyStrap\Asset\ScriptRegistry;
 
 /**
  * The scripts of the core, one function for each call, the integration suite tests it.
+ *
+ * Needs WordPress 6.3 or later, for the loading strategy of the scripts.
  */
 final readonly class CoreScriptRegistry implements ScriptRegistry
 {

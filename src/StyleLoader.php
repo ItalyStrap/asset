@@ -8,6 +8,8 @@ use ItalyStrap\Asset\Core\CoreStyleRegistry;
 
 /**
  * Registers a style with its inline styles, then enqueues it when its condition is satisfied.
+ *
+ * Needs WordPress 3.6 or later.
  */
 final readonly class StyleLoader
 {
